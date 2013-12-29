@@ -1213,7 +1213,7 @@ namespace Krkadoni.EnigmaSettings
                         sData[10] = tmpName;
                         Log.Debug(string.Format("Workaround completed with result {0}", tmpName));
                     }
-                    string fName = sData[10];
+                    string fName = Path.GetFileName(sData[10]);
                     if (fName == null) return;
                     IFileBouquet subBqt = ReadFileBouquet(new FileInfo(Path.Combine(folder.FullName, fName)), ref settings);
                     if (settings.SettingsVersion == Enums.SettingsVersion.Enigma1
