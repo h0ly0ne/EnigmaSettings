@@ -1,7 +1,7 @@
 EnigmaSettings
 ==============
 
-Enigma1 &amp; Enigma2 settings management utility
+Enigma1 & Enigma2 settings management utility
 
 EnigmaSettings is open source library for Enigma1 & Enigma2 settings management.
 It does all heavy work with settings loading, manipulation and saving so you don’t have to.
@@ -30,6 +30,9 @@ Main Features
 
 Examples
 ==============
+
+Too see library used in a real application check out SESE aplication available on https://github.com/shaxxx/SESE
+
 ```C#
 // C#
 
