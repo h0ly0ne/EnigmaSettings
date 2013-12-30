@@ -12,7 +12,8 @@ It’s written in C# and compatible with Mono 2.8 and higher.
 
 Contributions and bugfixes are welcomed.
 
-Additional info and support on http://www.krkadoni.com/.
+- Additional info and support on http://www.krkadoni.com/.
+- Help file (.chm): http://www.krkadoni.com/EnigmaSettingsHelp.zip
 
 Main Features
 ==============
