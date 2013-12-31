@@ -12,13 +12,13 @@ namespace Krkadoni.EnigmaSettings
     {
         private string _description = string.Empty;
 
-        private int _markerNumber;
+        private string _markerNumber = "0";
 
         #region "IEditable"
 
         private bool _isEditing;
         private string _mDescription;
-        private int _mMarkerNumber;
+        private string _mMarkerNumber = "0";
 
         public override void BeginEdit()
         {
@@ -53,10 +53,14 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="markerNumber">Marker sequential number trough entire settings</param>
         /// <remarks></remarks>
         /// <exception cref="ArgumentNullException">Throws argument null exception if description is null</exception>
-        public BouquetItemMarker(string description, int markerNumber)
+        public BouquetItemMarker(string description, string markerNumber)
         {
             if (description == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("description");
+
+            if (markerNumber == null)
+                markerNumber = "0";
+
             Description = description.Trim();
             MarkerNumber = markerNumber;
         }
@@ -99,13 +103,13 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Default value is 0</remarks>
-        public int MarkerNumber
+        public string MarkerNumber
         {
             get { return _markerNumber; }
             set
             {
                 if (value == _markerNumber) return;
-                _markerNumber = value;
+                _markerNumber = value ?? "0";
                 OnPropertyChanged("MarkerNumber");
             }
         }

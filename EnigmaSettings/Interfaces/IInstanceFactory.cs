@@ -20,7 +20,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
         IBouquetItemFileBouquet InitNewBouquetItemFileBouquet(IFileBouquet bouquet);
 
-        IBouquetItemMarker InitNewBouquetItemMarker(string description, int markerNumber);
+        IBouquetItemMarker InitNewBouquetItemMarker(string description, string markerNumber);
 
         IBouquetItemService InitNewBouquetItemService(string bouquetLine);
 

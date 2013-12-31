@@ -12,7 +12,7 @@ namespace Krkadoni.EnigmaSettings
             return new FileBouquet();
         }
 
-        public IBouquetItemMarker InitNewBouquetItemMarker(string description, int markerNumber)
+        public IBouquetItemMarker InitNewBouquetItemMarker(string description, string markerNumber)
         {
             return new BouquetItemMarker(description, markerNumber);
         }

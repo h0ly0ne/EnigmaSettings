@@ -681,11 +681,8 @@ namespace Krkadoni.EnigmaSettings
                 IList<IBouquetItemMarker> bim = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemMarker>().ToList();
                 for (int i = 0; i <= bim.Count - 1; i++)
                 {
-                    if (bim[i].MarkerNumber != i)
-                    {
-                        bim[i].MarkerNumber = i;
-                        Log.Debug(string.Format("Marker {0} now has number {1} ", bim[i].Description, i));
-                    }
+                        bim[i].MarkerNumber = i.ToString("X");
+                        Log.Debug(string.Format("Marker {0} now has number {1} (integer value {2}) ", bim[i].Description, i.ToString("X"), i));
                 }
                 Log.Debug(string.Format("Finished renumbering markers"));
             }

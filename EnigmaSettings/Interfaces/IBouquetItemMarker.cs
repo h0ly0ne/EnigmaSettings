@@ -19,6 +19,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        int MarkerNumber { get; set; }
+        string MarkerNumber { get; set; }
     }
 }

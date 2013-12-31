@@ -1362,15 +1362,15 @@ namespace Krkadoni.EnigmaSettings
                     description = description.Substring(12);
                 }
                 string[] sData = bouquetLine.Split(':');
-                IBouquetItemMarker bqim = Factory.InitNewBouquetItemMarker(description, Convert.ToInt32(sData[2]));
+                IBouquetItemMarker bqim = Factory.InitNewBouquetItemMarker(description, sData[2]);
                 bqim.FavoritesTypeFlag = sData[0];
                 bqim.LineSpecifierFlag = sData[1];
                 return bqim;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw new SettingsException(string.Format(Resources.SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_,
-                    bouquetLine));
+                    bouquetLine),ex);
             }
         }
 
@@ -1410,10 +1410,10 @@ namespace Krkadoni.EnigmaSettings
                 bqis.LineSpecifierFlag = sData[1];
                 return bqis;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw new SettingsException(string.Format(
-                    Resources.SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_, bouquetLine));
+                    Resources.SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_, bouquetLine),ex);
             }
         }
 
@@ -1622,13 +1622,14 @@ namespace Krkadoni.EnigmaSettings
                                 int orderNumber = Int32.Parse(sData[4], NumberStyles.HexNumber);
                                 sLocked.Add(Factory.InitNewBouquetItemBouquetsBouquet(orderNumber));
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
                                 Log.Warn(
                                     string.Format(
                                         Resources
                                             .SettingsIO_ReadServicesLocked_Unable_to_parse_bouquet_order_number__0__to_integer_for_bouquet__1__on_line__2_,
                                         sData[4], fileName.FullName, line));
+                                Log.Warn(ex.ToString());
                             }
                         }
                         else if (srv.LineSpecifierType == Enums.LineSpecifier.NormalService)
