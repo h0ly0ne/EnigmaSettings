@@ -1257,6 +1257,7 @@ namespace Krkadoni.EnigmaSettings
                                 && (
                                     (Enums.FavoritesType)Enum.Parse(typeof(Enums.FavoritesType), favoritesType) == Enums.FavoritesType.Stream
                                     || sData[10].IndexOf("//", StringComparison.InvariantCulture) > -1)
+                                    || (sData.Length == 12 && sData[11] != null)
                                 )
                             {
                                 //it's stream
