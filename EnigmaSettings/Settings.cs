@@ -1000,7 +1000,7 @@ namespace Krkadoni.EnigmaSettings
                 foreach (IBouquet bouquet in Bouquets)
                 {
                     IList<IBouquetItemService> biServices =
-                        bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => Equals(x.Service.Transponder, transponder)).ToList();
+                        bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.Service != null && Equals(x.Service.Transponder, transponder)).ToList();
                     foreach (IBouquetItemService bis in biServices)
                     {
                         bouquet.BouquetItems.Remove(bis);
