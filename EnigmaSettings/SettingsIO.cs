@@ -607,6 +607,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 OnFileLoaded(this, fileName, false);
                 throw new SettingsException(string.Format(Resources.Settings_Read_Failed_to_read_file__0__1__2_, fileName.FullName, "", ""), ex);
             }
@@ -653,6 +654,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 OnFileLoaded(this, fileName, false);
                 throw new SettingsException(string.Format(Resources.Settings_Read_Failed_to_read_file__0__1__2_, fileName.FullName, "", ""), ex);
             }
@@ -687,6 +689,7 @@ namespace Krkadoni.EnigmaSettings
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex.Message, ex);
                     throw new SettingsException(
                         string.Format(Resources.SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_, fileName), ex);
                 }
@@ -714,6 +717,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fi, false);
                 throw new SettingsException(string.Format("There was an error while writing file {0} to disk", fileName), ex);
             }
@@ -823,12 +827,14 @@ namespace Krkadoni.EnigmaSettings
                 Log.Debug(string.Format("Settings loaded with {0} services and {1} transponders", settings.Services.Count, settings.Transponders.Count));
                 return settings;
             }
-            catch (SettingsException)
+            catch (SettingsException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     string.Format(Resources.Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_, Environment.NewLine, ex.Message), ex);
             }
@@ -1136,12 +1142,14 @@ namespace Krkadoni.EnigmaSettings
                 }
                 return bqt;
             }
-            catch (SettingsException)
+            catch (SettingsException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.Settings_ReadBouquet_Failed_to_read_bouquet__0_, fileName.Name), ex);
             }
         }
@@ -1331,6 +1339,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);   
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_, bouquetLine), ex);
             }
@@ -1370,6 +1379,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_,
                     bouquetLine),ex);
             }
@@ -1413,6 +1423,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(
                     Resources.SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_, bouquetLine),ex);
             }
@@ -1506,12 +1517,14 @@ namespace Krkadoni.EnigmaSettings
                 }
                 return bqt;
             }
-            catch (SettingsException)
+            catch (SettingsException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_), ex);
             }
         }
@@ -1574,6 +1587,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
 
@@ -1646,12 +1660,14 @@ namespace Krkadoni.EnigmaSettings
                     }
                 }
             }
-            catch (SettingsException)
+            catch (SettingsException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file, ex);
             }
 
@@ -1697,6 +1713,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
 
@@ -1720,6 +1737,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
 
@@ -1771,6 +1789,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fi, false);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, Path.Combine(directory.FullName, fileName)), ex);
@@ -2185,6 +2204,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fi, false);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_, bouquetName, fileName), ex);
@@ -2754,12 +2774,14 @@ namespace Krkadoni.EnigmaSettings
 
                 WriteFile(fName, fContent.ToString(), Encoding.Default);
             }
-            catch (SystemException)
+            catch (SystemException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_, directory.FullName), ex);
             }
@@ -2867,12 +2889,14 @@ namespace Krkadoni.EnigmaSettings
 
                 WriteFile(fName, fContent.ToString(), Encoding.Default);
             }
-            catch (SystemException)
+            catch (SystemException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_, directory.FullName), ex);
             }

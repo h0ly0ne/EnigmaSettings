@@ -158,8 +158,9 @@ namespace Krkadoni.EnigmaSettings
                 {
                     return Path.GetDirectoryName(SettingsFileName);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Log.Error(ex.Message, ex);
                     return string.Empty;
                 }
             }
@@ -326,6 +327,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException("There was an error while searching for bouquets with duplicate filenames", ex);
             }
         }
@@ -409,6 +411,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites, ex);
             }
         }
@@ -448,12 +451,14 @@ namespace Krkadoni.EnigmaSettings
                     Log.Warn(string.Format("Transponder ID {0} added to xmlTransponders", tran.TransponderId));
                 }
             }
-            catch (SettingsException)
+            catch (SettingsException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders, ex);
             }
         }
@@ -497,6 +502,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     Resources.Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_services_with_transponders, ex);
             }
@@ -539,6 +545,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     Resources.Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transponders_with_satellites_, ex);
             }
@@ -595,6 +602,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
         }
@@ -664,6 +672,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
         }
@@ -688,6 +697,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_, ex);
             }
         }
@@ -752,6 +762,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_, ex);
             }
         }
@@ -841,6 +852,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers, ex);
             }
         }
@@ -865,6 +877,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets, ex);
             }
         }
@@ -892,6 +905,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveStreams_There_was_an_error_while_removing_streams, ex);
             }
         }
@@ -924,6 +938,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 if (service != null)
                 {
                     throw new SettingsException(
@@ -979,6 +994,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveServices_There_was_an_error_while_deleting_services, ex);
             }
         }
@@ -1020,6 +1036,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 if (transponder != null)
                     throw new SettingsException(
                         string.Format(Resources.Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_, transponder.TransponderId),
@@ -1087,6 +1104,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveTransponders_There_was_an_error_while_removing_transponders, ex);
             }
         }
@@ -1118,6 +1136,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveSatellite_There_was_an_error_while_removing_satellite, ex);
             }
         }
@@ -1152,6 +1171,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveSatellite_There_was_an_error_while_removing_satellite, ex);
             }
         }
@@ -1198,6 +1218,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouquet_items, ex);
             }
         }
@@ -1229,6 +1250,7 @@ namespace Krkadoni.EnigmaSettings
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     Resources.Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_namespaces_for_satellite_transponders_, ex);
             }
@@ -1291,12 +1313,14 @@ namespace Krkadoni.EnigmaSettings
                 satellite.Position = newPosition.ToString(CultureInfo.InvariantCulture);
                 Log.Debug(string.Format("Finished changing satellite position for satellite {0}", satellite.Name));
             }
-            catch (SettingsException)
+            catch (SettingsException ex)
             {
+                Log.Error(ex.Message, ex);
                 throw;
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position, ex);
             }
         }
