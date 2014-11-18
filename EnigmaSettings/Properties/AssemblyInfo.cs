@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-using log4net.Config;
 
 [assembly: AssemblyTitle("EnigmaSettings")]
 [assembly: AssemblyDescription("Enigma1 & Enigma2 settings management utility")]
@@ -36,5 +35,4 @@ using log4net.Config;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.4")]
 [assembly: AssemblyFileVersion("1.0.0.4")]
-[assembly: XmlConfigurator(ConfigFile = "EnigmaSettings.log4net", Watch = true)]
 [assembly: NeutralResourcesLanguage("en")]

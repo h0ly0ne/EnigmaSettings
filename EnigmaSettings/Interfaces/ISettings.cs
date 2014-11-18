@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using log4net;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {

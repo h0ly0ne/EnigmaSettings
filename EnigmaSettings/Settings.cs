@@ -10,7 +10,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Krkadoni.EnigmaSettings.Interfaces;
 using Krkadoni.EnigmaSettings.Properties;
-using log4net;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -97,7 +96,7 @@ namespace Krkadoni.EnigmaSettings
         private readonly IList<ITransponder> _transponders = new BindingList<ITransponder>();
 
         [NonSerialized()] 
-        private ILog _log = LogManager.GetLogger("EnigmaSettings");
+        private ILog _log;
 
         private string _settingsFileName = string.Empty;
         private Enums.SettingsVersion _settingsVersion = Enums.SettingsVersion.Unknown;
@@ -112,8 +111,6 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (_log == null)
-                    _log = LogManager.GetLogger("EnigmaSettings");
                 return _log;
             }
             set

@@ -4,8 +4,6 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using log4net;
-
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
     public interface ISettingsIO : INotifyPropertyChanged, IEditableObject

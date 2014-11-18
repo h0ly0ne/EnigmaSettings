@@ -34,10 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
@@ -50,6 +46,7 @@
     <Compile Include="BouquetItemService.cs" />
     <Compile Include="BouquetItemStream.cs" />
     <Compile Include="BouquetsBouquet.cs" />
+    <Compile Include="DebugLogger.cs" />
     <Compile Include="FileBouquet.cs" />
     <Compile Include="FileLoadedEventArgs.cs" />
     <Compile Include="FileLoadingEventArgs.cs" />
@@ -69,6 +66,7 @@
     <Compile Include="Interfaces\IFileBouquet.cs" />
     <Compile Include="Interfaces\IFlag.cs" />
     <Compile Include="Interfaces\IInstanceFactory.cs" />
+    <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Interfaces\IService.cs" />
     <Compile Include="Interfaces\ISettings.cs" />
     <Compile Include="Interfaces\ISettingsIO.cs" />
@@ -101,9 +99,6 @@
     <Compile Include="XmlSatellite.cs" />
     <Compile Include="XmlSatellitesIO.cs" />
     <Compile Include="XmlTransponder.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="log4net.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EnigmaSettings.licenseheader" />
