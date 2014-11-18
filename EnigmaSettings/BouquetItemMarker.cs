@@ -46,6 +46,19 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public new object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        #endregion
+
         /// <summary>
         ///     Initializes new marker
         /// </summary>

@@ -13,7 +13,6 @@ namespace Krkadoni.EnigmaSettings
 
         private IService _service;
 
-
         #region "IEditable"
 
         private bool _isEditing;
@@ -43,7 +42,21 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
 
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public new object Clone()
+        {
+            var bis = (IBouquetItemService) MemberwiseClone();
+            bis.Service = Service != null ? (IService)Service.Clone() : null;
+            return bis;
+        }
+
+        #endregion
+        
         /// <summary>
         ///     Initializes new bouquet item that is service
         /// </summary>

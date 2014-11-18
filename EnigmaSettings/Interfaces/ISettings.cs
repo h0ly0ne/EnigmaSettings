@@ -7,10 +7,10 @@ using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface ISettings : INotifyPropertyChanged, IEditableObject
+    public interface ISettings : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
-        ///     Log4Net instance used for logging
+        ///     Instance used for logging
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -47,7 +47,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Each satelite has coresponding xml transponders from satellites.xml file</remarks>
-        IList<IXmlSatellite> Satellites { get; }
+        IList<IXmlSatellite> Satellites { get; set; }
 
         /// <summary>
         ///     All transponders (DVBS, DVBT, DVBC) from settings file
@@ -55,7 +55,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks>These are not transponders from satellites.xml file</remarks>
-        IList<ITransponder> Transponders { get; }
+        IList<ITransponder> Transponders { get; set; }
 
         /// <summary>
         ///     All services from settings file
@@ -63,7 +63,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Each service should have corresponding transponder from services file</remarks>
-        IList<IService> Services { get; }
+        IList<IService> Services { get; set; }
 
         /// <summary>
         ///     All bouquets except the ones stored in 'bouquets' file from Enigma 1
@@ -71,7 +71,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        IList<IBouquet> Bouquets { get; }
+        IList<IBouquet> Bouquets { get; set; }
 
         /// <summary>
         ///     Returns list of satellite transponders from list with all transponders
@@ -281,5 +281,12 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="newPosition">New orbital position as integer as seen in satellites.xml file, IE. Astra 19.2 = 192</param>
         /// <remarks></remarks>
         void ChangeSatellitePosition(IXmlSatellite satellite, int newPosition);
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        object ShallowCopy();
+
     }
 }

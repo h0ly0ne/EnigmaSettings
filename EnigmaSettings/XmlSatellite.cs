@@ -67,7 +67,23 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private readonly IList<IXmlTransponder> _transponders = new BindingList<IXmlTransponder>();
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var sat = (IXmlSatellite)MemberwiseClone();
+           sat.Transponders = new List<IXmlTransponder>();
+            foreach (var xmlTransponder in Transponders)
+            {
+                if (xmlTransponder != null)
+                    sat.Transponders.Add((IXmlTransponder)xmlTransponder.Clone());
+            }
+            return sat;
+        }
+
+        private IList<IXmlTransponder> _transponders = new BindingList<IXmlTransponder>();
         private string _flags;
         private string _name = string.Empty;
         private string _position = string.Empty;
@@ -169,15 +185,22 @@ namespace Krkadoni.EnigmaSettings
         public IList<IXmlTransponder> Transponders
         {
             get { return _transponders; }
+            set
+            {
+                value = value ?? new List<IXmlTransponder>();
+                _transponders = value;
+                OnPropertyChanged("Transponders");
+            }
         }
 
         /// <summary>
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        public IXmlSatellite ShallowCopy()
+        public object ShallowCopy()
         {
-            return (IXmlSatellite)MemberwiseClone();
+            return MemberwiseClone();
         }
+
     }
 }

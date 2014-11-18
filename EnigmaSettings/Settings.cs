@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using Krkadoni.EnigmaSettings.Interfaces;
 using Krkadoni.EnigmaSettings.Properties;
 
@@ -88,31 +87,72 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var settings = (ISettings)MemberwiseClone();
+            settings.Bouquets = new List<IBouquet>();
+            settings.Satellites = new List<IXmlSatellite>();
+            settings.Services = new List<IService>();
+            settings.Transponders = new List<ITransponder>();
+
+            foreach (var bouquet in Bouquets)
+            {
+                if (bouquet != null)
+                    settings.Bouquets.Add((IBouquet)bouquet.Clone());
+            }
+
+            foreach (var satellite in Satellites)
+            {
+                if (satellite != null)
+                    settings.Satellites.Add((IXmlSatellite)satellite.Clone());
+            }
+
+            foreach (var service in Services)
+            {
+                if (service != null)
+                    settings.Services.Add((IService)service.Clone());
+            }
+
+            foreach (var transponder in Transponders)
+            {
+                if (transponder != null)
+                    settings.Transponders.Add((ITransponder)transponder.Clone());
+            }
+
+            return settings;
+        }
+
+        #endregion
+        
         #region "Properties"
 
-        private readonly IList<IBouquet> _bouquets = new BindingList<IBouquet>();
-        private readonly IList<IXmlSatellite> _satellites = new BindingList<IXmlSatellite>();
-        private readonly IList<IService> _services = new BindingList<IService>();
-        private readonly IList<ITransponder> _transponders = new BindingList<ITransponder>();
+        private  IList<IBouquet> _bouquets = new BindingList<IBouquet>();
+        private  IList<IXmlSatellite> _satellites = new BindingList<IXmlSatellite>();
+        private  IList<IService> _services = new BindingList<IService>();
+        private  IList<ITransponder> _transponders = new BindingList<ITransponder>();
 
         [NonSerialized()] 
         private ILog _log;
+        private static readonly ILog _nullLogger = new NullLogger();
 
         private string _settingsFileName = string.Empty;
         private Enums.SettingsVersion _settingsVersion = Enums.SettingsVersion.Unknown;
 
         /// <summary>
-        ///     Log4Net instance used for logging
+        ///     Instance used for logging
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
         public ILog Log
         {
-            get
-            {
-                return _log;
-            }
+            get { return _log ?? _nullLogger; }
             set
             {
                 if (value == null) return;
@@ -189,6 +229,13 @@ namespace Krkadoni.EnigmaSettings
         public IList<IXmlSatellite> Satellites
         {
             get { return _satellites; }
+            set
+            {
+                if (value == null)
+                    value = new List<IXmlSatellite>();
+                _satellites = value;
+                OnPropertyChanged("Satellites");
+            }
         }
 
         /// <summary>
@@ -200,6 +247,13 @@ namespace Krkadoni.EnigmaSettings
         public IList<ITransponder> Transponders
         {
             get { return _transponders; }
+            set
+            {
+                if (value == null)
+                    value = new List<ITransponder>();
+                _transponders = value;
+                OnPropertyChanged("Transponders");
+            }
         }
 
         /// <summary>
@@ -211,6 +265,13 @@ namespace Krkadoni.EnigmaSettings
         public IList<IService> Services
         {
             get { return _services; }
+            set
+            {
+                if (value == null)
+                    value = new List<IService>();
+                _services = value;
+                OnPropertyChanged("Services");
+            }
         }
 
         /// <summary>
@@ -222,6 +283,13 @@ namespace Krkadoni.EnigmaSettings
         public IList<IBouquet> Bouquets
         {
             get { return _bouquets; }
+            set
+            {
+                if (value == null)
+                    value = new List<IBouquet>();
+                _bouquets = value;
+                OnPropertyChanged("Bouquets");
+            }
         }
 
         #endregion
@@ -1320,6 +1388,15 @@ namespace Krkadoni.EnigmaSettings
                 Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position, ex);
             }
+        }
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
         }
 
         #endregion

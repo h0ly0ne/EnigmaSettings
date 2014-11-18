@@ -1,11 +1,12 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
+using System;
 using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface IFlag : INotifyPropertyChanged, IEditableObject
+    public interface IFlag : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
         ///     Type of the flag from 3rd line of service data in lamedb
@@ -54,5 +55,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns>0 if flag is not numeric</returns>
         /// <remarks></remarks>
         int FlagInt { get; set; }
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        object ShallowCopy();
     }
 }

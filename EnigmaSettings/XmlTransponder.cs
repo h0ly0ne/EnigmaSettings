@@ -75,6 +75,19 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        #endregion
+
         private string _fecInner;
         private string _frequency;
         private string _inversion;
@@ -249,9 +262,9 @@ namespace Krkadoni.EnigmaSettings
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        public IXmlTransponder ShallowCopy()
+        public object ShallowCopy()
         {
-            return (IXmlTransponder)MemberwiseClone();
+            return MemberwiseClone();
         }
 
     }

@@ -1,12 +1,13 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface IBouquet : INotifyPropertyChanged, IEditableObject
+    public interface IBouquet : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
         ///     Type of settings file
@@ -22,7 +23,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        IList<IBouquetItem> BouquetItems { get; }
+        IList<IBouquetItem> BouquetItems { get; set; }
 
         /// <summary>
         ///     Bouquet name
@@ -31,5 +32,12 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         string Name { get; set; }
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        object ShallowCopy();
+
     }
 }

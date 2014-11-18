@@ -1,11 +1,12 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
+using System;
 using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface IXmlTransponder : INotifyPropertyChanged, IEditableObject
+    public interface IXmlTransponder : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
         ///     Frequency in Hertz
@@ -90,7 +91,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        IXmlTransponder ShallowCopy();
+        object ShallowCopy();
 
     }
 }

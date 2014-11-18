@@ -53,6 +53,19 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return ShallowCopy();
+        }
+
+        #endregion
+
         // ReSharper disable InconsistentNaming
         protected string _favoritesTypeFlag = "1";
         protected string _lineSpecifierFlag = "0";
@@ -186,9 +199,10 @@ namespace Krkadoni.EnigmaSettings
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        public IBouquetItem ShallowCopy()
+        public object ShallowCopy()
         {
             return (IBouquetItem)MemberwiseClone();
         }
+
     }
 }

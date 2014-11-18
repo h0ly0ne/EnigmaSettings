@@ -62,8 +62,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         #endregion
-        
-        
+       
         private string _bandwidth = "0";
         private string _fecHigh = "0";
         private string _fecLow = "0";
@@ -572,5 +571,6 @@ namespace Krkadoni.EnigmaSettings
                 "/"
             });
         }
+
     }
 }

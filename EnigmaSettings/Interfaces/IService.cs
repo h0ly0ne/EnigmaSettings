@@ -1,13 +1,14 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface IService : INotifyPropertyChanged, IEditableObject
+    public interface IService : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
         ///     Service ID
@@ -121,6 +122,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        IService ShallowCopy();
+        object ShallowCopy();
     }
 }

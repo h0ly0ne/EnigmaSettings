@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface IXmlSatellite : INotifyPropertyChanged, IEditableObject
+    public interface IXmlSatellite : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
         ///     List of transponders from xml file
@@ -14,7 +15,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        IList<IXmlTransponder> Transponders { get; }
+        IList<IXmlTransponder> Transponders { get; set; }
 
         /// <summary>
         ///     Satellite name from satellites.xml file
@@ -52,6 +53,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        IXmlSatellite ShallowCopy();
+        object ShallowCopy();
     }
 }

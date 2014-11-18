@@ -45,6 +45,21 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public new object Clone()
+        {
+            var bibb = (IBouquetItemBouquetsBouquet)MemberwiseClone();
+            bibb.Bouquet = Bouquet != null ? (IBouquetsBouquet)Bouquet.Clone() : null;
+            return bibb;
+        }
+
+        #endregion
+
         /// <summary>
         ///     Initializes new instance from Bouquet instance and sets corresponding properties
         /// </summary>

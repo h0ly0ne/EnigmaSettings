@@ -9,7 +9,7 @@ using Krkadoni.EnigmaSettings.Interfaces;
 namespace Krkadoni.EnigmaSettings
 {
     [Serializable]
-    public class BouquetsBouquet : IBouquetsBouquet, INotifyPropertyChanged
+    public class BouquetsBouquet : IBouquetsBouquet
     {
         #region "INotifyPropertyChanged"
 
@@ -61,7 +61,26 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private readonly IList<IBouquetItem> _bouquetItems = new BindingList<IBouquetItem>();
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var bb = new BouquetsBouquet {Name = Name, Locked = Locked};
+            bb.BouquetItems = new List<IBouquetItem>();
+            foreach (var bouquetItem in BouquetItems)
+            {
+                bb.BouquetItems.Add((IBouquetItem)bouquetItem.Clone());
+            }
+            return bb;
+        }
+
+        #endregion
+
+        private IList<IBouquetItem> _bouquetItems = new BindingList<IBouquetItem>();
         private bool _locked;
         private string _name = string.Empty;
 
@@ -74,6 +93,12 @@ namespace Krkadoni.EnigmaSettings
         public IList<IBouquetItem> BouquetItems
         {
             get { return _bouquetItems; }
+            set {                 
+                if (value == null)
+                    value = new List<IBouquetItem>();
+                _bouquetItems = value;
+                OnPropertyChanged("BouquetItems");
+            }
         }
 
         /// <summary>
@@ -107,6 +132,11 @@ namespace Krkadoni.EnigmaSettings
             }
         }
 
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
+        }
+
         /// <summary>
         ///     Determines if bouquet is locked.
         /// </summary>
@@ -123,6 +153,5 @@ namespace Krkadoni.EnigmaSettings
                 OnPropertyChanged("Locked");
             }
         }
-
     }
 }

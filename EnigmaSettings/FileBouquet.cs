@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +8,7 @@ using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-   [Serializable]
+    [Serializable]
     public class FileBouquet : IFileBouquet, INotifyPropertyChanged
     {
         #region "INotifyPropertyChanged"
@@ -25,7 +25,7 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private readonly IList<IBouquetItem> _bouquetItems = new BindingList<IBouquetItem>();
+        private IList<IBouquetItem> _bouquetItems = new BindingList<IBouquetItem>();
         private string _fileName = string.Empty;
         private string _name = string.Empty;
 
@@ -61,6 +61,26 @@ namespace Krkadoni.EnigmaSettings
                 BouquetItems.Add(bouquetItem);
             }
             _isEditing = false;
+        }
+
+        #endregion
+
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs deep Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var fb = (IFileBouquet)MemberwiseClone();
+            fb.BouquetItems = new List<IBouquetItem>();
+            foreach (var bouquetItem in BouquetItems)
+            {
+                if (bouquetItem != null)
+                    fb.BouquetItems.Add((IBouquetItem)bouquetItem.Clone());
+            }
+            return fb;
         }
 
         #endregion
@@ -104,6 +124,13 @@ namespace Krkadoni.EnigmaSettings
         public IList<IBouquetItem> BouquetItems
         {
             get { return _bouquetItems; }
+            set
+            {
+                if (value == null)
+                    value = new List<IBouquetItem>();
+                _bouquetItems = value;
+                OnPropertyChanged("BouquetItems");
+            }
         }
 
         /// <summary>
@@ -151,6 +178,15 @@ namespace Krkadoni.EnigmaSettings
                 return Enums.BouquetType.UserBouquetRadio;
             }
             return Enums.BouquetType.Unknown;
+        }
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
         }
     }
 }

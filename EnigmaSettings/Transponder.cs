@@ -59,21 +59,26 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        #endregion
+
+
         // ReSharper disable once InconsistentNaming
         protected Enums.TransponderType _TransponderType = Enums.TransponderType.Unknown;
         private string _frequency = "0";
         private string _nameSpc = "0";
         private string _nid = "0";
         private string _tsid = "0";
-
-        /// <summary>
-        /// Performs MemberwiseClone on current object
-        /// </summary>
-        /// <returns></returns>
-        public ITransponder ShallowCopy()
-        {
-            return (ITransponder)MemberwiseClone();
-        }
 
         /// <summary>
         ///     Namespace of the satellite
@@ -176,6 +181,15 @@ namespace Krkadoni.EnigmaSettings
         public string TransponderId
         {
             get { return string.Join(":", new[] { NameSpc, TSID, NID }).ToLower(); }
+        }
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
         }
     }
 }

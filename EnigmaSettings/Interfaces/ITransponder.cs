@@ -1,11 +1,12 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
+using System;
 using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface ITransponder : INotifyPropertyChanged, IEditableObject
+    public interface ITransponder : INotifyPropertyChanged, IEditableObject, ICloneable
     {
         /// <summary>
         ///     Namespace of the satellite
@@ -59,7 +60,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        ITransponder ShallowCopy();
+        object ShallowCopy();
 
     }
 }

@@ -80,6 +80,21 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var s = (IService)MemberwiseClone();
+            s.Transponder = Transponder != null ? (ITransponder)Transponder.Clone() : null;
+            return s;
+        }
+
+        #endregion
+
         private readonly string _transponderId = string.Empty;
         private string _flags = "p:";
         private bool _locked;
@@ -397,7 +412,7 @@ namespace Krkadoni.EnigmaSettings
             get
             {
                 string[] fStrings = _flags.Split(',');
-                var mFlagList = new BindingList<IFlag>();
+                var mFlagList = new List<IFlag>();
 
                 // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (string fString  in fStrings)
@@ -474,9 +489,9 @@ namespace Krkadoni.EnigmaSettings
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
-        public IService ShallowCopy()
+        public object ShallowCopy()
         {
-            return (IService)MemberwiseClone();
+            return MemberwiseClone();
         }
     }
 }

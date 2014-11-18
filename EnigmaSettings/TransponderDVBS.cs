@@ -71,6 +71,21 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs deep Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public new object Clone()
+        {
+            var transponder = (ITransponderDVBS)MemberwiseClone();
+            transponder.Satellite = Satellite != null ? (IXmlSatellite)Satellite.Clone() : null;
+            return transponder;
+        }
+
+        #endregion
+
         private string _fec = "0";
         private string _flags;
         private string _inversion = "0";

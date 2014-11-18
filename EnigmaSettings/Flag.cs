@@ -60,6 +60,19 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
+        #region "ICloneable"
+
+        /// <summary>
+        /// Performs deep Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        #endregion
+
         private string _flagString = string.Empty;
 
         /// <summary>
@@ -319,5 +332,15 @@ namespace Krkadoni.EnigmaSettings
                 OnPropertyChanged("F_FlagType");
             }
         }
+
+        /// <summary>
+        /// Performs MemberwiseClone on current object
+        /// </summary>
+        /// <returns></returns>
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
+        }
+
     }
 }
