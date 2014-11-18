@@ -201,7 +201,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return (IBouquetItem)MemberwiseClone();
+            return MemberwiseClone();
         }
 
     }

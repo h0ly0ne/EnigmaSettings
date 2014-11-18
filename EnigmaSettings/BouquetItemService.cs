@@ -45,7 +45,7 @@ namespace Krkadoni.EnigmaSettings
         #region "ICloneable"
 
         /// <summary>
-        /// Performs Memberwise Clone on the object
+        /// Performs deep Clone on the object
         /// </summary>
         /// <returns></returns>
         public new object Clone()

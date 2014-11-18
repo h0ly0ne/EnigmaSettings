@@ -132,6 +132,10 @@ namespace Krkadoni.EnigmaSettings
             }
         }
 
+        /// <summary>
+        /// Performs MemberwiseClone
+        /// </summary>
+        /// <returns></returns>
         public object ShallowCopy()
         {
             return MemberwiseClone();
