@@ -132,10 +132,10 @@ namespace Krkadoni.EnigmaSettings
         
         #region "Properties"
 
-        private  IList<IBouquet> _bouquets = new BindingList<IBouquet>();
-        private  IList<IXmlSatellite> _satellites = new BindingList<IXmlSatellite>();
-        private  IList<IService> _services = new BindingList<IService>();
-        private  IList<ITransponder> _transponders = new BindingList<ITransponder>();
+        private  IList<IBouquet> _bouquets = new List<IBouquet>();
+        private  IList<IXmlSatellite> _satellites = new List<IXmlSatellite>();
+        private  IList<IService> _services = new List<IService>();
+        private  IList<ITransponder> _transponders = new List<ITransponder>();
 
         [NonSerialized()] 
         private ILog _log;
@@ -304,7 +304,7 @@ namespace Krkadoni.EnigmaSettings
         public IList<ITransponderDVBS> FindSatelliteTransponders()
         {
             return
-                new BindingList<ITransponderDVBS>(
+                new List<ITransponderDVBS>(
                     Transponders.OfType<ITransponderDVBS>().OrderBy(x => x.OrbitalPositionInt).ThenBy(x => x.Frequency).ToList());
         }
 
@@ -316,7 +316,7 @@ namespace Krkadoni.EnigmaSettings
         public IList<ITransponderDVBS> FindTranspondersForSatellite(IXmlSatellite satellite)
         {
             return
-                new BindingList<ITransponderDVBS>(
+                new List<ITransponderDVBS>(
                     FindSatelliteTransponders().Where(x => x.OrbitalPositionInt == Convert.ToInt32(satellite.Position)).ToList());
         }
 
@@ -328,7 +328,7 @@ namespace Krkadoni.EnigmaSettings
         public IList<IService> FindServicesForSatellite(IXmlSatellite satellite)
         {
             return
-                new BindingList<IService>(
+                new List<IService>(
                     Services.Where(
                         x =>
                             (x.Transponder) is ITransponderDVBS &&
@@ -342,7 +342,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public IList<ITransponderDVBS> FindTranspondersWithoutSatellite()
         {
-            return new BindingList<ITransponderDVBS>(FindSatelliteTransponders().Where(x => x.Satellite == null).ToList());
+            return new List<ITransponderDVBS>(FindSatelliteTransponders().Where(x => x.Satellite == null).ToList());
         }
 
         /// <summary>
@@ -352,7 +352,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public IList<IService> FindServicesWithoutTransponder()
         {
-            return new BindingList<IService>(Services.Where(x => x.Transponder == null).ToList());
+            return new List<IService>(Services.Where(x => x.Transponder == null).ToList());
         }
 
         /// <summary>
@@ -362,7 +362,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public IList<IService> FindServicesForTransponder(ITransponder transponder)
         {
-            return new BindingList<IService>(Services.Where(x => x.TransponderId == transponder.TransponderId).ToList());
+            return new List<IService>(Services.Where(x => x.TransponderId == transponder.TransponderId).ToList());
         }
 
         /// <summary>
@@ -372,7 +372,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public IList<IService> FindLockedServices()
         {
-            return new BindingList<IService>(Services.Where(x => x.ServiceSecurity == Enums.ServiceSecurity.BlackListed).ToList());
+            return new List<IService>(Services.Where(x => x.ServiceSecurity == Enums.ServiceSecurity.BlackListed).ToList());
         }
 
         /// <summary>

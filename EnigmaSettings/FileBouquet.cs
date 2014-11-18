@@ -25,7 +25,7 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private IList<IBouquetItem> _bouquetItems = new BindingList<IBouquetItem>();
+        private IList<IBouquetItem> _bouquetItems = new List<IBouquetItem>();
         private string _fileName = string.Empty;
         private string _name = string.Empty;
 

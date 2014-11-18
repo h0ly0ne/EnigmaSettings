@@ -80,7 +80,7 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private IList<IBouquetItem> _bouquetItems = new BindingList<IBouquetItem>();
+        private IList<IBouquetItem> _bouquetItems = new List<IBouquetItem>();
         private bool _locked;
         private string _name = string.Empty;
 

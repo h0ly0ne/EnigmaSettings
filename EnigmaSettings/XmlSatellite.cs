@@ -83,7 +83,7 @@ namespace Krkadoni.EnigmaSettings
             return sat;
         }
 
-        private IList<IXmlTransponder> _transponders = new BindingList<IXmlTransponder>();
+        private IList<IXmlTransponder> _transponders = new List<IXmlTransponder>();
         private string _flags;
         private string _name = string.Empty;
         private string _position = string.Empty;

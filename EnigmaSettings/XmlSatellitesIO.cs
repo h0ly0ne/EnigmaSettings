@@ -55,7 +55,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public IList<IXmlSatellite> LoadSatellitesFromFile(string fileName)
         {
-            var sats = new BindingList<IXmlSatellite>();
+            var sats = new List<IXmlSatellite>();
             SerializerSatellites ss = SerializerSatellites.LoadFromFile(fileName);
             foreach (SerializerSatellites.SerializerSatellite sSat in ss.sat)
             {
