@@ -10,10 +10,10 @@ namespace Krkadoni.EnigmaSettings
     public sealed class SettingsSavingEventArgs : EventArgs
     {
 
-        private readonly DirectoryInfo _folder;
+        private readonly string _folder;
         private readonly ISettings _settings;
 
-        public SettingsSavingEventArgs(DirectoryInfo folder, ISettings settings)
+        public SettingsSavingEventArgs(string folder, ISettings settings)
         {
             _folder = folder;
             _settings = settings;
@@ -25,7 +25,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public DirectoryInfo Folder
+        public string Folder
         {
             get { return _folder; }
         }

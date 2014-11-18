@@ -162,7 +162,7 @@ namespace Krkadoni.EnigmaSettings
                 int i;
                 if (Position == null || !Int32.TryParse(Position, out i))
                     return string.Empty;
-                string pos = Math.Abs(Convert.ToInt32(Position)).ToString(CultureInfo.InvariantCulture);
+                string pos = Math.Abs(Convert.ToInt32(Position)).ToString(CultureInfo.CurrentCulture);
                 if (pos.EndsWith("0"))
                 {
                     pos = pos.Substring(0, pos.Length - 1);

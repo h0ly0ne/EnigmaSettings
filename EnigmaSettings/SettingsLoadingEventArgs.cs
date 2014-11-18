@@ -9,9 +9,9 @@ namespace Krkadoni.EnigmaSettings
     public sealed class SettingsLoadingEventArgs : EventArgs
     {
 
-        private readonly FileInfo _file;
+        private readonly string _file;
 
-        public SettingsLoadingEventArgs(FileInfo file)
+        public SettingsLoadingEventArgs(string file)
         {
             _file = file;
         }
@@ -22,7 +22,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public FileInfo File
+        public string File
         {
             get { return _file; }
         }

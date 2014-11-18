@@ -82,7 +82,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="settingsFile">Full path to lamedb or services file</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        ISettings Load(FileInfo settingsFile);
+        ISettings Load(string settingsFile);
 
         /// <summary>
         ///     Loads up and links all the settings data
@@ -91,7 +91,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="xmlSatellitesIO">Implementation of reading/writing satellites file</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        ISettings Load(FileInfo settingsFile, IXmlSatellitesIO xmlSatellitesIO);
+        ISettings Load(string settingsFile, IXmlSatellitesIO xmlSatellitesIO);
 
         /// <summary>
         ///     Loads up and links all the settings data with XmlSatelliteIO from Factory asynchronusly
@@ -100,7 +100,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="callback">Async callback to be called after load finishes</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        void LoadAsync(FileInfo settingsFile, AsyncCallback callback);
+        void LoadAsync(string settingsFile, AsyncCallback callback);
 
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="callback">Async callback to be called after load finishes</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        void LoadAsync(FileInfo settingsFile, IXmlSatellitesIO xmlSatellitesIO, AsyncCallback callback);
+        void LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, AsyncCallback callback);
 
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="folder">Directory where all settings files will be saved</param>
         /// <param name="settings">Settings instance with all the data</param>
         /// <remarks></remarks>
-        void Save(DirectoryInfo folder, ISettings settings);
+        void Save(string folder, ISettings settings);
 
         /// <summary>
         ///     Saves settings to disk
@@ -129,7 +129,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="settings">Settings instance with all the data</param>
         /// <param name="xmlSatellitesIO">Instance of satellite.xml writer implementation</param>
         /// <remarks></remarks>
-        void Save(DirectoryInfo folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO);
+        void Save(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO);
 
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="settings">Settings instance with all the data</param>
         /// <param name="callback">Async callback to be called after save finishes</param>
         /// <remarks></remarks>
-        void SaveAsync(DirectoryInfo folder, ISettings settings, AsyncCallback callback);
+        void SaveAsync(string folder, ISettings settings, AsyncCallback callback);
 
         /// <summary>
         ///     Saves settings to disk asynchronusly
@@ -149,7 +149,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="xmlSatellitesIO">Instance of satellite.xml writer implementation</param>
         /// <param name="callback">Async callback to be called after save finishes</param>
         /// <remarks></remarks>
-        void SaveAsync(DirectoryInfo folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, AsyncCallback callback);
+        void SaveAsync(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, AsyncCallback callback);
 
     }
 }

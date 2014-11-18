@@ -428,7 +428,7 @@ namespace Krkadoni.EnigmaSettings
                 // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (string fString  in fStrings)
                 {
-                    if (fString.IndexOf(":", StringComparison.InvariantCulture) > -1 && fString.Split(':').Length >= 2)
+                    if (fString.IndexOf(":", StringComparison.CurrentCulture) > -1 && fString.Split(':').Length >= 2)
                     {
                         IFlag f = Activator.CreateInstance(typeof (TFlag), new object[] {fString}) as TFlag;
                         if (f == null) continue;

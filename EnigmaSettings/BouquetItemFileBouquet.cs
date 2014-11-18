@@ -69,10 +69,10 @@ namespace Krkadoni.EnigmaSettings
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException();
             _fileName = fileName;
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
             _lineSpecifierFlag =
                 Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted)
-                    .ToString(CultureInfo.InvariantCulture);
+                    .ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>

@@ -328,7 +328,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentNullException(Resources.Flag_New_Flag_string_cannot_be_empty_);
-                if (value.IndexOf(":", StringComparison.InvariantCulture) == -1)
+                if (value.IndexOf(":", StringComparison.CurrentCulture) == -1)
                     throw new ArgumentException(Resources.Flag_New_Invalid_flag);
                 if (value == _flagString) return;
                 _flagString = value.Trim();

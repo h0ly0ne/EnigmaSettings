@@ -144,7 +144,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     FavoritesTypeFlag,
                     LineSpecifierFlag,
-                    MarkerNumber.ToString(CultureInfo.InvariantCulture),
+                    MarkerNumber.ToString(),
                     "0",
                     "0",
                     "0",

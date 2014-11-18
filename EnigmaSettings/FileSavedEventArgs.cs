@@ -9,10 +9,10 @@ namespace Krkadoni.EnigmaSettings
     public sealed class FileSavedEventArgs : EventArgs
     {
 
-        private readonly FileInfo _file;
+        private readonly string _file;
         private readonly bool _success;
 
-        public FileSavedEventArgs(FileInfo file, bool success)
+        public FileSavedEventArgs(string file, bool success)
         {
             _file = file;
             _success = success;
@@ -24,7 +24,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public FileInfo File
+        public string File
         {
             get { return _file; }
         }

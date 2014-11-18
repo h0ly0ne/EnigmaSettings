@@ -72,10 +72,10 @@ namespace Krkadoni.EnigmaSettings
             if (bouquet == null)
                 throw new ArgumentNullException();
             Bouquet = bouquet;
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
             _lineSpecifierFlag =
                 Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted)
-                    .ToString(CultureInfo.InvariantCulture);
+                    .ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>
@@ -86,10 +86,10 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemBouquetsBouquet(int bouquetOrderNumber)
         {
             _bouquetOrderNumberInt = bouquetOrderNumber;
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
             _lineSpecifierFlag =
                 Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted)
-                    .ToString(CultureInfo.InvariantCulture);
+                    .ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>

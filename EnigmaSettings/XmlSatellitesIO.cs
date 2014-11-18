@@ -198,7 +198,8 @@ namespace Krkadoni.EnigmaSettings
             public virtual string Serialize()
             {
                 var memoryStream = new MemoryStream();
-                var xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.GetEncoding("ISO-8859-1")) { Formatting = Formatting.Indented };
+                var xmlSettings = new XmlWriterSettings() {Encoding = Encoding.GetEncoding("ISO-8859-1"), Indent = true};
+                var xmlTextWriter = XmlWriter.Create(memoryStream, xmlSettings); //  (memoryStream, Encoding.GetEncoding("ISO-8859-1")) { Formatting = Formatting.Indented };
                 // XmlTextWriter xmlTextWriter = New XmlTextWriter(memoryStream, New UTF8Encoding(True))
                 var ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
@@ -221,22 +222,25 @@ namespace Krkadoni.EnigmaSettings
             public virtual void SaveToFile(string fileName)
             {
                 string xmlString = Serialize();
-                var xmlFile = new FileInfo(fileName);
-                using (var streamWriter = xmlFile.CreateText())
-                {
-                    streamWriter.WriteLine(xmlString);
-                }
+                File.WriteAllText(fileName, xmlString);
+                //var xmlFile = new FileInfo(fileName);
+                //using (var streamWriter = xmlFile.CreateText())
+                //{
+                //    streamWriter.WriteLine(xmlString);
+                //}
             }
 
             public static SerializerSatellites LoadFromFile(string fileName)
             {
-                var file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                string xmlString;
-                using (var sr = new StreamReader(file))
-                {
-                    xmlString = sr.ReadToEnd();
-                }
+                var xmlString = File.ReadAllText(fileName);
                 return Deserialize(xmlString);
+                //var file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                //string xmlString;
+                //using (var sr = new StreamReader(file))
+                //{
+                //    xmlString = sr.ReadToEnd();
+                //}
+                //return Deserialize(xmlString);
             }
 
             #endregion

@@ -394,7 +394,10 @@ namespace Krkadoni.EnigmaSettings
             {
                 Log.Debug("Searching  for bouquets with duplicate filenames");
                 var fileNames = Bouquets.OfType<IFileBouquet>().GroupBy(x => x.FileName).Where(g => g.Count() > 1).Select(grp => grp.Key).ToList();
-                fileNames.ForEach(s => Log.Debug(string.Format("Bouquet filename {0} is not unique.", s)));
+                foreach (var fileName in fileNames)
+                {
+                    Log.Debug(string.Format("Bouquet filename {0} is not unique.", fileName));
+                }
                 return Bouquets.OfType<IFileBouquet>().GroupBy(x => x.FileName).Where(grp => grp.Count() > 1).SelectMany(grp => grp).ToList();
             }
             catch (Exception ex)
@@ -436,18 +439,21 @@ namespace Krkadoni.EnigmaSettings
                 {
                     if (position == 0) continue;
                     int mPosition = position;
-                    if (Satellites.Any(x => x.Position == mPosition.ToString(CultureInfo.InvariantCulture)))
+                    if (Satellites.Any(x => x.Position == mPosition.ToString(CultureInfo.CurrentCulture)))
                     {
                         IXmlSatellite xmlSat = factory.InitNewxmlSatellite();
-                        xmlSat.Position = position.ToString(CultureInfo.InvariantCulture);
+                        xmlSat.Position = position.ToString(CultureInfo.CurrentCulture);
                         xmlSat.Flags = "0";
                         xmlSat.Name = "Sat " + xmlSat.PositionString;
                         Satellites.Add(xmlSat);
                         newSatellites.Add(xmlSat);
-                        FindTranspondersWithoutSatellite()
+                        IList<ITransponderDVBS> found = FindTranspondersWithoutSatellite()
                             .Where(x => x.OrbitalPositionInt == Convert.ToInt32(xmlSat.Position))
-                            .ToList()
-                            .ForEach(s => s.Satellite = xmlSat);
+                            .ToList();
+                        foreach (var transponder in found)
+                        {
+                            transponder.Satellite = xmlSat;
+                        }
                         Log.Warn(string.Format(Resources.Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites, position));
                     }
                     else
@@ -795,11 +801,11 @@ namespace Krkadoni.EnigmaSettings
                     string name = Path.GetFileName(bouquet.FileName);
                     if (name != null && !name.StartsWith("userbouquet.dbe")) continue;
                     string fileName = string.Empty;
-                    if (bouquet.FileName.IndexOf("/", StringComparison.InvariantCulture) > -1)
+                    if (bouquet.FileName.IndexOf("/", StringComparison.CurrentCulture) > -1)
                     {
-                        fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf("/", StringComparison.InvariantCulture) + 1);
+                        fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf("/", StringComparison.CurrentCulture) + 1);
                     }
-                    fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0') + ".tv";
+                    fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.CurrentCulture).PadLeft(2, '0') + ".tv";
                     if (fileName != bouquet.FileName)
                     {
                         Log.Debug(string.Format("Changed filename for bouquet {0} from {1} to {2}", bouquet.Name, Path.GetFileName(bouquet.FileName),
@@ -817,11 +823,11 @@ namespace Krkadoni.EnigmaSettings
                 foreach (IFileBouquet bouquet in bqsRadio)
                 {
                     string fileName = string.Empty;
-                    if (bouquet.FileName.IndexOf("/", StringComparison.InvariantCulture) > -1)
+                    if (bouquet.FileName.IndexOf("/", StringComparison.CurrentCulture) > -1)
                     {
-                        fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf("/", StringComparison.InvariantCulture) + 1);
+                        fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf("/", StringComparison.CurrentCulture) + 1);
                     }
-                    fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0') + ".radio";
+                    fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.CurrentCulture).PadLeft(2, '0') + ".radio";
                     if (fileName != bouquet.FileName)
                     {
                         Log.Debug(string.Format("Changed filename for bouquet {0} from {1} to {2}", bouquet.Name, Path.GetFileName(bouquet.FileName),
@@ -1230,7 +1236,7 @@ namespace Krkadoni.EnigmaSettings
                     Transponders.OfType<ITransponderDVBS>().Where(x => x.OrbitalPositionInt == orbitalPosition).Select(x => (ITransponder)x).ToList();
                 RemoveTransponders(trans);
 
-                IXmlSatellite satellite = Satellites.FirstOrDefault(x => x.Position == orbitalPosition.ToString(CultureInfo.InvariantCulture));
+                IXmlSatellite satellite = Satellites.FirstOrDefault(x => x.Position == orbitalPosition.ToString(CultureInfo.CurrentCulture));
                 if (satellite != null)
                 {
                     if (Satellites.Contains(satellite))
@@ -1341,11 +1347,11 @@ namespace Krkadoni.EnigmaSettings
             {
                 if (satellite == null)
                     throw new ArgumentNullException();
-                if (satellite.Position == newPosition.ToString(CultureInfo.InvariantCulture))
+                if (satellite.Position == newPosition.ToString(CultureInfo.CurrentCulture))
                     return;
                 Log.Debug(string.Format("Changing position for satellite {0} from {1} to {2}", satellite.Name, satellite.Position, newPosition));
 
-                if (Satellites.Any(x => x.Position == newPosition.ToString(CultureInfo.InvariantCulture)))
+                if (Satellites.Any(x => x.Position == newPosition.ToString(CultureInfo.CurrentCulture)))
                 {
                     throw new SettingsException(
                         string.Format(
@@ -1382,7 +1388,7 @@ namespace Krkadoni.EnigmaSettings
                     }
                 }
 
-                satellite.Position = newPosition.ToString(CultureInfo.InvariantCulture);
+                satellite.Position = newPosition.ToString(CultureInfo.CurrentCulture);
                 Log.Debug(string.Format("Finished changing satellite position for satellite {0}", satellite.Name));
             }
             catch (SettingsException ex)
