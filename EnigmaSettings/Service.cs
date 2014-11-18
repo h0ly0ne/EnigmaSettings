@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
-using Krkadoni.EnigmaSettings.Properties;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class Service<TFlag> : IService where TFlag : class, IFlag
     {
         #region "INotifyPropertyChanged"
@@ -143,6 +143,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string SID
         {
             get { return _sid; }
@@ -164,6 +165,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd693747(v=vs.85).aspx">Service types</see>
+        [DataMember]
         public string Type
         {
             get { return _type; }
@@ -185,6 +187,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string ProgNumber
         {
             get { return _progNumber; }
@@ -205,6 +208,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd693747(v=vs.85).aspx">Service types</see>
+        [DataMember]
         public Enums.ServiceType ServiceType
         {
             get
@@ -283,6 +287,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Name
         {
             get { return _name; }
@@ -302,6 +307,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value>Returns 'p:' if empty</value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Flags
         {
             get
@@ -318,6 +324,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Used to match service from bouquets</remarks>
+        [DataMember]
         public string ServiceId
         {
             get
@@ -357,6 +364,7 @@ namespace Krkadoni.EnigmaSettings
         ///     initialized with
         /// </returns>
         /// <remarks></remarks>
+        [DataMember]
         public string TransponderId
         {
             get
@@ -369,6 +377,7 @@ namespace Krkadoni.EnigmaSettings
             }
         }
 
+        [DataMember]
         public ITransponder Transponder
         {
             get { return _transponder; }
@@ -390,6 +399,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public Enums.ServiceSecurity ServiceSecurity
         {
             get { return _serviceSecurity; }
@@ -407,6 +417,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Use UpdateFlags method to update flags</remarks>
+        [DataMember]
         public ReadOnlyCollection<IFlag> FlagList
         {
             get
@@ -429,22 +440,12 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Syncs Flags string from the list of flags
-        /// </summary>
-        /// <remarks></remarks>
-        public void UpdateFlags(IList<IFlag> flagsList)
-        {
-            _flags = string.Join(",", FlagList.Select(x => x.FlagString).ToArray());
-            OnPropertyChanged("Flags");
-            OnPropertyChanged("FlagList");
-        }
-
-        /// <summary>
         ///     Determines if service is locked for updates
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public bool Locked
         {
             get { return _locked; }
@@ -456,6 +457,17 @@ namespace Krkadoni.EnigmaSettings
                     OnPropertyChanged("Locked");
                 }
             }
+        }
+
+        /// <summary>
+        ///     Syncs Flags string from the list of flags
+        /// </summary>
+        /// <remarks></remarks>
+        public void UpdateFlags(IList<IFlag> flagsList)
+        {
+            _flags = string.Join(",", FlagList.Select(x => x.FlagString).ToArray());
+            OnPropertyChanged("Flags");
+            OnPropertyChanged("FlagList");
         }
 
         public override string ToString()

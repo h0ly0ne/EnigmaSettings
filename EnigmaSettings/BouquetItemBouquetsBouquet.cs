@@ -1,13 +1,14 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class BouquetItemBouquetsBouquet : BouquetItem, IBouquetItemBouquetsBouquet
     {
         private IBouquetsBouquet _bouquet;
@@ -97,6 +98,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Enums.BouquetType.E1BouquetsBouquet</returns>
         /// <remarks></remarks>
+        [DataMember]
         public override Enums.BouquetItemType BouquetItemType
         {
             get { return Enums.BouquetItemType.BouquetsBouquet; }
@@ -108,6 +110,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IBouquetsBouquet Bouquet
         {
             get { return _bouquet; }
@@ -125,6 +128,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Used to match locked bouquets</remarks>
+        [DataMember]
         public string BouquetOrderNumber
         {
             get { return BouquetOrderNumberInt.ToString("X").ToLower(); }
@@ -136,6 +140,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Used to match locked bouquets</remarks>
+        [DataMember]
         public int BouquetOrderNumberInt
         {
             get { return _bouquetOrderNumberInt; }

@@ -1,13 +1,14 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class BouquetItemStream : BouquetItem, IBouquetItemStream
     {
         private string _description = string.Empty;
@@ -139,6 +140,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>URL decoded string</returns>
         /// <remarks>Will automatically encode string</remarks>
+        [DataMember]
         public string URL
         {
             get { return Uri.UnescapeDataString(_url); }
@@ -158,6 +160,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Enums.BouquetItemType.Stream</returns>
         /// <remarks></remarks>
+        [DataMember]
         public override Enums.BouquetItemType BouquetItemType
         {
             get { return Enums.BouquetItemType.Stream; }
@@ -169,6 +172,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>'Stream' if empty</returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Description
         {
             get { return _description; }
@@ -188,6 +192,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Hex value</returns>
         /// <remarks></remarks>
+        [DataMember]
         public string StreamFlag
         {
             get { return _streamFlag; }
@@ -208,6 +213,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>0 if flag is not valid hex</returns>
         /// <remarks></remarks>
+        [DataMember]
         public int StreamFlagInt
         {
             get
@@ -236,6 +242,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>In hex format</remarks>
+        [DataMember]
         public string ExtraFlag1
         {
             get { return _extraFlag1; }
@@ -256,6 +263,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Integer value of flag</returns>
         /// <remarks></remarks>
+        [DataMember]
         public int ExtraFlag1Int
         {
             get
@@ -284,6 +292,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>In hex format</remarks>
+        [DataMember]
         public string ExtraFlag2
         {
             get { return _extraFlag2; }
@@ -304,6 +313,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Integer value of flag</returns>
         /// <remarks></remarks>
+        [DataMember]
         public int ExtraFlag2Int
         {
             get
@@ -332,6 +342,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>In hex format</remarks>
+        [DataMember]
         public string ServiceID
         {
             get { return _serviceId; }
@@ -352,6 +363,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Integer value of flag</returns>
         /// <remarks></remarks>
+        [DataMember]
         public int ServiceIDInt
         {
             get

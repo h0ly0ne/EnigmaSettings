@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class FileBouquet : IFileBouquet, INotifyPropertyChanged
     {
         #region "INotifyPropertyChanged"
@@ -91,6 +92,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Name of the file to be read or to be saved to</returns>
         /// <remarks></remarks>
+        [DataMember]
         public string FileName
         {
             get { return _fileName; }
@@ -110,6 +112,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public Enums.BouquetType BouquetType
         {
             get { return GetTypeFromFileName(_fileName); }
@@ -121,6 +124,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IList<IBouquetItem> BouquetItems
         {
             get { return _bouquetItems; }
@@ -139,6 +143,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Makes sense only with non system bouquets</remarks>
+        [DataMember]
         public string Name
         {
             get { return _name; }

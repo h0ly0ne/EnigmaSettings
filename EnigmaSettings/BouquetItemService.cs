@@ -1,12 +1,13 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class BouquetItemService : BouquetItem, IBouquetItemService
     {
         private readonly string _serviceId = string.Empty;
@@ -50,13 +51,13 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            var bis = (IBouquetItemService) MemberwiseClone();
+            var bis = (IBouquetItemService)MemberwiseClone();
             bis.Service = Service != null ? (IService)Service.Clone() : null;
             return bis;
         }
 
         #endregion
-        
+
         /// <summary>
         ///     Initializes new bouquet item that is service
         /// </summary>
@@ -140,6 +141,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Enums.BouquetItemType.Service</returns>
         /// <remarks></remarks>
+        [DataMember]
         public override Enums.BouquetItemType BouquetItemType
         {
             get { return Enums.BouquetItemType.Service; }
@@ -151,6 +153,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string ServiceId
         {
             get
@@ -169,6 +172,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IService Service
         {
             get { return _service; }

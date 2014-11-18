@@ -2,11 +2,12 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
      
 using System;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class TransponderDVBC : Transponder, ITransponderDVBC
     {
 
@@ -111,6 +112,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string SymbolRate
         {
             get { return _symbolRate; }
@@ -131,6 +133,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public string Inversion
         {
             get { return _inversion; }
@@ -152,6 +155,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public string Modulation
         {
             get { return _modulation; }
@@ -173,6 +177,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public string FECInner
         {
             get { return _fecInner; }
@@ -193,6 +198,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Flags
         {
             get { return _flags; }
@@ -213,6 +219,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public Enums.DVBCInversionType InversionType
         {
             get
@@ -238,6 +245,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public Enums.DVBCModulationType ModulationType
         {
             get
@@ -269,6 +277,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public Enums.DVBCFECInnerType FECInnerType
         {
             get

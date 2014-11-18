@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Krkadoni.EnigmaSettings.Interfaces;
-using Krkadoni.EnigmaSettings.Properties;
 
 namespace Krkadoni.EnigmaSettings
 {

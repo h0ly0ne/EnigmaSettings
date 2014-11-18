@@ -1,13 +1,13 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
-using System;
+
 using System.ComponentModel;
 using Krkadoni.EnigmaSettings.Interfaces;
+using System.Runtime.Serialization;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public abstract class BouquetItem : IBouquetItem
     {
         #region "INotifyPropertyChanged"
@@ -77,11 +77,13 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public abstract Enums.BouquetItemType BouquetItemType { get; }
 
         /// <summary>
         ///     First number in SERVICE line inside one of the bouquets files
         /// </summary>
+        [DataMember]
         public Enums.FavoritesType FavoritesType
         {
             get
@@ -107,6 +109,7 @@ namespace Krkadoni.EnigmaSettings
         /// <summary>
         ///     Second number in SERVICE line inside one of the bouquets files
         /// </summary>
+        [DataMember]
         public Enums.LineSpecifier LineSpecifierType
         {
             get
@@ -164,6 +167,7 @@ namespace Krkadoni.EnigmaSettings
         /// <summary>
         ///     First number in SERVICE line inside one of the bouquets files
         /// </summary>
+        [DataMember]
         public string FavoritesTypeFlag
         {
             get { return _favoritesTypeFlag; }
@@ -181,6 +185,7 @@ namespace Krkadoni.EnigmaSettings
         /// <summary>
         ///     Second number in SERVICE line inside one of the bouquets files
         /// </summary>
+        [DataMember]
         public string LineSpecifierFlag
         {
             get { return _lineSpecifierFlag; }

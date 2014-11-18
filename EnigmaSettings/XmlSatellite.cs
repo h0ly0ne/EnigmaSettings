@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class XmlSatellite : IXmlSatellite
     {
         #region "INotifyPropertyChanged"
@@ -94,6 +95,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Flags
         {
             get { return _flags; }
@@ -111,6 +113,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Name
         {
             get { return _name; }
@@ -130,6 +133,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value>Position as integer number with length 3 (ie. 19.2E = 192)</value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Position
         {
             get { return _position; }
@@ -150,6 +154,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>IE. for position value '192' returns '19.2° E'</returns>
         /// <remarks></remarks>
+        [DataMember]
         public string PositionString
         {
             get
@@ -182,6 +187,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IList<IXmlTransponder> Transponders
         {
             get { return _transponders; }

@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class BouquetsBouquet : IBouquetsBouquet
     {
         #region "INotifyPropertyChanged"
@@ -90,6 +91,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IList<IBouquetItem> BouquetItems
         {
             get { return _bouquetItems; }
@@ -107,6 +109,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public Enums.BouquetType BouquetType
         {
             get { return Enums.BouquetType.E1BouquetsBouquet; }
@@ -119,6 +122,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <exception cref="ArgumentException">Throws argument exception if name is null or empty</exception>
+        [DataMember]
         public string Name
         {
             get { return _name; }
@@ -133,20 +137,12 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        /// Performs MemberwiseClone
-        /// </summary>
-        /// <returns></returns>
-        public object ShallowCopy()
-        {
-            return MemberwiseClone();
-        }
-
-        /// <summary>
         ///     Determines if bouquet is locked.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Locked bouquets are stored inside services.locked file</remarks>
+        [DataMember]
         public bool Locked
         {
             get { return _locked; }
@@ -157,5 +153,15 @@ namespace Krkadoni.EnigmaSettings
                 OnPropertyChanged("Locked");
             }
         }
+
+        /// <summary>
+        /// Performs MemberwiseClone
+        /// </summary>
+        /// <returns></returns>
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
+        }
+
     }
 }

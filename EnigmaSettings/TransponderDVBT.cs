@@ -2,11 +2,12 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
      
 using System;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class TransponderDVBT : Transponder, ITransponderDVBT
     {
 
@@ -134,6 +135,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Bandwidth values</see>
+        [DataMember]
         public string Bandwidth
         {
             get { return _bandwidth; }
@@ -155,6 +157,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public string FECHigh
         {
             get { return _fecHigh; }
@@ -176,6 +179,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public string FECLow
         {
             get { return _fecLow; }
@@ -197,6 +201,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public string Modulation
         {
             get { return _modulation; }
@@ -218,6 +223,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Transmission types</see>
+        [DataMember]
         public string Transmission
         {
             get { return _transmission; }
@@ -239,6 +245,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Guard interval types</see>
+        [DataMember]
         public string GuardInterval
         {
             get { return _guardInterval; }
@@ -260,6 +267,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Hierarchy types</see>
+        [DataMember]
         public string Hierarchy
         {
             get { return _hierarchy; }
@@ -281,6 +289,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public string Inversion
         {
             get { return _inversion; }
@@ -301,6 +310,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Flags
         {
             get { return _flags; }
@@ -321,6 +331,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Bandwidth types</see>
+        [DataMember]
         public Enums.DVBTBandwidthType BandwidthType
         {
             get
@@ -348,6 +359,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public Enums.DVBTFECHighType FECHighType
         {
             get
@@ -379,6 +391,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public Enums.DVBTFECLowType FECLowType
         {
             get
@@ -410,6 +423,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public Enums.DVBTModulationType ModulationType
         {
             get
@@ -437,6 +451,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Transmission types</see>
+        [DataMember]
         public Enums.DVBTTransmissionType TransmissionType
         {
             get
@@ -462,6 +477,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Guard interval types</see>
+        [DataMember]
         public Enums.DVBTGuardIntervalType GuardIntervalType
         {
             get
@@ -491,6 +507,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Hierarchy types</see>
+        [DataMember]
         public Enums.DVBTHierarchyType HierarchyType
         {
             get
@@ -520,6 +537,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public Enums.DVBTInversionType InversionType
         {
             get

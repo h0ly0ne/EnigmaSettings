@@ -3,12 +3,12 @@
      
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
-using Krkadoni.EnigmaSettings.Properties;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class TransponderDVBS : Transponder, ITransponderDVBS
     {
 
@@ -154,6 +154,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IXmlSatellite Satellite
         {
             get { return _satellite; }
@@ -171,6 +172,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string SymbolRate
         {
             get { return _symbolRate; }
@@ -193,6 +195,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Polarization values</see>
+        [DataMember]
         public string Polarization
         {
             get { return _polarization; }
@@ -214,6 +217,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public string FEC
         {
             get { return _fec; }
@@ -236,6 +240,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value>Position as integer number with length 3 (ie. 19.2E = 192) </value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public int OrbitalPositionInt
         {
             get { return _orbitalPositionInt; }
@@ -254,6 +259,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string OrbitalPositionHex
         {
             get { return _orbitalPositionInt.ToString("X"); }
@@ -279,6 +285,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public string Inversion
         {
             get { return _inversion; }
@@ -299,6 +306,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Flags
         {
             get { return _flags; }
@@ -317,6 +325,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">System types</see>
+        [DataMember]
         public string System
         {
             get { return _system; }
@@ -336,6 +345,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public string Modulation
         {
             get { return _modulation; }
@@ -354,6 +364,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string RollOff
         {
             get { return _rollOff; }
@@ -374,6 +385,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Pilot
         {
             get { return _pilot; }
@@ -395,6 +407,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Polarization values</see>
+        [DataMember]
         public Enums.DVBSPolarizationType PolarizationType
         {
             get
@@ -422,6 +435,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public Enums.DVBSFECType FECType
         {
             get
@@ -463,6 +477,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public Enums.DVBSInversionType InversionType
         {
             get
@@ -488,6 +503,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">System types</see>
+        [DataMember]
         public Enums.DVBSSystemType SystemType
         {
             get
@@ -513,6 +529,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public Enums.DVBSModulationType ModulationType
         {
             get
@@ -542,6 +559,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">RollOff types</see>
+        [DataMember]
         public Enums.DVBSRollOffType RollOffType
         {
             get
@@ -569,6 +587,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Pilot types</see>
+        [DataMember]
         public Enums.DVBSPilotType PilotType
         {
             get
@@ -595,6 +614,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Calculates namespace based on Enigma algorithm</remarks>
+        [DataMember]
         public string CalculatedNameSpace
         {
             get

@@ -4,12 +4,13 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
-using Krkadoni.EnigmaSettings.Properties;
+
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class Flag : IFlag
     {
         #region "INotifyPropertyChanged"
@@ -94,6 +95,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>F Flag type from enum, if it's not supported returns 'Unknown'</returns>
         /// <remarks>If current flag is not F, type will be 'None'</remarks>
+        [DataMember]
         public Enums.FFlagType FFlagType
         {
             get
@@ -178,6 +180,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>C Flag type from enum, if it's not supported returns 'Unknown'</returns>
         /// <remarks>If current flag is not C, type will be 'None'</remarks>
+        [DataMember]
         public Enums.CFlagType CFlagType
         {
             get
@@ -222,6 +225,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>C, F, P or Unknown</returns>
         /// <remarks>Defaults to 'Unknown'</remarks>
+        [DataMember]
         public Enums.FlagType FlagType
         {
             get
@@ -249,6 +253,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>Hex value if flag is numeric</returns>
         /// <remarks></remarks>
         /// <exception cref="ArgumentException">Throws argument exception if set before speficifing flag type</exception>
+        [DataMember]
         public string FlagValue
         {
             get { return FlagString.Length > 0 ? FlagString.Split(':')[1] : string.Empty; }
@@ -272,6 +277,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>0 if flag is not numeric</returns>
         /// <remarks></remarks>
         /// <exception cref="ArgumentException">Throws argument exception if set before speficifing flag type</exception>
+        [DataMember]
         public int FlagInt
         {
             get
@@ -314,6 +320,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         /// <exception cref="ArgumentNullException">Throws argument null exception if setting null or empty value</exception>
         /// <exception cref="ArgumentException">Throws argument exception if setting flag in invalid format</exception>
+        [DataMember]
         public string FlagString
         {
             get { return _flagString; }

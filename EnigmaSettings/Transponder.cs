@@ -3,11 +3,12 @@
      
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public abstract class Transponder : ITransponder
     {
         #region "INotifyPropertyChanged"
@@ -86,6 +87,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Used to match transponder to satellite</remarks>
+        [DataMember]
         public string NameSpc
         {
             get { return _nameSpc; }
@@ -106,6 +108,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Should be unique for satellite, but often not</remarks>
+        [DataMember]
         public string TSID
         {
             get { return _tsid; }
@@ -126,6 +129,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string NID
         {
             get { return _nid; }
@@ -146,6 +150,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Frequency
         {
             get { return _frequency; }
@@ -167,6 +172,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public Enums.TransponderType TransponderType
         {
             get { return _TransponderType; }
@@ -178,6 +184,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Returns 1st line of transponder info for services file</returns>
         /// <remarks>Used to match transponder to service</remarks>
+        [DataMember]
         public string TransponderId
         {
             get { return string.Join(":", new[] { NameSpc, TSID, NID }).ToLower(); }

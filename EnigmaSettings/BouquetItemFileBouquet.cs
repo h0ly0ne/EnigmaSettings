@@ -1,13 +1,14 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Globalization;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class BouquetItemFileBouquet : BouquetItem, IBouquetItemFileBouquet
     {
         private readonly string _fileName = string.Empty;
@@ -51,7 +52,7 @@ namespace Krkadoni.EnigmaSettings
         public new object Clone()
         {
             var bifb = (IBouquetItemFileBouquet)MemberwiseClone();
-            bifb.Bouquet = Bouquet !=null ? (IFileBouquet)Bouquet.Clone(): null;
+            bifb.Bouquet = Bouquet != null ? (IFileBouquet)Bouquet.Clone() : null;
             return bifb;
         }
 
@@ -93,6 +94,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Enums.BouquetItemType.FileBouquet</returns>
         /// <remarks></remarks>
+        [DataMember]
         public override Enums.BouquetItemType BouquetItemType
         {
             get { return Enums.BouquetItemType.FileBouquet; }
@@ -104,6 +106,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IFileBouquet Bouquet
         {
             get { return _bouquet; }
@@ -121,6 +124,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns>Local value if matching bouquet is empty, otherwise returns Bouquet.FileName</returns>
         /// <remarks></remarks>
+        [DataMember]
         public string FileName
         {
             get

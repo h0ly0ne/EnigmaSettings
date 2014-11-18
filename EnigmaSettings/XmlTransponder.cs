@@ -3,11 +3,12 @@
      
 using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class XmlTransponder : IXmlTransponder
     {
         #region "INotifyPropertyChanged"
@@ -105,6 +106,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        [DataMember]
         public string FECInner
         {
             get { return _fecInner; }
@@ -122,6 +124,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string Frequency
         {
             get { return _frequency; }
@@ -140,6 +143,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        [DataMember]
         public string Inversion
         {
             get { return _inversion; }
@@ -158,6 +162,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        [DataMember]
         public string Modulation
         {
             get { return _modulation; }
@@ -176,6 +181,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Pilot types</see>
+        [DataMember]
         public string Pilot
         {
             get { return _pilot; }
@@ -194,6 +200,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Polarization values</see>
+        [DataMember]
         public string Polarization
         {
             get { return _polarization; }
@@ -212,6 +219,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">RollOff types</see>
+        [DataMember]
         public string RollOff
         {
             get { return _rollOff; }
@@ -229,6 +237,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value>Usually 8 digit integer</value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string SymbolRate
         {
             get { return _symbolRate; }
@@ -247,6 +256,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">System types</see>
+        [DataMember]
         public string System
         {
             get { return _system; }

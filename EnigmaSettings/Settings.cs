@@ -7,12 +7,12 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
-using Krkadoni.EnigmaSettings.Properties;
 
 namespace Krkadoni.EnigmaSettings
 {
-    [Serializable]
+    [DataContract]
     public class Settings : ISettings
     {
         #region "INotifyPropertyChanged"
@@ -137,7 +137,7 @@ namespace Krkadoni.EnigmaSettings
         private  IList<IService> _services = new List<IService>();
         private  IList<ITransponder> _transponders = new List<ITransponder>();
 
-        [NonSerialized()] 
+
         private ILog _log;
         private static readonly ILog _nullLogger = new NullLogger();
 
@@ -168,6 +168,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string SettingsFileName
         {
             get { return _settingsFileName; }
@@ -185,6 +186,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public string SettingsDirectory
         {
             get
@@ -209,6 +211,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public Enums.SettingsVersion SettingsVersion
         {
             get { return _settingsVersion; }
@@ -226,6 +229,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Each satelite has coresponding xml transponders from satellites.xml file</remarks>
+        [DataMember]
         public IList<IXmlSatellite> Satellites
         {
             get { return _satellites; }
@@ -244,6 +248,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>These are not transponders from satellites.xml file</remarks>
+        [DataMember]
         public IList<ITransponder> Transponders
         {
             get { return _transponders; }
@@ -262,6 +267,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks>Each service should have corresponding transponder from services file</remarks>
+        [DataMember]
         public IList<IService> Services
         {
             get { return _services; }
@@ -280,6 +286,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
+        [DataMember]
         public IList<IBouquet> Bouquets
         {
             get { return _bouquets; }

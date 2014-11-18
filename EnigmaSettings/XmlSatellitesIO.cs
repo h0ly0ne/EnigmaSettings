@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
-using Krkadoni.EnigmaSettings.Properties;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -264,7 +264,7 @@ namespace Krkadoni.EnigmaSettings
                 public string name { get; set; }
             }
 
-            [Serializable, XmlType("transponder")]
+            [DataContract, XmlType("transponder")]
             public class SerializerTransponder
             {
                 [XmlAttribute]
