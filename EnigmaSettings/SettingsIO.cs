@@ -371,8 +371,8 @@ namespace Krkadoni.EnigmaSettings
 
                 Log.Info(string.Format(Resources.Settings_Load_Loading_settings_from__0_, settingsFile));
 
-                //var st = new Stopwatch();
-                //st.Start();
+                var st = new Stopwatch();
+                st.Start();
 
                 ISettings settings = ReadSettingsFile(settingsFile);
                 settings.SettingsFileName = settingsFile;
@@ -414,9 +414,9 @@ namespace Krkadoni.EnigmaSettings
                     ReadBlackWhiteList(Path.Combine(settings.SettingsDirectory, BlackListFile), ref settings);
                 }
 
-                //st.Stop();
-                //Log.Info(string.Format("Settings loaded in {0} ms", st.ElapsedMilliseconds));
-                Log.Info("Settings loaded");
+                st.Stop();
+                Log.Info(string.Format("Settings loaded in {0} ms", st.ElapsedMilliseconds));
+                //Log.Info("Settings loaded");
                 OnSettingsLoaded(this, settingsFile, true, settings);
                 return settings;
             }
@@ -502,8 +502,8 @@ namespace Krkadoni.EnigmaSettings
             //    Log.Debug(string.Format("Folder {0} exists", folder));
             //}
 
-            //var st = new Stopwatch();
-            //st.Start();
+            var st = new Stopwatch();
+            st.Start();
 
             try
             {
@@ -520,9 +520,9 @@ namespace Krkadoni.EnigmaSettings
 
                 IXmlSatellitesIO satellitesIO = Factory.InitNewXmlSatelliteIO();
                 satellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
-                //st.Stop();
-                //Log.Info(string.Format("Settings saved successfully in {0} ms.", st.ElapsedMilliseconds));
-                Log.Info("Settings saved successfully");
+                st.Stop();
+                Log.Info(string.Format("Settings saved successfully in {0} ms.", st.ElapsedMilliseconds));
+                //Log.Info("Settings saved successfully");
                 OnSettingsSaved(this, folder, true, settings);
             }
             catch (SettingsException ex)
@@ -602,9 +602,9 @@ namespace Krkadoni.EnigmaSettings
             OnFileLoading(this, fileName);
             Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
 
-            //var st = new Stopwatch();
+            var st = new Stopwatch();
             string[] fileLines;
-            //st.Start();
+            st.Start();
 
             try
             {
@@ -619,8 +619,8 @@ namespace Krkadoni.EnigmaSettings
 
             //st.Stop();
 
-           // Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
-            Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
+            Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
+           // Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
 
             if (fileLines.Length == 0)
             {
@@ -651,9 +651,9 @@ namespace Krkadoni.EnigmaSettings
             OnFileLoading(this, fileName);
             Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
 
-            //var st = new Stopwatch();
+            var st = new Stopwatch();
             string fileText;
-            //st.Start();
+            st.Start();
 
             try
             {
@@ -666,10 +666,10 @@ namespace Krkadoni.EnigmaSettings
                 throw new SettingsException(string.Format(Resources.Settings_Read_Failed_to_read_file__0__1__2_, fileName, "", ""), ex);
             }
 
-            //st.Stop();
+            st.Stop();
 
-            //Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
-            Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
+            Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
+            //Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
 
             if (fileText.Length == 0)
             {

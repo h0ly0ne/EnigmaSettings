@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Resources;
+
 namespace Krkadoni.EnigmaSettings {
     using System;
     
@@ -39,8 +41,9 @@ namespace Krkadoni.EnigmaSettings {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Krkadoni.EnigmaSettings.Resources", typeof(Resources).Assembly);
-                    resourceMan = temp;
+                    //global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Krkadoni.EnigmaSettings.Resources", typeof(Resources).Assembly);
+                    //resourceMan = temp;
+                    resourceMan = new ResourceManager(typeof(Resources));
                 }
                 return resourceMan;
             }
