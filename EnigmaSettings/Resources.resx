@@ -378,4 +378,10 @@
   <data name="Transponder_New_Invalid_transponder_type_" xml:space="preserve">
     <value>Invalid transponder type!</value>
   </data>
+  <data name="XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider" xml:space="preserve">
+    <value>Invalid file provider</value>
+  </data>
+  <data name="XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider" xml:space="preserve">
+    <value>Invalid path provider</value>
+  </data>
 </root>

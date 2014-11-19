@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
@@ -73,14 +73,14 @@ namespace Krkadoni.EnigmaSettings
             };
         }
 
-        public ISettings InitNewSettings()
+        public ISettings InitNewSettings(IPathProvider pathProvider)
         {
-            return new Settings();
+            return new Settings(pathProvider);
         }
 
-        public IXmlSatellitesIO InitNewXmlSatelliteIO()
+        public IXmlSatellitesIO InitNewXmlSatelliteIO(IFileProvider fileProvider)
         {
-            return new XmlSatellitesIO(this);
+            return new XmlSatellitesIO(this, fileProvider);
         }
 
         public IBouquetsBouquet InitNewBouquetsBouquet()

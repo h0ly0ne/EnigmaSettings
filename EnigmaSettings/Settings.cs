@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.IO;
+//using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
@@ -139,10 +139,11 @@ namespace Krkadoni.EnigmaSettings
 
 
         private ILog _log;
-        private static readonly ILog _nullLogger = new NullLogger();
+        private static readonly ILog NullLogger = new NullLogger();
 
         private string _settingsFileName = string.Empty;
         private Enums.SettingsVersion _settingsVersion = Enums.SettingsVersion.Unknown;
+        private readonly IPathProvider _pathProvider;
 
         /// <summary>
         ///     Instance used for logging
@@ -152,7 +153,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public ILog Log
         {
-            get { return _log ?? _nullLogger; }
+            get { return _log ?? NullLogger; }
             set
             {
                 if (value == null) return;
@@ -195,7 +196,7 @@ namespace Krkadoni.EnigmaSettings
                     return string.Empty;
                 try
                 {
-                    return Path.GetDirectoryName(SettingsFileName);
+                    return _pathProvider.GetDirectoryName(SettingsFileName);
                 }
                 catch (Exception ex)
                 {
@@ -302,6 +303,13 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "Public methods"
+
+        public Settings(IPathProvider pathProvider)
+        {
+            if (pathProvider == null)
+                throw new ArgumentNullException(Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider);
+            _pathProvider = pathProvider;            
+        }
 
         /// <summary>
         ///     Returns list of satellite transponders from list with all transponders
@@ -792,13 +800,13 @@ namespace Krkadoni.EnigmaSettings
                 Log.Debug("Renumbering bouquets filenames");
                 IList<IFileBouquet> bqsTv = Bouquets.OfType<IFileBouquet>().Where(x =>
                 {
-                    string s = Path.GetFileName(x.FileName);
+                    string s = _pathProvider.GetFileName(x.FileName);
                     return s != null && (x.BouquetType == Enums.BouquetType.UserBouquetTv && s.StartsWith("userbouquet.dbe"));
                 }).OrderBy(x => x.FileName).ToList();
                 int index = 0;
                 foreach (IFileBouquet bouquet in bqsTv)
                 {
-                    string name = Path.GetFileName(bouquet.FileName);
+                    string name = _pathProvider.GetFileName(bouquet.FileName);
                     if (name != null && !name.StartsWith("userbouquet.dbe")) continue;
                     string fileName = string.Empty;
                     if (bouquet.FileName.IndexOf("/", StringComparison.CurrentCulture) > -1)
@@ -808,8 +816,8 @@ namespace Krkadoni.EnigmaSettings
                     fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.CurrentCulture).PadLeft(2, '0') + ".tv";
                     if (fileName != bouquet.FileName)
                     {
-                        Log.Debug(string.Format("Changed filename for bouquet {0} from {1} to {2}", bouquet.Name, Path.GetFileName(bouquet.FileName),
-                            Path.GetFileName(fileName)));
+                        Log.Debug(string.Format("Changed filename for bouquet {0} from {1} to {2}", bouquet.Name, _pathProvider.GetFileName(bouquet.FileName),
+                            _pathProvider.GetFileName(fileName)));
                         bouquet.FileName = fileName;
                     }
                     index += 1;
@@ -817,7 +825,7 @@ namespace Krkadoni.EnigmaSettings
                 index = 0;
                 IList<IFileBouquet> bqsRadio = Bouquets.OfType<IFileBouquet>().Where(x =>
                 {
-                    string name = Path.GetFileName(x.FileName);
+                    string name = _pathProvider.GetFileName(x.FileName);
                     return name != null && (x.BouquetType == Enums.BouquetType.UserBouquetRadio && name.StartsWith("userbouquet.dbe"));
                 }).OrderBy(x => x.FileName).ToList();
                 foreach (IFileBouquet bouquet in bqsRadio)
@@ -830,8 +838,8 @@ namespace Krkadoni.EnigmaSettings
                     fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.CurrentCulture).PadLeft(2, '0') + ".radio";
                     if (fileName != bouquet.FileName)
                     {
-                        Log.Debug(string.Format("Changed filename for bouquet {0} from {1} to {2}", bouquet.Name, Path.GetFileName(bouquet.FileName),
-                            Path.GetFileName(fileName)));
+                        Log.Debug(string.Format("Changed filename for bouquet {0} from {1} to {2}", bouquet.Name, _pathProvider.GetFileName(bouquet.FileName),
+                            _pathProvider.GetFileName(fileName)));
                         bouquet.FileName = fileName;
                     }
                     index += 1;

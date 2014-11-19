@@ -22,18 +22,25 @@ namespace Krkadoni.EnigmaSettings
     public class XmlSatellitesIO : IXmlSatellitesIO
     {
         private readonly IInstanceFactory _factory;
+        private static IFileProvider _fileProvider;
 
         /// <summary>
         ///     Initialites new instance with custom factory implementation
         /// </summary>
         /// <param name="factory"></param>
+        /// <param name="fileProvider"></param>
+        /// <param name="pathProvider"></param>
         /// <remarks></remarks>
         /// <exception cref="ArgumentNullException">Throws argument null exception if factory is null</exception>
-        public XmlSatellitesIO(IInstanceFactory factory)
+        public XmlSatellitesIO(IInstanceFactory factory, IFileProvider fileProvider)
         {
             if (factory == null)
                 throw new ArgumentNullException(Resources.SettingsIO_New_Invalid_instance_factory_);
+            if (fileProvider == null)
+                throw new ArgumentNullException(Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
+
             _factory = factory;
+            _fileProvider = fileProvider;
         }
 
         /// <summary>
@@ -198,7 +205,7 @@ namespace Krkadoni.EnigmaSettings
             public virtual string Serialize()
             {
                 var memoryStream = new MemoryStream();
-                var xmlSettings = new XmlWriterSettings() {Encoding = Encoding.GetEncoding("ISO-8859-1"), Indent = true};
+                var xmlSettings = new XmlWriterSettings {Encoding = Encoding.GetEncoding("ISO-8859-1"), Indent = true};
                 var xmlTextWriter = XmlWriter.Create(memoryStream, xmlSettings); //  (memoryStream, Encoding.GetEncoding("ISO-8859-1")) { Formatting = Formatting.Indented };
                 // XmlTextWriter xmlTextWriter = New XmlTextWriter(memoryStream, New UTF8Encoding(True))
                 var ns = new XmlSerializerNamespaces();
@@ -222,7 +229,7 @@ namespace Krkadoni.EnigmaSettings
             public virtual void SaveToFile(string fileName)
             {
                 string xmlString = Serialize();
-                File.WriteAllText(fileName, xmlString);
+                _fileProvider.WriteAllText(fileName, xmlString);
                 //var xmlFile = new FileInfo(fileName);
                 //using (var streamWriter = xmlFile.CreateText())
                 //{
@@ -232,7 +239,7 @@ namespace Krkadoni.EnigmaSettings
 
             public static SerializerSatellites LoadFromFile(string fileName)
             {
-                var xmlString = File.ReadAllText(fileName);
+                var xmlString = _fileProvider.ReadAllText(fileName);
                 return Deserialize(xmlString);
                 //var file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
                 //string xmlString;

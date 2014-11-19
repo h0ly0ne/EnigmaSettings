@@ -874,5 +874,23 @@ namespace Krkadoni.EnigmaSettings {
                 return ResourceManager.GetString("Transponder_New_Invalid_transponder_type_", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid file provider.
+        /// </summary>
+        internal static string XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider {
+            get {
+                return ResourceManager.GetString("XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid path provider.
+        /// </summary>
+        internal static string XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider {
+            get {
+                return ResourceManager.GetString("XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider", resourceCulture);
+            }
+        }
     }
 }
