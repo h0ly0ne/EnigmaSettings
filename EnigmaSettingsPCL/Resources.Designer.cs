@@ -10,6 +10,7 @@
 
 namespace Krkadoni.EnigmaSettings {
     using System;
+    using System.Reflection;
     
     
     /// <summary>
@@ -22,7 +23,7 @@ namespace Krkadoni.EnigmaSettings {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,10 +37,10 @@ namespace Krkadoni.EnigmaSettings {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Krkadoni.EnigmaSettings.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Krkadoni.EnigmaSettings.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +52,7 @@ namespace Krkadoni.EnigmaSettings {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +64,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Cannot change flag value before specifing flag..
         /// </summary>
-        public static string Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_ {
+        internal static string Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_ {
             get {
                 return ResourceManager.GetString("Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_", resourceCulture);
             }
@@ -72,7 +73,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Flag string cannot be empty..
         /// </summary>
-        public static string Flag_New_Flag_string_cannot_be_empty_ {
+        internal static string Flag_New_Flag_string_cannot_be_empty_ {
             get {
                 return ResourceManager.GetString("Flag_New_Flag_string_cannot_be_empty_", resourceCulture);
             }
@@ -81,7 +82,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid flag.
         /// </summary>
-        public static string Flag_New_Invalid_flag {
+        internal static string Flag_New_Invalid_flag {
             get {
                 return ResourceManager.GetString("Flag_New_Invalid_flag", resourceCulture);
             }
@@ -90,7 +91,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service name cannot be empty.
         /// </summary>
-        public static string Service_New_Service_name_cannot_be_empty {
+        internal static string Service_New_Service_name_cannot_be_empty {
             get {
                 return ResourceManager.GetString("Service_New_Service_name_cannot_be_empty", resourceCulture);
             }
@@ -99,7 +100,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid service data..
         /// </summary>
-        public static string Service_ServiceData_Invalid_service_data_ {
+        internal static string Service_ServiceData_Invalid_service_data_ {
             get {
                 return ResourceManager.GetString("Service_ServiceData_Invalid_service_data_", resourceCulture);
             }
@@ -108,7 +109,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service data cannot be empty..
         /// </summary>
-        public static string Service_ServiceData_Service_data_cannot_be_empty_ {
+        internal static string Service_ServiceData_Service_data_cannot_be_empty_ {
             get {
                 return ResourceManager.GetString("Service_ServiceData_Service_data_cannot_be_empty_", resourceCulture);
             }
@@ -117,7 +118,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Added new transponder {0} for previously missing satellite {1}.
         /// </summary>
-        public static string Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing_satellite__1_ {
+        internal static string Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing_satellite__1_ {
             get {
                 return ResourceManager.GetString("Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing" +
                         "_satellite__1_", resourceCulture);
@@ -127,7 +128,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to update missing XML satellites.
         /// </summary>
-        public static string Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites {
+        internal static string Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites {
             get {
                 return ResourceManager.GetString("Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites", resourceCulture);
             }
@@ -136,7 +137,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to New satellite for position {0} added to satellites.
         /// </summary>
-        public static string Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites {
+        internal static string Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites {
             get {
                 return ResourceManager.GetString("Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellit" +
                         "es", resourceCulture);
@@ -146,7 +147,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to WARNING: Some transponders are market as satellite but have invalid position 0 degrees!.
         /// </summary>
-        public static string Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_ {
+        internal static string Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_ {
             get {
                 return ResourceManager.GetString("Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satelli" +
                         "te_but_have_invalid_position_0_degrees_", resourceCulture);
@@ -156,7 +157,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to update missing XML transponders.
         /// </summary>
-        public static string Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders {
+        internal static string Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders {
             get {
                 return ResourceManager.GetString("Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders", resourceCulture);
             }
@@ -165,7 +166,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Cannot change position for satellite {1} to {2}.{0}There is already satellite on this position.
         /// </summary>
-        public static string Settings_ChangeSatellitePosition_Cannot_change_position_for_satellite__1__to__2___0_There_is_already_satellite_on_this_position {
+        internal static string Settings_ChangeSatellitePosition_Cannot_change_position_for_satellite__1__to__2___0_There_is_already_satellite_on_this_position {
             get {
                 return ResourceManager.GetString("Settings_ChangeSatellitePosition_Cannot_change_position_for_satellite__1__to__2__" +
                         "_0_There_is_already_satellite_on_this_position", resourceCulture);
@@ -175,7 +176,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to load settings from {0}.
         /// </summary>
-        public static string Settings_Load_Failed_to_load_settings_from__0_ {
+        internal static string Settings_Load_Failed_to_load_settings_from__0_ {
             get {
                 return ResourceManager.GetString("Settings_Load_Failed_to_load_settings_from__0_", resourceCulture);
             }
@@ -184,7 +185,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Loading settings from {0}.
         /// </summary>
-        public static string Settings_Load_Loading_settings_from__0_ {
+        internal static string Settings_Load_Loading_settings_from__0_ {
             get {
                 return ResourceManager.GetString("Settings_Load_Loading_settings_from__0_", resourceCulture);
             }
@@ -193,7 +194,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to File {0} does not exist.
         /// </summary>
-        public static string Settings_LoadSettings_File__0__does_not_exist_ {
+        internal static string Settings_LoadSettings_File__0__does_not_exist_ {
             get {
                 return ResourceManager.GetString("Settings_LoadSettings_File__0__does_not_exist_", resourceCulture);
             }
@@ -202,7 +203,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid filename!.
         /// </summary>
-        public static string Settings_LoadSettings_Invalid_filename_ {
+        internal static string Settings_LoadSettings_Invalid_filename_ {
             get {
                 return ResourceManager.GetString("Settings_LoadSettings_Invalid_filename_", resourceCulture);
             }
@@ -211,7 +212,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Bouquet service {0} not found in settings.
         /// </summary>
-        public static string Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings {
+        internal static string Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings {
             get {
                 return ResourceManager.GetString("Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings", resourceCulture);
             }
@@ -220,7 +221,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while matching bouquet items to services.
         /// </summary>
-        public static string Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services {
+        internal static string Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services {
             get {
                 return ResourceManager.GetString("Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_" +
                         "services", resourceCulture);
@@ -230,7 +231,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to No satellite has been found for transponder {0}.
         /// </summary>
-        public static string Settings_MatchSatellitesWithTransponders_No_satellite_has_been_found_for_transponder__0_ {
+        internal static string Settings_MatchSatellitesWithTransponders_No_satellite_has_been_found_for_transponder__0_ {
             get {
                 return ResourceManager.GetString("Settings_MatchSatellitesWithTransponders_No_satellite_has_been_found_for_transpon" +
                         "der__0_", resourceCulture);
@@ -240,7 +241,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while matching transponders with satellites..
         /// </summary>
-        public static string Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transponders_with_satellites_ {
+        internal static string Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transponders_with_satellites_ {
             get {
                 return ResourceManager.GetString("Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transp" +
                         "onders_with_satellites_", resourceCulture);
@@ -250,7 +251,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to No transponder has been found for service {0}   {1}.
         /// </summary>
-        public static string Settings_MatchServicesWithTransponders_No_transponder_has_been_found_for_service__0_____1_ {
+        internal static string Settings_MatchServicesWithTransponders_No_transponder_has_been_found_for_service__0_____1_ {
             get {
                 return ResourceManager.GetString("Settings_MatchServicesWithTransponders_No_transponder_has_been_found_for_service_" +
                         "_0_____1_", resourceCulture);
@@ -260,7 +261,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while trying to match services with transponders.
         /// </summary>
-        public static string Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_services_with_transponders {
+        internal static string Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_services_with_transponders {
             get {
                 return ResourceManager.GetString("Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_s" +
                         "ervices_with_transponders", resourceCulture);
@@ -270,7 +271,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while moving satellite to a new position.
         /// </summary>
-        public static string Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position {
+        internal static string Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position {
             get {
                 return ResourceManager.GetString("Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_positio" +
                         "n", resourceCulture);
@@ -280,7 +281,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to read file {0}{1}{2}.
         /// </summary>
-        public static string Settings_Read_Failed_to_read_file__0__1__2_ {
+        internal static string Settings_Read_Failed_to_read_file__0__1__2_ {
             get {
                 return ResourceManager.GetString("Settings_Read_Failed_to_read_file__0__1__2_", resourceCulture);
             }
@@ -289,7 +290,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to File {0} read in {1} ms.
         /// </summary>
-        public static string Settings_Read_File__0__read_in__1__ms {
+        internal static string Settings_Read_File__0__read_in__1__ms {
             get {
                 return ResourceManager.GetString("Settings_Read_File__0__read_in__1__ms", resourceCulture);
             }
@@ -298,7 +299,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Filename cannot be empty.
         /// </summary>
-        public static string Settings_Read_Filename_cannot_be_empty_ {
+        internal static string Settings_Read_Filename_cannot_be_empty_ {
             get {
                 return ResourceManager.GetString("Settings_Read_Filename_cannot_be_empty_", resourceCulture);
             }
@@ -307,7 +308,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Reading file {0}.
         /// </summary>
-        public static string Settings_Read_Reading_file__0_ {
+        internal static string Settings_Read_Reading_file__0_ {
             get {
                 return ResourceManager.GetString("Settings_Read_Reading_file__0_", resourceCulture);
             }
@@ -316,7 +317,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Bouquet {0} in bouquet {1} is of unknown type.
         /// </summary>
-        public static string Settings_ReadBouquet_Bouquet__0__in_bouquet__1__is_of_unknown_type {
+        internal static string Settings_ReadBouquet_Bouquet__0__in_bouquet__1__is_of_unknown_type {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquet_Bouquet__0__in_bouquet__1__is_of_unknown_type", resourceCulture);
             }
@@ -325,7 +326,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Bouquet {0} is empty.
         /// </summary>
-        public static string Settings_ReadBouquet_Bouquet__0__is_empty {
+        internal static string Settings_ReadBouquet_Bouquet__0__is_empty {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquet_Bouquet__0__is_empty", resourceCulture);
             }
@@ -334,7 +335,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to read bouquet {0}.
         /// </summary>
-        public static string Settings_ReadBouquet_Failed_to_read_bouquet__0_ {
+        internal static string Settings_ReadBouquet_Failed_to_read_bouquet__0_ {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquet_Failed_to_read_bouquet__0_", resourceCulture);
             }
@@ -343,7 +344,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to No &apos;{0}&apos; tag was found in file {1}.
         /// </summary>
-        public static string Settings_ReadBouquet_No___0___tag_was_found_in_file__1_ {
+        internal static string Settings_ReadBouquet_No___0___tag_was_found_in_file__1_ {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquet_No___0___tag_was_found_in_file__1_", resourceCulture);
             }
@@ -352,7 +353,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Stream service {1} added to bouquet {0} without description.
         /// </summary>
-        public static string Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description {
+        internal static string Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description", resourceCulture);
             }
@@ -361,7 +362,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Unsupported line &apos;{1}&apos; in bouquet {0}.
         /// </summary>
-        public static string Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_ {
+        internal static string Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_ {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_", resourceCulture);
             }
@@ -370,7 +371,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to File {0} is unknown bouquet type.
         /// </summary>
-        public static string Settings_ReadBouquets_File__0__is_unknown_bouquet_type {
+        internal static string Settings_ReadBouquets_File__0__is_unknown_bouquet_type {
             get {
                 return ResourceManager.GetString("Settings_ReadBouquets_File__0__is_unknown_bouquet_type", resourceCulture);
             }
@@ -379,7 +380,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Ignoring line {0} in Enigma1 bouquet {1}, doesn&apos;t look like regular service.
         /// </summary>
-        public static string Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_like_regular_service {
+        internal static string Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_like_regular_service {
             get {
                 return ResourceManager.GetString("Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_li" +
                         "ke_regular_service", resourceCulture);
@@ -389,7 +390,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to File {0} is empty.
         /// </summary>
-        public static string Settings_ReadServicesFile_File__0__is_empty_ {
+        internal static string Settings_ReadServicesFile_File__0__is_empty_ {
             get {
                 return ResourceManager.GetString("Settings_ReadServicesFile_File__0__is_empty_", resourceCulture);
             }
@@ -398,7 +399,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to File {0} is not valid settings file.
         /// </summary>
-        public static string Settings_ReadServicesFile_File__0__is_not_valid_settings_file_ {
+        internal static string Settings_ReadServicesFile_File__0__is_not_valid_settings_file_ {
             get {
                 return ResourceManager.GetString("Settings_ReadServicesFile_File__0__is_not_valid_settings_file_", resourceCulture);
             }
@@ -407,7 +408,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to No &apos;services&apos; tag was found in file {0}.
         /// </summary>
-        public static string Settings_ReadServicesFile_No__services__tag_was_found_in_file__0_ {
+        internal static string Settings_ReadServicesFile_No__services__tag_was_found_in_file__0_ {
             get {
                 return ResourceManager.GetString("Settings_ReadServicesFile_No__services__tag_was_found_in_file__0_", resourceCulture);
             }
@@ -416,7 +417,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to No &apos;transponder&apos; tag was found in {0}.
         /// </summary>
-        public static string Settings_ReadServicesFile_No__transponder__tag_was_found_in__0_ {
+        internal static string Settings_ReadServicesFile_No__transponder__tag_was_found_in__0_ {
             get {
                 return ResourceManager.GetString("Settings_ReadServicesFile_No__transponder__tag_was_found_in__0_", resourceCulture);
             }
@@ -425,7 +426,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while reading settings{0}{1}.
         /// </summary>
-        public static string Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_ {
+        internal static string Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_ {
             get {
                 return ResourceManager.GetString("Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_", resourceCulture);
             }
@@ -434,7 +435,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Unsuported settings version {0}.
         /// </summary>
-        public static string Settings_ReadServicesFile_Unsuported_settings_version__0_ {
+        internal static string Settings_ReadServicesFile_Unsuported_settings_version__0_ {
             get {
                 return ResourceManager.GetString("Settings_ReadServicesFile_Unsuported_settings_version__0_", resourceCulture);
             }
@@ -443,7 +444,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing double markers.
         /// </summary>
-        public static string Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers {
+        internal static string Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers {
             get {
                 return ResourceManager.GetString("Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers", resourceCulture);
             }
@@ -452,7 +453,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing empty bouquets.
         /// </summary>
-        public static string Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets {
+        internal static string Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets {
             get {
                 return ResourceManager.GetString("Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets", resourceCulture);
             }
@@ -461,7 +462,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing invalid bouquet items.
         /// </summary>
-        public static string Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouquet_items {
+        internal static string Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouquet_items {
             get {
                 return ResourceManager.GetString("Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouq" +
                         "uet_items", resourceCulture);
@@ -471,7 +472,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing satellite.
         /// </summary>
-        public static string Settings_RemoveSatellite_There_was_an_error_while_removing_satellite {
+        internal static string Settings_RemoveSatellite_There_was_an_error_while_removing_satellite {
             get {
                 return ResourceManager.GetString("Settings_RemoveSatellite_There_was_an_error_while_removing_satellite", resourceCulture);
             }
@@ -480,7 +481,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing service {0}.
         /// </summary>
-        public static string Settings_RemoveService_There_was_an_error_while_removing_service__0_ {
+        internal static string Settings_RemoveService_There_was_an_error_while_removing_service__0_ {
             get {
                 return ResourceManager.GetString("Settings_RemoveService_There_was_an_error_while_removing_service__0_", resourceCulture);
             }
@@ -489,7 +490,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while deleting services.
         /// </summary>
-        public static string Settings_RemoveServices_There_was_an_error_while_deleting_services {
+        internal static string Settings_RemoveServices_There_was_an_error_while_deleting_services {
             get {
                 return ResourceManager.GetString("Settings_RemoveServices_There_was_an_error_while_deleting_services", resourceCulture);
             }
@@ -498,7 +499,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing streams.
         /// </summary>
-        public static string Settings_RemoveStreams_There_was_an_error_while_removing_streams {
+        internal static string Settings_RemoveStreams_There_was_an_error_while_removing_streams {
             get {
                 return ResourceManager.GetString("Settings_RemoveStreams_There_was_an_error_while_removing_streams", resourceCulture);
             }
@@ -507,7 +508,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing transponder {0}.
         /// </summary>
-        public static string Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_ {
+        internal static string Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_ {
             get {
                 return ResourceManager.GetString("Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_", resourceCulture);
             }
@@ -516,7 +517,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while removing transponders.
         /// </summary>
-        public static string Settings_RemoveTransponders_There_was_an_error_while_removing_transponders {
+        internal static string Settings_RemoveTransponders_There_was_an_error_while_removing_transponders {
             get {
                 return ResourceManager.GetString("Settings_RemoveTransponders_There_was_an_error_while_removing_transponders", resourceCulture);
             }
@@ -525,7 +526,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while trying to renumber bouquet file names..
         /// </summary>
-        public static string Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_ {
+        internal static string Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_ {
             get {
                 return ResourceManager.GetString("Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bou" +
                         "quet_file_names_", resourceCulture);
@@ -535,7 +536,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while renumbering markers..
         /// </summary>
-        public static string Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_ {
+        internal static string Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_ {
             get {
                 return ResourceManager.GetString("Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_", resourceCulture);
             }
@@ -544,7 +545,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error while updating namespaces for satellite transponders..
         /// </summary>
-        public static string Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_namespaces_for_satellite_transponders_ {
+        internal static string Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_namespaces_for_satellite_transponders_ {
             get {
                 return ResourceManager.GetString("Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_" +
                         "namespaces_for_satellite_transponders_", resourceCulture);
@@ -554,7 +555,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to File {0} already exists and could not be deleted!.
         /// </summary>
-        public static string SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_ {
+        internal static string SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_ {
             get {
                 return ResourceManager.GetString("SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_", resourceCulture);
             }
@@ -563,7 +564,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} in bouquet {1} has no matching transponder. Not writing it..
         /// </summary>
-        public static string SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transponder__Not_writing_it_ {
+        internal static string SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transponder__Not_writing_it_ {
             get {
                 return ResourceManager.GetString("SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transpond" +
                         "er__Not_writing_it_", resourceCulture);
@@ -573,7 +574,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} in bouquet {1} is not supported in Enigma1. Not writing it..
         /// </summary>
-        public static string SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigma1__Not_writing_it_ {
+        internal static string SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigma1__Not_writing_it_ {
             get {
                 return ResourceManager.GetString("SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigm" +
                         "a1__Not_writing_it_", resourceCulture);
@@ -583,7 +584,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service reference {0} in bouquet {1} is not matched to any service. Not writing it to bouquet..
         /// </summary>
-        public static string SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_to_any_service__Not_writing_it_to_bouquet_ {
+        internal static string SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_to_any_service__Not_writing_it_to_bouquet_ {
             get {
                 return ResourceManager.GetString("SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_" +
                         "to_any_service__Not_writing_it_to_bouquet_", resourceCulture);
@@ -593,7 +594,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid instance factory!.
         /// </summary>
-        public static string SettingsIO_New_Invalid_instance_factory_ {
+        internal static string SettingsIO_New_Invalid_instance_factory_ {
             get {
                 return ResourceManager.GetString("SettingsIO_New_Invalid_instance_factory_", resourceCulture);
             }
@@ -602,7 +603,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to read Enigma1 bouquets file..
         /// </summary>
-        public static string SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_ {
+        internal static string SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_", resourceCulture);
             }
@@ -611,7 +612,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid service reference {0} not added to bouquet {1}.
         /// </summary>
-        public static string SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_ {
+        internal static string SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_" +
                         "", resourceCulture);
@@ -621,7 +622,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid stream reference {0} not added to bouquet {1}.
         /// </summary>
-        public static string SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_ {
+        internal static string SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_", resourceCulture);
             }
@@ -630,7 +631,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to initialize new marker from line {0}.
         /// </summary>
-        public static string SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_ {
+        internal static string SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_", resourceCulture);
             }
@@ -639,7 +640,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to initialize new service from line {0}.
         /// </summary>
-        public static string SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_ {
+        internal static string SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_", resourceCulture);
             }
@@ -648,7 +649,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Locked bouquet number {0} has no matching Enigma1 bouquet..
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_ {
+        internal static string SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_", resourceCulture);
             }
@@ -657,7 +658,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to read services.locked file.
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file {
+        internal static string SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file", resourceCulture);
             }
@@ -666,7 +667,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Found unknown reference type {0} in {1}.
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_ {
+        internal static string SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_", resourceCulture);
             }
@@ -675,7 +676,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid line {0} found in {1}.
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Invalid_line__0__found_in__1_ {
+        internal static string SettingsIO_ReadServicesLocked_Invalid_line__0__found_in__1_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Invalid_line__0__found_in__1_", resourceCulture);
             }
@@ -684,7 +685,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Locked bouquet item {0} has no matching service.
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service {
+        internal static string SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service", resourceCulture);
             }
@@ -693,7 +694,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Unable to parse bouquet order number {0} to integer for bouquet {1} on line {2}.
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Unable_to_parse_bouquet_order_number__0__to_integer_for_bouquet__1__on_line__2_ {
+        internal static string SettingsIO_ReadServicesLocked_Unable_to_parse_bouquet_order_number__0__to_integer_for_bouquet__1__on_line__2_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Unable_to_parse_bouquet_order_number__0__to_integer" +
                         "_for_bouquet__1__on_line__2_", resourceCulture);
@@ -703,7 +704,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Unsupported type {0} found in line {1} in file {2}.
         /// </summary>
-        public static string SettingsIO_ReadServicesLocked_Unsupported_type__0__found_in_line__1__in_file__2_ {
+        internal static string SettingsIO_ReadServicesLocked_Unsupported_type__0__found_in_line__1__in_file__2_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadServicesLocked_Unsupported_type__0__found_in_line__1__in_file__2_", resourceCulture);
             }
@@ -712,7 +713,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Unknown transponder type for transponder {0} {1}, adding it as satellite transponder.
         /// </summary>
-        public static string SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder {
+        internal static string SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___add" +
                         "ing_it_as_satellite_transponder", resourceCulture);
@@ -722,7 +723,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to initialize new stream reference from line {0}.
         /// </summary>
-        public static string SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_ {
+        internal static string SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_lin" +
                         "e__0_", resourceCulture);
@@ -732,7 +733,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Bouquet filenames are not unique..
         /// </summary>
-        public static string SettingsIO_Save_Bouquet_filenames_are_not_unique_ {
+        internal static string SettingsIO_Save_Bouquet_filenames_are_not_unique_ {
             get {
                 return ResourceManager.GetString("SettingsIO_Save_Bouquet_filenames_are_not_unique_", resourceCulture);
             }
@@ -741,7 +742,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to save settings to {0}.
         /// </summary>
-        public static string SettingsIO_Save_Failed_to_save_settings_to__0_ {
+        internal static string SettingsIO_Save_Failed_to_save_settings_to__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_Save_Failed_to_save_settings_to__0_", resourceCulture);
             }
@@ -750,7 +751,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to There was an error creating folder {0}.
         /// </summary>
-        public static string SettingsIO_Save_There_was_an_error_creating_folder__0_ {
+        internal static string SettingsIO_Save_There_was_an_error_creating_folder__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_Save_There_was_an_error_creating_folder__0_", resourceCulture);
             }
@@ -759,7 +760,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} has no transponder set, not writing it to settings..
         /// </summary>
-        public static string SettingsIO_ServicesToString_Service__0__has_no_transponder_set__not_writing_it_to_settings_ {
+        internal static string SettingsIO_ServicesToString_Service__0__has_no_transponder_set__not_writing_it_to_settings_ {
             get {
                 return ResourceManager.GetString("SettingsIO_ServicesToString_Service__0__has_no_transponder_set__not_writing_it_to" +
                         "_settings_", resourceCulture);
@@ -769,7 +770,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} has no matching transponder, not adding it to blacklist file.
         /// </summary>
-        public static string SettingsIO_WriteBlackList_Service__0__has_no_matching_transponder__not_adding_it_to_blacklist_file {
+        internal static string SettingsIO_WriteBlackList_Service__0__has_no_matching_transponder__not_adding_it_to_blacklist_file {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteBlackList_Service__0__has_no_matching_transponder__not_adding_it_" +
                         "to_blacklist_file", resourceCulture);
@@ -779,7 +780,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Skipping unknown bouquet item type in bouquet {0}.
         /// </summary>
-        public static string SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_ {
+        internal static string SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_", resourceCulture);
             }
@@ -788,7 +789,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Reference to Enigma1 bouquet {0} has no matching bouquet set, not adding it to bouquets file.
         /// </summary>
-        public static string SettingsIO_WriteEnigma1Bouquets_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_bouquets_file {
+        internal static string SettingsIO_WriteEnigma1Bouquets_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_bouquets_file {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteEnigma1Bouquets_Reference_to_Enigma1_bouquet__0__has_no_matching_" +
                         "bouquet_set__not_adding_it_to_bouquets_file", resourceCulture);
@@ -798,7 +799,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} in Enigma1 bouqet {0} has no matching transponder, not adding it to bouquets file..
         /// </summary>
-        public static string SettingsIO_WriteEnigma1Bouquets_Service__0__in_Enigma1_bouqet__0__has_no_matching_transponder__not_adding_it_to_bouquets_file_ {
+        internal static string SettingsIO_WriteEnigma1Bouquets_Service__0__in_Enigma1_bouqet__0__has_no_matching_transponder__not_adding_it_to_bouquets_file_ {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteEnigma1Bouquets_Service__0__in_Enigma1_bouqet__0__has_no_matching" +
                         "_transponder__not_adding_it_to_bouquets_file_", resourceCulture);
@@ -808,7 +809,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service reference {0} has no matching service, not adding it to bouquet {1}.
         /// </summary>
-        public static string SettingsIO_WriteEnigma1Bouquets_Service_reference__0__has_no_matching_service__not_adding_it_to_bouquet__1_ {
+        internal static string SettingsIO_WriteEnigma1Bouquets_Service_reference__0__has_no_matching_service__not_adding_it_to_bouquet__1_ {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteEnigma1Bouquets_Service_reference__0__has_no_matching_service__no" +
                         "t_adding_it_to_bouquet__1_", resourceCulture);
@@ -818,7 +819,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to write services.locked file to {0}.
         /// </summary>
-        public static string SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_ {
+        internal static string SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_ {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_", resourceCulture);
             }
@@ -827,7 +828,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Reference to Enigma1 bouquet {0} has no matching bouquet set, not adding it to services.locked.
         /// </summary>
-        public static string SettingsIO_WriteServicesLocked_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_services_locked {
+        internal static string SettingsIO_WriteServicesLocked_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_services_locked {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteServicesLocked_Reference_to_Enigma1_bouquet__0__has_no_matching_b" +
                         "ouquet_set__not_adding_it_to_services_locked", resourceCulture);
@@ -837,7 +838,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} has no transponder, not adding it to services.locked.
         /// </summary>
-        public static string SettingsIO_WriteServicesLocked_Service__0__has_no_transponder__not_adding_it_to_services_locked {
+        internal static string SettingsIO_WriteServicesLocked_Service__0__has_no_transponder__not_adding_it_to_services_locked {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteServicesLocked_Service__0__has_no_transponder__not_adding_it_to_s" +
                         "ervices_locked", resourceCulture);
@@ -847,7 +848,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Failed to write bouquet {0} to {1}.
         /// </summary>
-        public static string SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_ {
+        internal static string SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_ {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_", resourceCulture);
             }
@@ -856,7 +857,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Service {0} has no matching transponder, not adding it to whitelist file.
         /// </summary>
-        public static string SettingsIO_WriteWhiteList_Service__0__has_no_matching_transponder__not_adding_it_to_whitelist_file {
+        internal static string SettingsIO_WriteWhiteList_Service__0__has_no_matching_transponder__not_adding_it_to_whitelist_file {
             get {
                 return ResourceManager.GetString("SettingsIO_WriteWhiteList_Service__0__has_no_matching_transponder__not_adding_it_" +
                         "to_whitelist_file", resourceCulture);
@@ -866,7 +867,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid transponder type!.
         /// </summary>
-        public static string Transponder_New_Invalid_transponder_type_ {
+        internal static string Transponder_New_Invalid_transponder_type_ {
             get {
                 return ResourceManager.GetString("Transponder_New_Invalid_transponder_type_", resourceCulture);
             }
@@ -875,7 +876,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid file provider.
         /// </summary>
-        public static string XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider {
+        internal static string XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider {
             get {
                 return ResourceManager.GetString("XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider", resourceCulture);
             }
@@ -884,7 +885,7 @@ namespace Krkadoni.EnigmaSettings {
         /// <summary>
         ///   Looks up a localized string similar to Invalid path provider.
         /// </summary>
-        public static string XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider {
+        internal static string XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider {
             get {
                 return ResourceManager.GetString("XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider", resourceCulture);
             }

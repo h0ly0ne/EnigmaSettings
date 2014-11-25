@@ -1,0 +1,387 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_" xml:space="preserve">
+    <value>Cannot change flag value before specifing flag.</value>
+  </data>
+  <data name="Flag_New_Flag_string_cannot_be_empty_" xml:space="preserve">
+    <value>Flag string cannot be empty.</value>
+  </data>
+  <data name="Flag_New_Invalid_flag" xml:space="preserve">
+    <value>Invalid flag</value>
+  </data>
+  <data name="Service_New_Service_name_cannot_be_empty" xml:space="preserve">
+    <value>Service name cannot be empty</value>
+  </data>
+  <data name="Service_ServiceData_Invalid_service_data_" xml:space="preserve">
+    <value>Invalid service data.</value>
+  </data>
+  <data name="Service_ServiceData_Service_data_cannot_be_empty_" xml:space="preserve">
+    <value>Service data cannot be empty.</value>
+  </data>
+  <data name="SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_" xml:space="preserve">
+    <value>File {0} already exists and could not be deleted!</value>
+  </data>
+  <data name="SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_to_any_service__Not_writing_it_to_bouquet_" xml:space="preserve">
+    <value>Service reference {0} in bouquet {1} is not matched to any service. Not writing it to bouquet.</value>
+  </data>
+  <data name="SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transponder__Not_writing_it_" xml:space="preserve">
+    <value>Service {0} in bouquet {1} has no matching transponder. Not writing it.</value>
+  </data>
+  <data name="SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigma1__Not_writing_it_" xml:space="preserve">
+    <value>Service {0} in bouquet {1} is not supported in Enigma1. Not writing it.</value>
+  </data>
+  <data name="SettingsIO_New_Invalid_instance_factory_" xml:space="preserve">
+    <value>Invalid instance factory!</value>
+  </data>
+  <data name="SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_" xml:space="preserve">
+    <value>Failed to read Enigma1 bouquets file.</value>
+  </data>
+  <data name="SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_" xml:space="preserve">
+    <value>Invalid service reference {0} not added to bouquet {1}</value>
+  </data>
+  <data name="SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_" xml:space="preserve">
+    <value>Invalid stream reference {0} not added to bouquet {1}</value>
+  </data>
+  <data name="SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_" xml:space="preserve">
+    <value>Failed to initialize new marker from line {0}</value>
+  </data>
+  <data name="SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_" xml:space="preserve">
+    <value>Failed to initialize new service from line {0}</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_" xml:space="preserve">
+    <value>Locked bouquet number {0} has no matching Enigma1 bouquet.</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file" xml:space="preserve">
+    <value>Failed to read services.locked file</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_" xml:space="preserve">
+    <value>Found unknown reference type {0} in {1}</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Invalid_line__0__found_in__1_" xml:space="preserve">
+    <value>Invalid line {0} found in {1}</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service" xml:space="preserve">
+    <value>Locked bouquet item {0} has no matching service</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Unable_to_parse_bouquet_order_number__0__to_integer_for_bouquet__1__on_line__2_" xml:space="preserve">
+    <value>Unable to parse bouquet order number {0} to integer for bouquet {1} on line {2}</value>
+  </data>
+  <data name="SettingsIO_ReadServicesLocked_Unsupported_type__0__found_in_line__1__in_file__2_" xml:space="preserve">
+    <value>Unsupported type {0} found in line {1} in file {2}</value>
+  </data>
+  <data name="SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder" xml:space="preserve">
+    <value>Unknown transponder type for transponder {0} {1}, adding it as satellite transponder</value>
+  </data>
+  <data name="SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_" xml:space="preserve">
+    <value>Failed to initialize new stream reference from line {0}</value>
+  </data>
+  <data name="SettingsIO_Save_Bouquet_filenames_are_not_unique_" xml:space="preserve">
+    <value>Bouquet filenames are not unique.</value>
+  </data>
+  <data name="SettingsIO_Save_Failed_to_save_settings_to__0_" xml:space="preserve">
+    <value>Failed to save settings to {0}</value>
+  </data>
+  <data name="SettingsIO_Save_There_was_an_error_creating_folder__0_" xml:space="preserve">
+    <value>There was an error creating folder {0}</value>
+  </data>
+  <data name="SettingsIO_ServicesToString_Service__0__has_no_transponder_set__not_writing_it_to_settings_" xml:space="preserve">
+    <value>Service {0} has no transponder set, not writing it to settings.</value>
+  </data>
+  <data name="SettingsIO_WriteBlackList_Service__0__has_no_matching_transponder__not_adding_it_to_blacklist_file" xml:space="preserve">
+    <value>Service {0} has no matching transponder, not adding it to blacklist file</value>
+  </data>
+  <data name="SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_" xml:space="preserve">
+    <value>Skipping unknown bouquet item type in bouquet {0}</value>
+  </data>
+  <data name="SettingsIO_WriteEnigma1Bouquets_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_bouquets_file" xml:space="preserve">
+    <value>Reference to Enigma1 bouquet {0} has no matching bouquet set, not adding it to bouquets file</value>
+  </data>
+  <data name="SettingsIO_WriteEnigma1Bouquets_Service_reference__0__has_no_matching_service__not_adding_it_to_bouquet__1_" xml:space="preserve">
+    <value>Service reference {0} has no matching service, not adding it to bouquet {1}</value>
+  </data>
+  <data name="SettingsIO_WriteEnigma1Bouquets_Service__0__in_Enigma1_bouqet__0__has_no_matching_transponder__not_adding_it_to_bouquets_file_" xml:space="preserve">
+    <value>Service {0} in Enigma1 bouqet {0} has no matching transponder, not adding it to bouquets file.</value>
+  </data>
+  <data name="SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_" xml:space="preserve">
+    <value>Failed to write services.locked file to {0}</value>
+  </data>
+  <data name="SettingsIO_WriteServicesLocked_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_services_locked" xml:space="preserve">
+    <value>Reference to Enigma1 bouquet {0} has no matching bouquet set, not adding it to services.locked</value>
+  </data>
+  <data name="SettingsIO_WriteServicesLocked_Service__0__has_no_transponder__not_adding_it_to_services_locked" xml:space="preserve">
+    <value>Service {0} has no transponder, not adding it to services.locked</value>
+  </data>
+  <data name="SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_" xml:space="preserve">
+    <value>Failed to write bouquet {0} to {1}</value>
+  </data>
+  <data name="SettingsIO_WriteWhiteList_Service__0__has_no_matching_transponder__not_adding_it_to_whitelist_file" xml:space="preserve">
+    <value>Service {0} has no matching transponder, not adding it to whitelist file</value>
+  </data>
+  <data name="Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing_satellite__1_" xml:space="preserve">
+    <value>Added new transponder {0} for previously missing satellite {1}</value>
+  </data>
+  <data name="Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites" xml:space="preserve">
+    <value>Failed to update missing XML satellites</value>
+  </data>
+  <data name="Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites" xml:space="preserve">
+    <value>New satellite for position {0} added to satellites</value>
+  </data>
+  <data name="Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_" xml:space="preserve">
+    <value>WARNING: Some transponders are market as satellite but have invalid position 0 degrees!</value>
+  </data>
+  <data name="Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders" xml:space="preserve">
+    <value>Failed to update missing XML transponders</value>
+  </data>
+  <data name="Settings_ChangeSatellitePosition_Cannot_change_position_for_satellite__1__to__2___0_There_is_already_satellite_on_this_position" xml:space="preserve">
+    <value>Cannot change position for satellite {1} to {2}.{0}There is already satellite on this position</value>
+  </data>
+  <data name="Settings_LoadSettings_File__0__does_not_exist_" xml:space="preserve">
+    <value>File {0} does not exist</value>
+  </data>
+  <data name="Settings_LoadSettings_Invalid_filename_" xml:space="preserve">
+    <value>Invalid filename!</value>
+  </data>
+  <data name="Settings_Load_Failed_to_load_settings_from__0_" xml:space="preserve">
+    <value>Failed to load settings from {0}</value>
+  </data>
+  <data name="Settings_Load_Loading_settings_from__0_" xml:space="preserve">
+    <value>Loading settings from {0}</value>
+  </data>
+  <data name="Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings" xml:space="preserve">
+    <value>Bouquet service {0} not found in settings</value>
+  </data>
+  <data name="Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services" xml:space="preserve">
+    <value>There was an error while matching bouquet items to services</value>
+  </data>
+  <data name="Settings_MatchSatellitesWithTransponders_No_satellite_has_been_found_for_transponder__0_" xml:space="preserve">
+    <value>No satellite has been found for transponder {0}</value>
+  </data>
+  <data name="Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transponders_with_satellites_" xml:space="preserve">
+    <value>There was an error while matching transponders with satellites.</value>
+  </data>
+  <data name="Settings_MatchServicesWithTransponders_No_transponder_has_been_found_for_service__0_____1_" xml:space="preserve">
+    <value>No transponder has been found for service {0}   {1}</value>
+  </data>
+  <data name="Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_services_with_transponders" xml:space="preserve">
+    <value>There was an error while trying to match services with transponders</value>
+  </data>
+  <data name="Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position" xml:space="preserve">
+    <value>There was an error while moving satellite to a new position</value>
+  </data>
+  <data name="Settings_ReadBouquets_File__0__is_unknown_bouquet_type" xml:space="preserve">
+    <value>File {0} is unknown bouquet type</value>
+  </data>
+  <data name="Settings_ReadBouquet_Bouquet__0__in_bouquet__1__is_of_unknown_type" xml:space="preserve">
+    <value>Bouquet {0} in bouquet {1} is of unknown type</value>
+  </data>
+  <data name="Settings_ReadBouquet_Bouquet__0__is_empty" xml:space="preserve">
+    <value>Bouquet {0} is empty</value>
+  </data>
+  <data name="Settings_ReadBouquet_Failed_to_read_bouquet__0_" xml:space="preserve">
+    <value>Failed to read bouquet {0}</value>
+  </data>
+  <data name="Settings_ReadBouquet_No___0___tag_was_found_in_file__1_" xml:space="preserve">
+    <value>No '{0}' tag was found in file {1}</value>
+  </data>
+  <data name="Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description" xml:space="preserve">
+    <value>Stream service {1} added to bouquet {0} without description</value>
+  </data>
+  <data name="Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_" xml:space="preserve">
+    <value>Unsupported line '{1}' in bouquet {0}</value>
+  </data>
+  <data name="Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_like_regular_service" xml:space="preserve">
+    <value>Ignoring line {0} in Enigma1 bouquet {1}, doesn't look like regular service</value>
+  </data>
+  <data name="Settings_ReadServicesFile_File__0__is_empty_" xml:space="preserve">
+    <value>File {0} is empty</value>
+  </data>
+  <data name="Settings_ReadServicesFile_File__0__is_not_valid_settings_file_" xml:space="preserve">
+    <value>File {0} is not valid settings file</value>
+  </data>
+  <data name="Settings_ReadServicesFile_No__services__tag_was_found_in_file__0_" xml:space="preserve">
+    <value>No 'services' tag was found in file {0}</value>
+  </data>
+  <data name="Settings_ReadServicesFile_No__transponder__tag_was_found_in__0_" xml:space="preserve">
+    <value>No 'transponder' tag was found in {0}</value>
+  </data>
+  <data name="Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_" xml:space="preserve">
+    <value>There was an error while reading settings{0}{1}</value>
+  </data>
+  <data name="Settings_ReadServicesFile_Unsuported_settings_version__0_" xml:space="preserve">
+    <value>Unsuported settings version {0}</value>
+  </data>
+  <data name="Settings_Read_Failed_to_read_file__0__1__2_" xml:space="preserve">
+    <value>Failed to read file {0}{1}{2}</value>
+  </data>
+  <data name="Settings_Read_Filename_cannot_be_empty_" xml:space="preserve">
+    <value>Filename cannot be empty</value>
+  </data>
+  <data name="Settings_Read_File__0__read_in__1__ms" xml:space="preserve">
+    <value>File {0} read in {1} ms</value>
+  </data>
+  <data name="Settings_Read_Reading_file__0_" xml:space="preserve">
+    <value>Reading file {0}</value>
+  </data>
+  <data name="Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers" xml:space="preserve">
+    <value>There was an error while removing double markers</value>
+  </data>
+  <data name="Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets" xml:space="preserve">
+    <value>There was an error while removing empty bouquets</value>
+  </data>
+  <data name="Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouquet_items" xml:space="preserve">
+    <value>There was an error while removing invalid bouquet items</value>
+  </data>
+  <data name="Settings_RemoveSatellite_There_was_an_error_while_removing_satellite" xml:space="preserve">
+    <value>There was an error while removing satellite</value>
+  </data>
+  <data name="Settings_RemoveServices_There_was_an_error_while_deleting_services" xml:space="preserve">
+    <value>There was an error while deleting services</value>
+  </data>
+  <data name="Settings_RemoveService_There_was_an_error_while_removing_service__0_" xml:space="preserve">
+    <value>There was an error while removing service {0}</value>
+  </data>
+  <data name="Settings_RemoveStreams_There_was_an_error_while_removing_streams" xml:space="preserve">
+    <value>There was an error while removing streams</value>
+  </data>
+  <data name="Settings_RemoveTransponders_There_was_an_error_while_removing_transponders" xml:space="preserve">
+    <value>There was an error while removing transponders</value>
+  </data>
+  <data name="Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_" xml:space="preserve">
+    <value>There was an error while removing transponder {0}</value>
+  </data>
+  <data name="Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_" xml:space="preserve">
+    <value>There was an error while trying to renumber bouquet file names.</value>
+  </data>
+  <data name="Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_" xml:space="preserve">
+    <value>There was an error while renumbering markers.</value>
+  </data>
+  <data name="Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_namespaces_for_satellite_transponders_" xml:space="preserve">
+    <value>There was an error while updating namespaces for satellite transponders.</value>
+  </data>
+  <data name="Transponder_New_Invalid_transponder_type_" xml:space="preserve">
+    <value>Invalid transponder type!</value>
+  </data>
+  <data name="XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider" xml:space="preserve">
+    <value>Invalid file provider</value>
+  </data>
+  <data name="XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider" xml:space="preserve">
+    <value>Invalid path provider</value>
+  </data>
+</root>
