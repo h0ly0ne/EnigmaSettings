@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -116,8 +116,8 @@
     <Compile Include="..\EnigmaSettings\Interfaces\IFileBouquet.cs">
       <Link>Interfaces\IFileBouquet.cs</Link>
     </Compile>
-    <Compile Include="..\EnigmaSettings\Interfaces\IFileProvider.cs">
-      <Link>Interfaces\IFileProvider.cs</Link>
+    <Compile Include="..\EnigmaSettings\Interfaces\IFileHelper.cs">
+      <Link>Interfaces\IFileHelper.cs</Link>
     </Compile>
     <Compile Include="..\EnigmaSettings\Interfaces\IFlag.cs">
       <Link>Interfaces\IFlag.cs</Link>

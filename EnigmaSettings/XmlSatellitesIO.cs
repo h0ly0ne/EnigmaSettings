@@ -22,7 +22,7 @@ namespace Krkadoni.EnigmaSettings
     public class XmlSatellitesIO : IXmlSatellitesIO
     {
         private readonly IInstanceFactory _factory;
-        private static IFileProvider _fileProvider;
+        private static IFileHelper _fileProvider;
 
         /// <summary>
         ///     Initialites new instance with custom factory implementation
@@ -32,7 +32,7 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="pathProvider"></param>
         /// <remarks></remarks>
         /// <exception cref="ArgumentNullException">Throws argument null exception if factory is null</exception>
-        public XmlSatellitesIO(IInstanceFactory factory, IFileProvider fileProvider)
+        public XmlSatellitesIO(IInstanceFactory factory, IFileHelper fileProvider)
         {
             if (factory == null)
                 throw new ArgumentNullException(Resources.SettingsIO_New_Invalid_instance_factory_);

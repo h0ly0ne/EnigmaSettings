@@ -42,9 +42,9 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
         IService InitNewService(string serviceData, string name, string flags);
 
-        ISettings InitNewSettings(IPathProvider pathProvider);
+        ISettings InitNewSettings();
 
-        IXmlSatellitesIO InitNewXmlSatelliteIO(IFileProvider fileProvider);
+        IXmlSatellitesIO InitNewXmlSatelliteIO(IFileHelper fileProvider);
 
         IBouquetItemBouquetsBouquet InitNewBouquetItemBouquetsBouquet(int bouquetOrderNumber);
 

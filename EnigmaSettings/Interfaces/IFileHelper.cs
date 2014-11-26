@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-   public interface IFileProvider
+   public interface IFileHelper
    {
        bool Exists(string path);
 

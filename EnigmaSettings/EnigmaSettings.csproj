@@ -48,8 +48,7 @@
     <Compile Include="BouquetItemStream.cs" />
     <Compile Include="BouquetsBouquet.cs" />
     <Compile Include="DebugLogger.cs" />
-    <Compile Include="DesktopFileProvider.cs" />
-    <Compile Include="DesktopPathProvider.cs" />
+    <Compile Include="FileHelper.cs" />
     <Compile Include="FileBouquet.cs" />
     <Compile Include="FileLoadedEventArgs.cs" />
     <Compile Include="FileLoadingEventArgs.cs" />
@@ -67,13 +66,10 @@
     <Compile Include="Interfaces\IBouquetItemStream.cs" />
     <Compile Include="Interfaces\IBouquetsBouquet.cs" />
     <Compile Include="Interfaces\IFileBouquet.cs" />
-    <Compile Include="Interfaces\IFileProvider.cs" />
+    <Compile Include="Interfaces\IFileHelper.cs" />
     <Compile Include="Interfaces\IFlag.cs" />
     <Compile Include="Interfaces\IInstanceFactory.cs" />
     <Compile Include="Interfaces\ILog.cs" />
-    <Compile Include="Interfaces\IPathProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Interfaces\IService.cs" />
     <Compile Include="Interfaces\ISettings.cs" />
     <Compile Include="Interfaces\ISettingsIO.cs" />
@@ -108,14 +104,14 @@
     <Compile Include="XmlTransponder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EnigmaSettings.licenseheader" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="EnigmaSettings.licenseheader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

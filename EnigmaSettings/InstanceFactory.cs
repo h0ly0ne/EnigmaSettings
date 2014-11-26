@@ -73,12 +73,12 @@ namespace Krkadoni.EnigmaSettings
             };
         }
 
-        public ISettings InitNewSettings(IPathProvider pathProvider)
+        public ISettings InitNewSettings()
         {
-            return new Settings(pathProvider);
+            return new Settings();
         }
 
-        public IXmlSatellitesIO InitNewXmlSatelliteIO(IFileProvider fileProvider)
+        public IXmlSatellitesIO InitNewXmlSatelliteIO(IFileHelper fileProvider)
         {
             return new XmlSatellitesIO(this, fileProvider);
         }

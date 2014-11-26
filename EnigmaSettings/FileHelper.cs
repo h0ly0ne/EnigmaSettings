@@ -4,7 +4,7 @@ using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    public class DesktopFileProvider : IFileProvider
+    internal class FileHelper : IFileHelper
     {
         public bool Exists(string path)
         {
