@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
     public interface ITransponderDVBS : ITransponder
@@ -106,6 +106,32 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <remarks></remarks>
         string Pilot { get; set; }
 
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        string IsId { get; set; }
+        
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        string PlsCode { get; set; }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        string PlsMode { get; set; }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        string T2miPlpId { get; set; }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        string T2miPid { get; set; }
+
+        /// <summary>
         /// <summary>
         ///     0=Horizontal, 1=Vertical, 2=Circular Left, 3=Circular right
         /// </summary>

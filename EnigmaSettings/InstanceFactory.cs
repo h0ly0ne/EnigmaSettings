@@ -69,7 +69,12 @@ namespace Krkadoni.EnigmaSettings
                 Polarization = transponder.Polarization,
                 RollOff = transponder.RollOff,
                 SymbolRate = transponder.SymbolRate,
-                System = transponder.System
+                System = transponder.System,
+                IsId = transponder.IsId,
+                PlsCode = transponder.PlsCode,
+                PlsMode = transponder.PlsMode,
+                T2miPid = transponder.T2miPid,
+                T2miPlpId = transponder.T2miPlpId
             };
         }
 

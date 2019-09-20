@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
     public interface ITransponderDVBT : ITransponder
@@ -84,6 +84,16 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         string Flags { get; set; }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L793
+        /// </summary>
+        string System { get; set; }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L793
+        /// </summary>
+        string PlpId { get; set; }
 
         /// <summary>
         ///     0=Auto, 1=8Mhz, 2=7Mhz, 3=6Mhz

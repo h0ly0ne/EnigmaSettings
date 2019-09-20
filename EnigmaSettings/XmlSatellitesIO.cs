@@ -84,6 +84,11 @@ namespace Krkadoni.EnigmaSettings
                     xmlTran.RollOff = sTran.rolloff;
                     xmlTran.SymbolRate = sTran.symbol_rate;
                     xmlTran.System = sTran.system;
+                    xmlTran.IsId = sTran.is_id;
+                    xmlTran.PlsCode = sTran.pls_code;
+                    xmlTran.PlsMode = sTran.pls_mode;
+                    xmlTran.T2miPid = sTran.t2mi_pid;
+                    xmlTran.T2miPlpId = sTran.t2mi_plp_id;
                     sat.Transponders.Add(xmlTran);
                 }
                 sats.Add(sat);
@@ -147,11 +152,16 @@ namespace Krkadoni.EnigmaSettings
                         case Enums.SettingsVersion.Enigma2Ver4:
                         case Enums.SettingsVersion.Enigma2Ver3:
                             serTran.fec_inner = xTran.FECInner;
-                            serTran.inversion = xTran.Inversion ?? "2";
-                            serTran.modulation = xTran.Modulation ?? "1";
+                            serTran.inversion = xTran.Inversion;// ?? "2";
+                            serTran.modulation = xTran.Modulation;// ?? "1";
                             serTran.system = xTran.System ?? "0";
                             serTran.pilot = xTran.Pilot;
                             serTran.rolloff = xTran.RollOff;
+                            serTran.is_id = xTran.IsId;
+                            serTran.pls_code = xTran.PlsCode;
+                            serTran.pls_mode = xTran.PlsMode;
+                            serTran.t2mi_plp_id = xTran.T2miPlpId;
+                            serTran.t2mi_pid = xTran.T2miPid;
                             break;
                     }
                     sSat.transponders.Add(serTran);
@@ -205,7 +215,7 @@ namespace Krkadoni.EnigmaSettings
             public virtual string Serialize()
             {
                 var memoryStream = new MemoryStream();
-                var xmlSettings = new XmlWriterSettings {Encoding = Encoding.GetEncoding("ISO-8859-1"), Indent = true};
+                var xmlSettings = new XmlWriterSettings {Indent = true, Encoding = Encoding.GetEncoding("ISO-8859-1")};
                 var xmlTextWriter = XmlWriter.Create(memoryStream, xmlSettings); //  (memoryStream, Encoding.GetEncoding("ISO-8859-1")) { Formatting = Formatting.Indented };
                 // XmlTextWriter xmlTextWriter = New XmlTextWriter(memoryStream, New UTF8Encoding(True))
                 var ns = new XmlSerializerNamespaces();
@@ -239,15 +249,15 @@ namespace Krkadoni.EnigmaSettings
 
             public static SerializerSatellites LoadFromFile(string fileName)
             {
-                var xmlString = _fileProvider.ReadAllText(fileName);
-                return Deserialize(xmlString);
-                //var file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                //string xmlString;
-                //using (var sr = new StreamReader(file))
-                //{
-                //    xmlString = sr.ReadToEnd();
-                //}
+                //var xmlString = _fileProvider.ReadAllText(fileName);
                 //return Deserialize(xmlString);
+                var file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                string xmlString;
+                using (var sr = new StreamReader(file, Encoding.GetEncoding("ISO-8859-1")))
+                {
+                    xmlString = sr.ReadToEnd();
+                }
+                return Deserialize(xmlString);
             }
 
             #endregion
@@ -266,13 +276,14 @@ namespace Krkadoni.EnigmaSettings
                 public List<SerializerTransponder> transponders { get; set; }
 
                 [XmlAttribute]
-                public string position { get; set; }
+                public string name { get; set; }
 
                 [XmlAttribute]
                 public string flags { get; set; }
 
                 [XmlAttribute]
-                public string name { get; set; }
+                public string position { get; set; }
+
             }
 
             [DataContract, XmlType("transponder")]
@@ -304,6 +315,21 @@ namespace Krkadoni.EnigmaSettings
 
                 [XmlAttribute]
                 public string rolloff { get; set; }
+
+               [XmlAttribute]
+                public string is_id { get; set; }
+
+                [XmlAttribute]
+                public string pls_code { get; set; }
+
+                [XmlAttribute]
+                public string pls_mode { get; set; }
+
+                [XmlAttribute]
+                public string t2mi_plp_id { get; set; }
+
+                [XmlAttribute]
+                public string t2mi_pid { get; set; }
             }
 
             #endregion

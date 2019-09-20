@@ -1953,6 +1953,16 @@ namespace Krkadoni.EnigmaSettings
                                     extraData += ":0";
                                 if (tran.Pilot != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
                                     extraData += ":" + tran.Pilot;
+                                if (tran.IsId != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                    extraData += ":" + tran.IsId;
+                                if (tran.PlsCode != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                    extraData += ":" + tran.PlsCode;
+                                if (tran.PlsMode != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                    extraData += ":" + tran.PlsMode;
+                                if (tran.T2miPlpId != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                    extraData += ":" + tran.T2miPlpId;
+                                if (tran.T2miPid != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                    extraData += ":" + tran.T2miPid;
                             }
                             //End If
                             sContent.Append(extraData + "\n" + "/" + "\n");
@@ -2018,7 +2028,8 @@ namespace Krkadoni.EnigmaSettings
                             tran.Inversion,
                             tran.Modulation,
                             tran.FECInner,
-                            tran.Flags
+                            tran.Flags,
+                            tran.System,
                         }));
                         sContent.Append("\n" + "/" + "\n");
                         break;
@@ -2080,7 +2091,9 @@ namespace Krkadoni.EnigmaSettings
                             tran.GuardInterval,
                             tran.Hierarchy,
                             tran.Inversion,
-                            tran.Flags
+                            tran.Flags,
+                            tran.System,
+                            tran.PlpId
                         }));
                         sContent.Append("\n" + "/" + "\n");
                         break;
@@ -2568,11 +2581,11 @@ namespace Krkadoni.EnigmaSettings
         protected virtual void WriteTvBouquetsE2(string directory, ISettings settings)
         {
             var sBouquetsTvContent = new StringBuilder();
-            sBouquetsTvContent.Append("#NAME Bouquets (TV)" + "\n");
+            sBouquetsTvContent.Append("#NAME User - Bouquets (TV)" + "\n");
             foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList()
                 )
             {
-                sBouquetsTvContent.Append("#SERVICE: 1:7:1:0:0:0:0:0:0:0:" + Path.GetFileName(bouquet.FileName) + "\n");
+                sBouquetsTvContent.Append("#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                 Log.Debug(string.Format("Bouquet {0} added to bouquets.tv", Path.GetFileName(bouquet.FileName)));
                 string bContent = E2BouquetToString(bouquet);
                 string fName = Path.GetFileName(bouquet.FileName);
@@ -2625,11 +2638,11 @@ namespace Krkadoni.EnigmaSettings
         protected virtual void WriteRadioBouquetsE2(string directory, ISettings settings)
         {
             var sBouquetsRadioContent = new StringBuilder();
-            sBouquetsRadioContent.Append("#NAME Bouquets (Radio)" + "\n");
+            sBouquetsRadioContent.Append("#NAME User - Bouquets (Radio)" + "\n");
             foreach (
                 IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetRadio).ToList())
             {
-                sBouquetsRadioContent.Append("#SERVICE: 1:7:2:0:0:0:0:0:0:0:" + Path.GetFileName(bouquet.FileName) + "\n");
+                sBouquetsRadioContent.Append("#SERVICE 1:7:2:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                 Log.Debug(string.Format("Bouquet {0} added to bouquets.radio", Path.GetFileName(bouquet.FileName)));
                 string bContent = E2BouquetToString(bouquet);
                 string fName = Path.GetFileName(bouquet.FileName);

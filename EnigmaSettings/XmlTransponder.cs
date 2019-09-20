@@ -37,6 +37,11 @@ namespace Krkadoni.EnigmaSettings
         private string _mRollOff;
         private string _mSymbolRate;
         private string _mSystem;
+        private string _mIs_id;
+        private string _mPls_code;
+        private string _mPls_mode;
+        private string _mT2mi_plp_id;
+        private string _mT2mi_pid;
 
 
         public void BeginEdit()
@@ -51,6 +56,11 @@ namespace Krkadoni.EnigmaSettings
             _mRollOff = _rollOff;
             _mSymbolRate = _symbolRate;
             _mSystem = _system;
+            _mIs_id = _is_id;
+            _mPls_code = _pls_code;
+            _mPls_mode = _pls_mode;
+            _mT2mi_plp_id = _t2mi_plp_id;
+            _mT2mi_pid = _t2mi_pid;
             _isEditing = true;
         }
 
@@ -71,6 +81,11 @@ namespace Krkadoni.EnigmaSettings
             RollOff = _mRollOff;
             SymbolRate = _mSymbolRate;
             System = _mSystem;
+            IsId = _mIs_id;
+            PlsCode = _mPls_code;
+            PlsMode = _mPls_mode;
+            T2miPlpId = _mT2mi_plp_id;
+            T2miPid = _mT2mi_pid;
             _isEditing = false;
         }
 
@@ -98,6 +113,11 @@ namespace Krkadoni.EnigmaSettings
         private string _rollOff;
         private string _symbolRate;
         private string _system;
+        private string _is_id;
+        private string _pls_code;
+        private string _pls_mode;
+        private string _t2mi_plp_id;
+        private string _t2mi_pid;
 
         /// <summary>
         ///     0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10
@@ -265,6 +285,81 @@ namespace Krkadoni.EnigmaSettings
                 if (value == _system) return;
                 _system = value;
                 OnPropertyChanged("System");
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        [DataMember]
+        public string IsId
+        {
+            get { return _is_id; }
+            set
+            {
+                if (value == _is_id) return;
+                _is_id = value;
+                OnPropertyChanged("IsId");
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        [DataMember]
+        public string PlsCode
+        {
+            get { return _pls_code; }
+            set
+            {
+                if (value == _pls_code) return;
+                _pls_code = value;
+                OnPropertyChanged("PlsCode");
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        [DataMember]
+        public string PlsMode
+        {
+            get { return _pls_mode; }
+            set
+            {
+                if (value == _pls_mode) return;
+                _pls_mode = value;
+                OnPropertyChanged("PlsMode");
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        [DataMember]
+        public string T2miPlpId
+        {
+            get { return _t2mi_plp_id; }
+            set
+            {
+                if (value == _t2mi_plp_id) return;
+                _t2mi_plp_id = value;
+                OnPropertyChanged("T2miPlpId");
+            }
+        }
+
+        /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L792
+        /// </summary>
+        [DataMember]
+        public string T2miPid
+        {
+            get { return _t2mi_pid; }
+            set
+            {
+                if (value == _t2mi_pid) return;
+                _t2mi_pid = value;
+                OnPropertyChanged("T2miPid");
             }
         }
 

@@ -19,6 +19,7 @@ namespace Krkadoni.EnigmaSettings
         private string _mInversion;
         private string _mModulation;
         private string _mSymbolRate;
+        private string _mSystem;
 
         public override void BeginEdit()
         {
@@ -29,6 +30,7 @@ namespace Krkadoni.EnigmaSettings
             _mInversion = _inversion;
             _mModulation = _modulation;
             _mSymbolRate = _symbolRate;
+            _mSystem = _system;
             _isEditing = true;
         }
 
@@ -47,6 +49,7 @@ namespace Krkadoni.EnigmaSettings
             Inversion = _mInversion;
             Modulation = _mModulation;
             SymbolRate = _mSymbolRate;
+            System = _mSystem;
             _isEditing = false;
         }
 
@@ -57,6 +60,7 @@ namespace Krkadoni.EnigmaSettings
         private string _inversion = "0";
         private string _modulation = "0";
         private string _symbolRate = "0";
+        private string _system;
 
         /// <summary>
         ///     Initializes new cable transponder from data found in services file
@@ -103,6 +107,8 @@ namespace Krkadoni.EnigmaSettings
                     FECInner = tFreq[4];
                 if (tFreq.Length > 5)
                     Flags = tFreq[5];
+                if (tFreq.Length > 6)
+                    System = tFreq[6];
             }
         }
 
@@ -209,6 +215,21 @@ namespace Krkadoni.EnigmaSettings
                 if (value == _flags) return;
                 _flags = value;
                 OnPropertyChanged("Flags");
+            }
+        }
+
+        /// <summary>
+        ///  https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L793
+        /// </summary>
+        [DataMember]
+        public string System
+        {
+            get { return _system; }
+            set
+            {
+                if (value == _system) return;
+                _system = value;
+                OnPropertyChanged("System");
             }
         }
 
@@ -330,7 +351,8 @@ namespace Krkadoni.EnigmaSettings
                     Inversion,
                     Modulation,
                     FECInner,
-                    Flags
+                    Flags,
+                    System
                 }),
                 "/"
             });

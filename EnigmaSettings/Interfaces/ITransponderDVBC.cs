@@ -49,6 +49,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Flags { get; set; }
 
         /// <summary>
+        /// https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L794
+        /// </summary>
+        string System { get; set; }
+
+        /// <summary>
         ///     0=Auto, 1=On, 2=Off
         /// </summary>
         /// <value></value>

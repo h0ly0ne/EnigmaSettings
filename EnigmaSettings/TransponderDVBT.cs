@@ -23,6 +23,8 @@ namespace Krkadoni.EnigmaSettings
         private string _mInversion;
         private string _mModulation;
         private string _mTransmission;
+        private string _mSystem;
+        private string _mPlpId;
 
         public override void BeginEdit()
         {
@@ -37,6 +39,8 @@ namespace Krkadoni.EnigmaSettings
             _mInversion = _inversion;
             _mModulation = _modulation;
             _mTransmission = _transmission;
+            _mSystem = _system;
+            _mPlpId = _plp_id;
             _isEditing = true;
         }
 
@@ -59,6 +63,9 @@ namespace Krkadoni.EnigmaSettings
             Inversion = _mInversion;
             Modulation = _mModulation;
             Transmission = _mTransmission;
+            System = _mSystem;
+            PlpId = _mPlpId;
+
             _isEditing = false;
         }
 
@@ -73,6 +80,8 @@ namespace Krkadoni.EnigmaSettings
         private string _inversion = "0";
         private string _modulation = "0";
         private string _transmission = "0";
+        private string _system;
+        private string _plp_id;
 
         /// <summary>
         ///     Initializes new terrestrial transponder from data found in services file
@@ -125,6 +134,10 @@ namespace Krkadoni.EnigmaSettings
                     Inversion = tFreq[8];
                 if (tFreq.Length > 9)
                     Flags = tFreq[9];
+                if (tFreq.Length > 10)
+                    System = tFreq[10];
+                if (tFreq.Length > 11)
+                    PlpId = tFreq[11];
             }
         }
 
@@ -321,6 +334,36 @@ namespace Krkadoni.EnigmaSettings
                 if (value == Flags) return;
                 _flags = value;
                 OnPropertyChanged("Flags");
+            }
+        }
+
+        /// <summary>
+        ///  https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L793
+        /// </summary>
+        [DataMember]
+        public string System
+        {
+            get { return _system; }
+            set
+            {
+                if (value == _system) return;
+                _system = value;
+                OnPropertyChanged("System");
+            }
+        }
+
+        /// <summary>
+        ///  https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L793
+        /// </summary>
+        [DataMember]
+        public string PlpId
+        {
+            get { return _plp_id; }
+            set
+            {
+                if (value == _plp_id) return;
+                _plp_id = value;
+                OnPropertyChanged("PlpId");
             }
         }
 

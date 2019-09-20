@@ -414,7 +414,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             Unknown = -2,
             DVBS = 1,
             DVBT = 2,
-            DVBC = 3
+            DVBC = 3,
+            ATSC = 4,
         }
     }
 }
