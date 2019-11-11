@@ -1096,7 +1096,7 @@ namespace Krkadoni.EnigmaSettings
                 foreach (IBouquet bouquet in Bouquets)
                 {
                     IList<IBouquetItemService> biServices =
-                        bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.Service != null && Equals(x.Service.Transponder, transponder)).ToList();
+                        bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.Service != null && Equals(x.Service.Transponder.TransponderId, transponder.TransponderId)).ToList();
                     foreach (IBouquetItemService bis in biServices)
                     {
                         bouquet.BouquetItems.Remove(bis);
@@ -1104,7 +1104,7 @@ namespace Krkadoni.EnigmaSettings
                     }
                 }
 
-                foreach (IService service in Services.Where(x => Equals(x.Transponder, transponder)).ToList())
+                foreach (IService service in Services.Where(x => Equals(x.Transponder.TransponderId, transponder.TransponderId)).ToList())
                 {
                     Services.Remove(service);
                     Log.Debug(string.Format("Service {0} removed from services", service.Name));
@@ -1148,7 +1148,7 @@ namespace Krkadoni.EnigmaSettings
                     {
                         IList<IBouquetItemService> bouquetServices =
                             bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => (x.Service != null)).ToList();
-                        var query = bouquetServices.Join(trans, bs => bs.Service.Transponder, tr => tr, (bs, tr) => new
+                        var query = bouquetServices.Join(trans, bs => bs.Service.Transponder.TransponderId, tr => tr.TransponderId, (bs, tr) => new
                         {
                             BouquetItem = bs,
                             Transponder = tr
@@ -1161,7 +1161,7 @@ namespace Krkadoni.EnigmaSettings
                         }
                     }
 
-                    var query2 = Services.Join(trans, sr => sr.Transponder, tr => tr, (sr, tr) => new
+                    var query2 = Services.Join(trans, sr => sr.Transponder.TransponderId, tr => tr.TransponderId, (sr, tr) => new
                     {
                         Service = sr,
                         Transponder = tr
