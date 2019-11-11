@@ -4,3 +4,9 @@
 
 /EnigmaSettings/bin/Debug
 /EnigmaSettings/obj/Debug
+/.vs/EnigmaSettings/v16
+/EnigmaSettings/bin/Release
+/EnigmaSettings/obj/Release/TempPE/Resources.Designer.cs.dll
+/EnigmaSettings/obj/Release
+/EnigmaSettingsPCL/obj/Debug/TempPE
+/EnigmaSettingsPCL/obj/Debug

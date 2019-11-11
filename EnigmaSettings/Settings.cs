@@ -101,6 +101,7 @@ namespace Krkadoni.EnigmaSettings
             settings.Satellites = new List<IXmlSatellite>();
             settings.Services = new List<IService>();
             settings.Transponders = new List<ITransponder>();
+            settings.Log = this.Log;
 
             foreach (var bouquet in Bouquets)
             {
@@ -1152,8 +1153,8 @@ namespace Krkadoni.EnigmaSettings
                             BouquetItem = bs,
                             Transponder = tr
                         });
-
-                        foreach (var match in query.ToList())
+                        var list1 = query.ToList();
+                        foreach (var match in list1)
                         {
                             bouquet.BouquetItems.Remove(match.BouquetItem);
                             Log.Debug(string.Format("Service {0} removed from bouquet {1}", match.BouquetItem.Service.Name, bouquet.Name));
@@ -1165,8 +1166,8 @@ namespace Krkadoni.EnigmaSettings
                         Service = sr,
                         Transponder = tr
                     });
-
-                    foreach (var match in query2.ToList())
+                    var list2 = query2.ToList();
+                    foreach (var match in list2)
                     {
                         Services.Remove(match.Service);
                         Log.Debug(string.Format("Service {0} removed from services", match.Service.Name));
