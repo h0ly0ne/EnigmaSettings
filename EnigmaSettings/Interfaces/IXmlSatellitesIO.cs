@@ -13,7 +13,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
     public interface IXmlSatellitesIO
     {
         /// <summary>
-        ///     Implementation of instance factory used to instatiate objects
+        ///     Implementation of instance factory used to instantiate objects
         /// </summary>
         /// <value></value>
         /// <returns></returns>

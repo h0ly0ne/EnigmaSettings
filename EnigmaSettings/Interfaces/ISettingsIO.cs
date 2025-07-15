@@ -61,7 +61,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         #endregion
 
         /// <summary>
-        ///     Implementation of instance factory used to instatiate objects
+        ///     Implementation of instance factory used to instantiate objects
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -89,12 +89,13 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// </summary>
         /// <param name="settingsFile">Full path to lamedb or services file</param>
         /// <param name="xmlSatellitesIO">Implementation of reading/writing satellites file</param>
+        /// <param name="xmlCablesIO">Implementation of reading/writing cables file</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        ISettings Load(string settingsFile, IXmlSatellitesIO xmlSatellitesIO);
+        ISettings Load(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO);
 
         /// <summary>
-        ///     Loads up and links all the settings data with XmlSatelliteIO from Factory asynchronusly
+        ///     Loads up and links all the settings data with XmlSatelliteIO from Factory asynchronously
         /// </summary>
         /// <param name="settingsFile">Full path to lamedb or services file</param>
         /// <param name="callback">Async callback to be called after load finishes</param>
@@ -104,14 +105,15 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
 
         /// <summary>
-        ///     Loads up and links all the settings data asynchronusly
+        ///     Loads up and links all the settings data asynchronously
         /// </summary>
         /// <param name="settingsFile">Full path to lamedb or services file</param>
         /// <param name="xmlSatellitesIO"></param>
+        /// <param name="xmlCablesIO"></param>
         /// <param name="callback">Async callback to be called after load finishes</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        void LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, AsyncCallback callback);
+        void LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, AsyncCallback callback);
 
 
         /// <summary>
@@ -127,13 +129,14 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// </summary>
         /// <param name="folder">Directory where all settings files will be saved</param>
         /// <param name="settings">Settings instance with all the data</param>
-        /// <param name="xmlSatellitesIO">Instance of satellite.xml writer implementation</param>
+        /// <param name="xmlSatellitesIO">Instance of satellites.xml writer implementation</param>
+        /// <param name="xmlCablesIO">Instance of cables.xml writer implementation</param>
         /// <remarks></remarks>
-        void Save(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO);
+        void Save(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO);
 
 
         /// <summary>
-        ///     Saves settings to disk, initializes default satellites.xml writer asynchronusly
+        ///     Saves settings to disk, initializes default satellites.xml writer asynchronously
         /// </summary>
         /// <param name="folder">Directory where all settings files will be saved</param>
         /// <param name="settings">Settings instance with all the data</param>
@@ -142,14 +145,15 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         void SaveAsync(string folder, ISettings settings, AsyncCallback callback);
 
         /// <summary>
-        ///     Saves settings to disk asynchronusly
+        ///     Saves settings to disk asynchronously
         /// </summary>
         /// <param name="folder">Directory where all settings files will be saved</param>
         /// <param name="settings">Settings instance with all the data</param>
-        /// <param name="xmlSatellitesIO">Instance of satellite.xml writer implementation</param>
+        /// <param name="xmlSatellitesIO">Instance of satellites.xml writer implementation</param>
+        /// <param name="xmlCablesIO">Instance of cables.xml writer implementation</param>
         /// <param name="callback">Async callback to be called after save finishes</param>
         /// <remarks></remarks>
-        void SaveAsync(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, AsyncCallback callback);
+        void SaveAsync(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, AsyncCallback callback);
 
     }
 }

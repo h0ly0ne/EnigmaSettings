@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
-namespace Krkadoni.EnigmaSettings.Interfaces
+
+namespace Krkadoni.EnigmaSettings
 {
 
     /// <summary>
@@ -64,69 +64,62 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             Subtitle = 9
         }
         
-        public enum DVBCFECInnerType
+        public enum DVBSCFECType
         {
-            Unknown = -2,
-            None = 0,
-            Auto = 1,
-            F12 = 2,
-            F23 = 3,
-            F34 = 4,
-            F56 = 5,
-            F78 = 6,
-            F89 = 7
+            Auto = 0,
+            F12 = 1,
+            F23 = 2,
+            F34 = 3,
+            F56 = 4,
+            F78 = 5,
+            F89 = 6,
+            F35 = 7,
+            F45 = 8,
+            F910 = 9,
+            F67 = 10,
+            None = 15
         }
 
-        public enum DVBCInversionType
+        public enum IPTVFECType
         {
-            Unknown = -2,
-            Auto = 0,
+            Unused = 0
+        }
+
+        public enum DVBSCInversionType
+        {
+            Off = 0,
             On = 1,
-            Off = 2
+            Auto = 2
+        }
+
+        public enum IPTVInversionType
+        {
+            Unused = 0
         }
 
         public enum DVBCModulationType
         {
-            Unknown = -2,
             Auto = 0,
-            Qam16 = 1,
-            Qam32 = 2,
-            Qam64 = 3,
-            Qam128 = 4,
-            Qam256 = 5
+            QAM16 = 1,
+            QAM32 = 2,
+            QAM64 = 3,
+            QAM128 = 4,
+            QAM256 = 5
         }
 
-        public enum DVBSFECType
+        public enum IPTVModulationType
         {
-            Unknown = -2,
-            None = 0,
-            Auto = 1,
-            F12 = 2,
-            F23 = 3,
-            F34 = 4,
-            F56 = 5,
-            F78 = 6,
-            F35 = 7,
-            F45 = 8,
-            F89 = 9,
-            F910 = 10
-        }
-
-        public enum DVBSInversionType
-        {
-            Unknown = -2,
-            Auto = 0,
-            On = 1,
-            Off = 2
+            Unused = 0
         }
 
         public enum DVBSModulationType
         {
-            Unknown = -2,
             Auto = 0,
             QPSK = 1,
-            Qam16 = 2,
-            PSK8 = 3
+            PSK8 = 2,
+            QAM16 = 3,
+            APSK16 = 4,
+            APSK32 = 5
         }
 
         public enum DVBSPilotType
@@ -400,10 +393,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         public enum SettingsVersion
         {
             Unknown = -2,
-            Enigma1V1 = 1,
-            Enigma1 = 2,
-            Enigma2Ver3 = 4,
-            Enigma2Ver4 = 5
+            Enigma1Ver1 = 1,
+            Enigma1Ver2 = 2,
+            Enigma2Ver3 = 3,
+            Enigma2Ver4 = 4,
+            Enigma2Ver5 = 5
         }
 
         /// <summary>
@@ -416,6 +410,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             DVBT = 2,
             DVBC = 3,
             ATSC = 4,
+            IPTV = 5
         }
     }
 }

@@ -1,124 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9C23E85-4340-48F8-B59B-9B9AD259DFC7}</ProjectGuid>
+	<TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Krkadoni.EnigmaSettings</RootNamespace>
-    <AssemblyName>EnigmaSettings</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <NoWarn>1591;</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <AssemblyTitle>EnigmaSettings</AssemblyTitle>
+    <Description>Enigma1 &amp; Enigma2 settings management utility</Description>
+    <Company>Krkadoni.com</Company>
+    <Product>EnigmaSettings</Product>
+    <Copyright>Copyright © Krkadoni.com 2013</Copyright>
+    <AssemblyVersion>1.0.0.4</AssemblyVersion>
+    <FileVersion>1.0.0.4</FileVersion>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BouquetItem.cs" />
-    <Compile Include="BouquetItemBouquetsBouquet.cs" />
-    <Compile Include="BouquetItemFileBouquet.cs" />
-    <Compile Include="BouquetItemMarker.cs" />
-    <Compile Include="BouquetItemService.cs" />
-    <Compile Include="BouquetItemStream.cs" />
-    <Compile Include="BouquetsBouquet.cs" />
-    <Compile Include="DebugLogger.cs" />
-    <Compile Include="FileHelper.cs" />
-    <Compile Include="FileBouquet.cs" />
-    <Compile Include="FileLoadedEventArgs.cs" />
-    <Compile Include="FileLoadingEventArgs.cs" />
-    <Compile Include="FileSavedEventArgs.cs" />
-    <Compile Include="FileSavingEventArgs.cs" />
-    <Compile Include="Flag.cs" />
-    <Compile Include="InstanceFactory.cs" />
-    <Compile Include="Interfaces\Enums.cs" />
-    <Compile Include="Interfaces\IBouquet.cs" />
-    <Compile Include="Interfaces\IBouquetItem.cs" />
-    <Compile Include="Interfaces\IBouquetItemBouquetsBouquet.cs" />
-    <Compile Include="Interfaces\IBouquetItemFileBouquet.cs" />
-    <Compile Include="Interfaces\IBouquetItemMarker.cs" />
-    <Compile Include="Interfaces\IBouquetItemService.cs" />
-    <Compile Include="Interfaces\IBouquetItemStream.cs" />
-    <Compile Include="Interfaces\IBouquetsBouquet.cs" />
-    <Compile Include="Interfaces\IFileBouquet.cs" />
-    <Compile Include="Interfaces\IFileHelper.cs" />
-    <Compile Include="Interfaces\IFlag.cs" />
-    <Compile Include="Interfaces\IInstanceFactory.cs" />
-    <Compile Include="Interfaces\ILog.cs" />
-    <Compile Include="Interfaces\IService.cs" />
-    <Compile Include="Interfaces\ISettings.cs" />
-    <Compile Include="Interfaces\ISettingsIO.cs" />
-    <Compile Include="Interfaces\ITransponder.cs" />
-    <Compile Include="Interfaces\ITransponderDVBC.cs" />
-    <Compile Include="Interfaces\ITransponderDVBS.cs" />
-    <Compile Include="Interfaces\ITransponderDVBT.cs" />
-    <Compile Include="Interfaces\IXmlSatellite.cs" />
-    <Compile Include="Interfaces\IXmlSatellitesIO.cs" />
-    <Compile Include="Interfaces\IXmlTransponder.cs" />
-    <Compile Include="NullLogger.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources.Designer.cs">
+    <Compile Update="Resources\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Service.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="SettingsException.cs" />
-    <Compile Include="SettingsIO.cs" />
-    <Compile Include="SettingsLoadedEventArgs.cs" />
-    <Compile Include="SettingsLoadingEventArgs.cs" />
-    <Compile Include="SettingsSavedEventArgs.cs" />
-    <Compile Include="SettingsSavingEventArgs.cs" />
-    <Compile Include="Transponder.cs" />
-    <Compile Include="TransponderDVBC.cs" />
-    <Compile Include="TransponderDVBS.cs" />
-    <Compile Include="TransponderDVBT.cs" />
-    <Compile Include="XmlSatellite.cs" />
-    <Compile Include="XmlSatellitesIO.cs" />
-    <Compile Include="XmlTransponder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
+    <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="EnigmaSettings.licenseheader" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

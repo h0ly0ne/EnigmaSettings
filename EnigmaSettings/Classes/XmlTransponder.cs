@@ -28,7 +28,7 @@ namespace Krkadoni.EnigmaSettings
         #region "IEditable"
 
         private bool _isEditing;
-        private string _mFecInner;
+        private string _mFec;
         private string _mFrequency;
         private string _mInversion;
         private string _mModulation;
@@ -47,7 +47,7 @@ namespace Krkadoni.EnigmaSettings
         public void BeginEdit()
         {
             if (_isEditing) return;
-            _mFecInner = _fecInner;
+            _mFec = _fec;
             _mFrequency = _frequency;
             _mInversion = _inversion;
             _mModulation = _modulation;
@@ -72,7 +72,7 @@ namespace Krkadoni.EnigmaSettings
         public void CancelEdit()
         {
             if (!_isEditing) return;
-            FECInner = _mFecInner;
+            FEC = _mFec;
             Frequency = _mFrequency;
             Inversion = _mInversion;
             Modulation = _mModulation;
@@ -104,7 +104,7 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private string _fecInner;
+        private string _fec;
         private string _frequency;
         private string _inversion;
         private string _modulation;
@@ -127,14 +127,14 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
         [DataMember]
-        public string FECInner
+        public string FEC
         {
-            get { return _fecInner; }
+            get { return _fec; }
             set
             {
-                if (value == _fecInner) return;
-                _fecInner = value;
-                OnPropertyChanged("FECInner");
+                if (value == _fec) return;
+                _fec = value;
+                OnPropertyChanged("FEC");
             }
         }
 

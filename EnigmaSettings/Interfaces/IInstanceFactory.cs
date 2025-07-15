@@ -10,11 +10,15 @@ namespace Krkadoni.EnigmaSettings.Interfaces
     /// <remarks></remarks>
     public interface IInstanceFactory
     {
-        IXmlSatellite InitNewxmlSatellite();
+        IXmlSatellite InitNewXmlSatellite();
+        
+        IXmlCable InitNewXmlCable();
 
-        IXmlTransponder InitNewxmlTransponder();
+        IXmlTransponder InitNewXmlTransponder();
 
-        IXmlTransponder InitNewxmlTransponder(ITransponderDVBS transponder);
+        IXmlTransponder InitNewXmlTransponder(ITransponderDVBS transponder);
+
+        IXmlTransponder InitNewXmlTransponder(ITransponderDVBC transponder);
 
         IBouquetItemFileBouquet InitNewBouquetItemFileBouquet(string fSileName);
 
@@ -34,6 +38,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
         IBouquetsBouquet InitNewBouquetsBouquet();
 
+        ITransponderIPTV InitNewTransponderIPTV(string transponderData, string transponderFrequency);
+
         ITransponderDVBC InitNewTransponderDVBC(string transponderData, string transponderFrequency);
 
         ITransponderDVBS InitNewTransponderDVBS(string transponderData, string transponderFrequency);
@@ -45,6 +51,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         ISettings InitNewSettings();
 
         IXmlSatellitesIO InitNewXmlSatelliteIO(IFileHelper fileProvider);
+
+        IXmlCablesIO InitNewXmlCableIO(IFileHelper fileProvider);
 
         IBouquetItemBouquetsBouquet InitNewBouquetItemBouquetsBouquet(int bouquetOrderNumber);
 

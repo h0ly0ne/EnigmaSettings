@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -42,12 +42,20 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.SettingsVersion SettingsVersion { get; set; }
 
         /// <summary>
-        ///     List of satellites from satelites.xml file
+        ///     List of satellites from satellites.xml file
         /// </summary>
         /// <value></value>
         /// <returns></returns>
-        /// <remarks>Each satelite has coresponding xml transponders from satellites.xml file</remarks>
+        /// <remarks>Each satellite has corresponding xml transponders from satellites.xml file</remarks>
         IList<IXmlSatellite> Satellites { get; set; }
+
+        /// <summary>
+        ///     List of cables from cables.xml file
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks>Each cable has corresponding xml transponders from cables.xml file</remarks>
+        IList<IXmlCable> Cables { get; set; }
 
         /// <summary>
         ///     All transponders (DVBS, DVBT, DVBC) from settings file
@@ -146,12 +154,12 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
         /// <summary>
         ///     Adds new xmlTransponders for all transponders in settings file
-        ///     that don't have corresponding xmlTransponder in xmlsatellites.xml
+        ///     that don't have corresponding xmlTransponder in xmlSatellites
         /// </summary>
         /// <param name="factory"></param>
         /// <param name="frequencyToleration">Toleration in Hz when searching for existing transponder</param>
         /// <remarks>Transponders are added to all satellites without matching transponder</remarks>
-        void AddMissingXmlTransponders(IInstanceFactory factory, int frequencyToleration = 30000);
+        void AddMissingXmlTranspondersSatellites(IInstanceFactory factory, int frequencyToleration = 30000);
 
         /// <summary>
         ///     Matches services without transponder with corresponding transponders
@@ -228,6 +236,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         void RemoveServices(IList<IService> srv);
 
         /// <summary>
+        ///     Removes all services from list of services and all bouquets
+        /// </summary>
+        void RemoveAllServices();
+
+        /// <summary>
         ///     Removes transponder from list of transponders
         ///     and all services on that transponder from all bouquets and from list of services
         /// </summary>
@@ -242,6 +255,12 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="trans"></param>
         /// <remarks></remarks>
         void RemoveTransponders(IList<ITransponder> trans);
+
+        /// <summary>
+        ///     Removes all transponders from list of transponders
+        ///     and all services on specified transponders from all bouquets and from list of services
+        ///  </summary>
+        void RemoveAllTransponders();
 
         /// <summary>
         ///     Remove satellite from list of satellites,
@@ -260,6 +279,29 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="orbitalPosition">Orbital position as integer, as seen in satellites.xml file - IE. Astra 19.2 = 192</param>
         /// <remarks></remarks>
         void RemoveSatellite(int orbitalPosition);
+
+        /// <summary>
+        ///     Remove all satellites from list of satellites,
+        ///     removes all corresponding transponders from list of transponders
+        ///     removes services on that satellite from all bouquets and from list of services
+        /// </summary>
+        void RemoveAllSatellites();
+
+        /// <summary>
+        ///     Remove cable from list of cables,
+        ///     removes all corresponding transponders from list of transponders
+        ///     removes services on that cable from all bouquets and from list of services
+        /// </summary>
+        /// <param name="cable"></param>
+        /// <remarks></remarks>
+        void RemoveCable(IXmlCable cable);
+
+        /// <summary>
+        ///     Remove all cables from list of cables,
+        ///     removes all corresponding transponders from list of transponders
+        ///     removes services on that cable from all bouquets and from list of services
+        /// </summary>
+        void RemoveAllCables();
 
         /// <summary>
         ///     Removes IBouquetItemService, IBouquetItemFileBouquet and IBouquetItemBouquetsBouquet bouquet items without valid

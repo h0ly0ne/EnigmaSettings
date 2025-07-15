@@ -186,8 +186,8 @@
   <data name="SettingsIO_ReadServicesLocked_Unsupported_type__0__found_in_line__1__in_file__2_" xml:space="preserve">
     <value>Unsupported type {0} found in line {1} in file {2}</value>
   </data>
-  <data name="SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder" xml:space="preserve">
-    <value>Unknown transponder type for transponder {0} {1}, adding it as satellite transponder</value>
+  <data name="SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1_" xml:space="preserve">
+    <value>Unknown transponder type for transponder {0} {1}</value>
   </data>
   <data name="SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_" xml:space="preserve">
     <value>Failed to initialize new stream reference from line {0}</value>
@@ -237,11 +237,20 @@
   <data name="Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing_satellite__1_" xml:space="preserve">
     <value>Added new transponder {0} for previously missing satellite {1}</value>
   </data>
+  <data name="Settings_AddMissingXMLCables_Added_new_transponder__0__for_previously_missing_cable" xml:space="preserve">
+    <value>Added new transponder {0} for previously missing cable</value>
+  </data>
   <data name="Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites" xml:space="preserve">
     <value>Failed to update missing XML satellites</value>
   </data>
+  <data name="Settings_AddMissingXMLCables_Failed_to_update_missing_XML_cables" xml:space="preserve">
+    <value>Failed to update missing XML cables</value>
+  </data>
   <data name="Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites" xml:space="preserve">
     <value>New satellite for position {0} added to satellites</value>
+  </data>
+  <data name="Settings_AddMissingXMLCables_New_cable__added_to_cables" xml:space="preserve">
+    <value>New cable added to cables</value>
   </data>
   <data name="Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_" xml:space="preserve">
     <value>WARNING: Some transponders are market as satellite but have invalid position 0 degrees!</value>
@@ -325,7 +334,7 @@
     <value>There was an error while reading settings{0}{1}</value>
   </data>
   <data name="Settings_ReadServicesFile_Unsuported_settings_version__0_" xml:space="preserve">
-    <value>Unsuported settings version {0}</value>
+    <value>Unsupported settings version {0}</value>
   </data>
   <data name="Settings_Read_Failed_to_read_file__0__1__2_" xml:space="preserve">
     <value>Failed to read file {0}{1}{2}</value>
@@ -350,6 +359,9 @@
   </data>
   <data name="Settings_RemoveSatellite_There_was_an_error_while_removing_satellite" xml:space="preserve">
     <value>There was an error while removing satellite</value>
+  </data>
+  <data name="Settings_RemoveCable_There_was_an_error_while_removing_cable" xml:space="preserve">
+    <value>There was an error while removing cable</value>
   </data>
   <data name="Settings_RemoveServices_There_was_an_error_while_deleting_services" xml:space="preserve">
     <value>There was an error while deleting services</value>

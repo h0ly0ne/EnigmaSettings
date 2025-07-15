@@ -15,14 +15,15 @@ namespace Krkadoni.EnigmaSettings
         private IFileBouquet _bouquet;
 
         #region "IEditable"
-
         private bool _isEditing;
         private IFileBouquet _mBouquet;
 
         public override void BeginEdit()
         {
             base.BeginEdit();
-            if (_isEditing) return;
+            if (_isEditing) 
+                return;
+
             _mBouquet = _bouquet;
             _isEditing = true;
         }
@@ -36,15 +37,15 @@ namespace Krkadoni.EnigmaSettings
         public override void CancelEdit()
         {
             base.CancelEdit();
-            if (!_isEditing) return;
+            if (!_isEditing) 
+                return;
+
             Bouquet = _mBouquet;
             _isEditing = false;
         }
-
         #endregion
 
         #region "ICloneable"
-
         /// <summary>
         /// Performs deep Clone on the object
         /// </summary>
@@ -52,7 +53,7 @@ namespace Krkadoni.EnigmaSettings
         public new object Clone()
         {
             var bifb = (IBouquetItemFileBouquet)MemberwiseClone();
-            bifb.Bouquet = Bouquet != null ? (IFileBouquet)Bouquet.Clone() : null;
+            bifb.Bouquet = (IFileBouquet)Bouquet?.Clone();
             return bifb;
         }
 
@@ -68,11 +69,10 @@ namespace Krkadoni.EnigmaSettings
         {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException();
+
             _fileName = fileName;
             _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag =
-                Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted)
-                    .ToString(CultureInfo.CurrentCulture);
+            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>
@@ -83,9 +83,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if bouquet is null</exception>
         public BouquetItemFileBouquet(IFileBouquet bouquet)
         {
-            if (bouquet == null)
-                throw new ArgumentNullException();
-            Bouquet = bouquet;
+            Bouquet = bouquet ?? throw new ArgumentNullException();
         }
 
         /// <summary>
@@ -95,10 +93,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>Enums.BouquetItemType.FileBouquet</returns>
         /// <remarks></remarks>
         [DataMember]
-        public override Enums.BouquetItemType BouquetItemType
-        {
-            get { return Enums.BouquetItemType.FileBouquet; }
-        }
+        public override Enums.BouquetItemType BouquetItemType => Enums.BouquetItemType.FileBouquet;
 
         /// <summary>
         ///     Reference to matching bouquet instance
@@ -109,12 +104,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IFileBouquet Bouquet
         {
-            get { return _bouquet; }
+            get => _bouquet;
             set
             {
-                if (value == _bouquet) return;
+                if (value == _bouquet) 
+                    return;
+
                 _bouquet = value;
-                OnPropertyChanged("Bouquet");
+                OnPropertyChanged(nameof(Bouquet));
             }
         }
 
@@ -125,14 +122,6 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>Local value if matching bouquet is empty, otherwise returns Bouquet.FileName</returns>
         /// <remarks></remarks>
         [DataMember]
-        public string FileName
-        {
-            get
-            {
-                if (Bouquet != null)
-                    return Bouquet.FileName;
-                return _fileName;
-            }
-        }
+        public string FileName => Bouquet != null ? Bouquet.FileName : _fileName;
     }
 }

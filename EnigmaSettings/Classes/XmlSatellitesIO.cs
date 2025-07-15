@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -74,8 +74,8 @@ namespace Krkadoni.EnigmaSettings
                 };
                 foreach (SerializerSatellites.SerializerTransponder sTran in sSat.transponders)
                 {
-                    IXmlTransponder xmlTran = Factory.InitNewxmlTransponder();
-                    xmlTran.FECInner = sTran.fec_inner;
+                    IXmlTransponder xmlTran = Factory.InitNewXmlTransponder();
+                    xmlTran.FEC = sTran.fec;
                     xmlTran.Frequency = sTran.frequency;
                     xmlTran.Inversion = sTran.inversion;
                     xmlTran.Modulation = sTran.modulation;
@@ -127,9 +127,9 @@ namespace Krkadoni.EnigmaSettings
                     };
                     switch (settings.SettingsVersion)
                     {
-                        case Enums.SettingsVersion.Enigma1:
-                        case Enums.SettingsVersion.Enigma1V1:
-                            switch (xTran.FECInner)
+                        case Enums.SettingsVersion.Enigma1Ver1:
+                        case Enums.SettingsVersion.Enigma1Ver2:
+                            switch (xTran.FEC)
                             {
                                 case "0":
                                 case "1":
@@ -137,10 +137,10 @@ namespace Krkadoni.EnigmaSettings
                                 case "3":
                                 case "4":
                                 case "5":
-                                    serTran.fec_inner = xTran.FECInner;
+                                    serTran.fec = xTran.FEC;
                                     break;
                                 default:
-                                    serTran.fec_inner = "0";
+                                    serTran.fec = "0";
                                     break;
                             }
                             serTran.inversion = null;
@@ -149,9 +149,10 @@ namespace Krkadoni.EnigmaSettings
                             serTran.pilot = null;
                             serTran.rolloff = null;
                             break;
-                        case Enums.SettingsVersion.Enigma2Ver4:
                         case Enums.SettingsVersion.Enigma2Ver3:
-                            serTran.fec_inner = xTran.FECInner;
+                        case Enums.SettingsVersion.Enigma2Ver4:
+                        case Enums.SettingsVersion.Enigma2Ver5:
+                            serTran.fec = xTran.FEC;
                             serTran.inversion = xTran.Inversion;// ?? "2";
                             serTran.modulation = xTran.Modulation;// ?? "1";
                             serTran.system = xTran.System ?? "0";
@@ -230,34 +231,22 @@ namespace Krkadoni.EnigmaSettings
 
             public static SerializerSatellites Deserialize(string xml)
             {
-                using (var stringReader = new StringReader(xml))
-                {
-                    return (SerializerSatellites)Serializer.Deserialize(XmlReader.Create(stringReader));
-                }
+                return (SerializerSatellites)Serializer.Deserialize(XmlReader.Create(new StringReader(xml)));
             }
 
             public virtual void SaveToFile(string fileName)
             {
-                string xmlString = Serialize();
-                _fileProvider.WriteAllText(fileName, xmlString);
-                //var xmlFile = new FileInfo(fileName);
-                //using (var streamWriter = xmlFile.CreateText())
-                //{
-                //    streamWriter.WriteLine(xmlString);
-                //}
+                _fileProvider.WriteAllText(fileName, Serialize());
             }
 
             public static SerializerSatellites LoadFromFile(string fileName)
             {
-                //var xmlString = _fileProvider.ReadAllText(fileName);
-                //return Deserialize(xmlString);
-                var file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                string xmlString;
-                using (var sr = new StreamReader(file, Encoding.GetEncoding("ISO-8859-1")))
+                string strXMLSerialized;
+                using (var srCurrentStreamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read), Encoding.GetEncoding("ISO-8859-1")))
                 {
-                    xmlString = sr.ReadToEnd();
+                    strXMLSerialized = srCurrentStreamReader.ReadToEnd();
                 }
-                return Deserialize(xmlString);
+                return Deserialize(strXMLSerialized);
             }
 
             #endregion
@@ -299,7 +288,7 @@ namespace Krkadoni.EnigmaSettings
                 public string polarization { get; set; }
 
                 [XmlAttribute]
-                public string fec_inner { get; set; }
+                public string fec { get; set; }
 
                 [XmlAttribute]
                 public string inversion { get; set; }

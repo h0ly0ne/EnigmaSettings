@@ -36,6 +36,14 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string ProgNumber { get; set; }
 
         /// <summary>
+        ///     System flag
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string SystemFlag { get; set; }
+
+        /// <summary>
         ///     1 -TV, 2-radio, 3-data
         /// </summary>
         /// <value></value>

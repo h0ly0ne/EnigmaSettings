@@ -3,7 +3,7 @@
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
-    public interface ITransponderDVBC : ITransponder
+    public interface ITransponderIPTV : ITransponder
     {
         /// <summary>
         ///     Symbol rate
@@ -13,7 +13,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <summary>
         ///     Spectral inversion
         /// </summary>
-        Enums.DVBSCInversionType InversionType { get; }
+        Enums.IPTVInversionType InversionType { get; }
 
         /// <summary>
         ///     Spectral inversion
@@ -23,7 +23,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <summary>
         ///     Modulation
         /// </summary>
-        Enums.DVBCModulationType ModulationType { get; }
+        Enums.IPTVModulationType ModulationType { get; }
 
         /// <summary>
         ///     Modulation
@@ -33,7 +33,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <summary>
         ///     FEC
         /// </summary>
-        Enums.DVBSCFECType FECType { get; }
+        Enums.IPTVFECType FECType { get; }
 
         /// <summary>
         ///     FEC

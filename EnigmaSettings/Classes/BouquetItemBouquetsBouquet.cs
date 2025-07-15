@@ -47,7 +47,6 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "ICloneable"
-
         /// <summary>
         /// Performs deep Clone on the object
         /// </summary>
@@ -55,10 +54,9 @@ namespace Krkadoni.EnigmaSettings
         public new object Clone()
         {
             var bibb = (IBouquetItemBouquetsBouquet)MemberwiseClone();
-            bibb.Bouquet = Bouquet != null ? (IBouquetsBouquet)Bouquet.Clone() : null;
+            bibb.Bouquet = (IBouquetsBouquet)Bouquet?.Clone();
             return bibb;
         }
-
         #endregion
 
         /// <summary>
@@ -69,13 +67,9 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if bouquet is null</exception>
         public BouquetItemBouquetsBouquet(IBouquetsBouquet bouquet)
         {
-            if (bouquet == null)
-                throw new ArgumentNullException();
-            Bouquet = bouquet;
+            Bouquet = bouquet ?? throw new ArgumentNullException();
             _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag =
-                Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted)
-                    .ToString(CultureInfo.CurrentCulture);
+            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>
@@ -87,9 +81,7 @@ namespace Krkadoni.EnigmaSettings
         {
             _bouquetOrderNumberInt = bouquetOrderNumber;
             _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag =
-                Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted)
-                    .ToString(CultureInfo.CurrentCulture);
+            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.CurrentCulture);
         }
 
         /// <summary>
@@ -99,13 +91,10 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>Enums.BouquetType.E1BouquetsBouquet</returns>
         /// <remarks></remarks>
         [DataMember]
-        public override Enums.BouquetItemType BouquetItemType
-        {
-            get { return Enums.BouquetItemType.BouquetsBouquet; }
-        }
+        public override Enums.BouquetItemType BouquetItemType => Enums.BouquetItemType.BouquetsBouquet;
 
         /// <summary>
-        ///     Reference to matcing bouquet instance
+        ///     Reference to matching bouquet instance
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -113,12 +102,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IBouquetsBouquet Bouquet
         {
-            get { return _bouquet; }
+            get => _bouquet;
             set
             {
-                if (value == _bouquet) return;
+                if (value == _bouquet) 
+                    return;
+
                 _bouquet = value;
-                OnPropertyChanged("Bouquet");
+                OnPropertyChanged(nameof(Bouquet));
             }
         }
 
@@ -129,10 +120,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks>Used to match locked bouquets</remarks>
         [DataMember]
-        public string BouquetOrderNumber
-        {
-            get { return BouquetOrderNumberInt.ToString("X").ToLower(); }
-        }
+        public string BouquetOrderNumber => BouquetOrderNumberInt.ToString("X").ToLower();
 
         /// <summary>
         ///     Negative number as integer as found in bouquets file
@@ -143,14 +131,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public int BouquetOrderNumberInt
         {
-            get { return _bouquetOrderNumberInt; }
+            get => _bouquetOrderNumberInt;
             set
             {
                 if (value != _bouquetOrderNumberInt)
                 {
                     _bouquetOrderNumberInt = value;
-                    OnPropertyChanged("BouquetOrderNumberInt");
-                    OnPropertyChanged("BouquetOrderNumber");
+                    OnPropertyChanged(nameof(BouquetOrderNumberInt));
+                    OnPropertyChanged(nameof(BouquetOrderNumber));
                 }
             }
         }

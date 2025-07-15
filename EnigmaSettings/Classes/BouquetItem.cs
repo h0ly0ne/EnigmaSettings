@@ -2,8 +2,9 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System.ComponentModel;
-using Krkadoni.EnigmaSettings.Interfaces;
 using System.Runtime.Serialization;
+
+using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -72,7 +73,7 @@ namespace Krkadoni.EnigmaSettings
         // ReSharper restore InconsistentNaming
 
         /// <summary>
-        ///     Type of bouquet item. Each subclass defines it's own type
+        ///     Type of bouquet item. Each subclass defines its own type
         /// </summary>
         /// <value></value>
         /// <returns></returns>

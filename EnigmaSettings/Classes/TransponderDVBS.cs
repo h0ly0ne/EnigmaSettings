@@ -1,6 +1,6 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
-     
+
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
@@ -459,44 +459,28 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10
+        ///     FEC
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
         [DataMember]
-        public Enums.DVBSFECType FECType
+        public Enums.DVBSCFECType FECType
         {
             get
             {
-                switch (FEC)
+                return FEC switch
                 {
-                    case "0":
-                        return Enums.DVBSFECType.None;
-                    case "1":
-                        return Enums.DVBSFECType.Auto;
-                    case "2":
-                        return Enums.DVBSFECType.F12;
-                    case "3":
-                        return Enums.DVBSFECType.F23;
-                    case "4":
-                        return Enums.DVBSFECType.F34;
-                    case "5":
-                        return Enums.DVBSFECType.F56;
-                    case "6":
-                        return Enums.DVBSFECType.F78;
-                    case "7":
-                        return Enums.DVBSFECType.F35;
-                    case "8":
-                        return Enums.DVBSFECType.F45;
-                    case "9":
-                        return Enums.DVBSFECType.F89;
-                    case "10":
-                        return Enums.DVBSFECType.F910;
-                    default:
-                        return Enums.DVBSFECType.Unknown;
-                }
+                    "0" => Enums.DVBSCFECType.Auto,
+                    "1" => Enums.DVBSCFECType.F12,
+                    "2" => Enums.DVBSCFECType.F23,
+                    "3" => Enums.DVBSCFECType.F34,
+                    "4" => Enums.DVBSCFECType.F56,
+                    "5" => Enums.DVBSCFECType.F78,
+                    "6" => Enums.DVBSCFECType.F89,
+                    "7" => Enums.DVBSCFECType.F35,
+                    "8" => Enums.DVBSCFECType.F45,
+                    "9" => Enums.DVBSCFECType.F910,
+                    "10" => Enums.DVBSCFECType.F67,
+                    _ => Enums.DVBSCFECType.None
+                };
             }
         }
 
@@ -508,21 +492,16 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
         [DataMember]
-        public Enums.DVBSInversionType InversionType
+        public Enums.DVBSCInversionType InversionType
         {
             get
             {
-                switch (Inversion)
+                return Inversion switch
                 {
-                    case "0":
-                        return Enums.DVBSInversionType.Auto;
-                    case "1":
-                        return Enums.DVBSInversionType.On;
-                    case "2":
-                        return Enums.DVBSInversionType.Off;
-                    default:
-                        return Enums.DVBSInversionType.Unknown;
-                }
+                    "0" => Enums.DVBSCInversionType.Off,
+                    "1" => Enums.DVBSCInversionType.On,
+                    _ => Enums.DVBSCInversionType.Auto
+                };
             }
         }
 
@@ -564,21 +543,17 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                switch (Modulation)
+                return Modulation switch
                 {
-                    case null:
-                        return Enums.DVBSModulationType.Auto;
-                    case "0":
-                        return Enums.DVBSModulationType.Auto;
-                    case "1":
-                        return Enums.DVBSModulationType.QPSK;
-                    case "2":
-                        return Enums.DVBSModulationType.Qam16;
-                    case "3":
-                        return Enums.DVBSModulationType.PSK8;
-                    default:
-                        return Enums.DVBSModulationType.Unknown;
-                }
+                    null => Enums.DVBSModulationType.Auto,
+                    "0" => Enums.DVBSModulationType.Auto,
+                    "1" => Enums.DVBSModulationType.QPSK,
+                    "2" => Enums.DVBSModulationType.PSK8,
+                    "3" => Enums.DVBSModulationType.QAM16,
+                    "4" => Enums.DVBSModulationType.APSK16,
+                    "5" => Enums.DVBSModulationType.APSK32,
+                    _ => Enums.DVBSModulationType.Auto
+                };
             }
         }
 

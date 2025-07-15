@@ -148,7 +148,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
-        Enums.DVBSFECType FECType { get; }
+        Enums.DVBSCFECType FECType { get; }
 
         /// <summary>
         ///     0=Auto, 1=On, 2=Off
@@ -157,7 +157,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
-        Enums.DVBSInversionType InversionType { get; }
+        Enums.DVBSCInversionType InversionType { get; }
 
         /// <summary>
         ///     0=DVB-S 1=DVB-S2
