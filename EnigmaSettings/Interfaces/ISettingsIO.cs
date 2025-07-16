@@ -3,7 +3,7 @@
      
 using System;
 using System.ComponentModel;
-using System.IO;
+
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
     public interface ISettingsIO : INotifyPropertyChanged, IEditableObject
@@ -103,7 +103,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <remarks></remarks>
         void LoadAsync(string settingsFile, AsyncCallback callback);
 
-
         /// <summary>
         ///     Loads up and links all the settings data asynchronously
         /// </summary>
@@ -114,7 +113,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         void LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, AsyncCallback callback);
-
 
         /// <summary>
         ///     Saves settings to disk, initializes default satellites.xml writer
@@ -133,7 +131,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="xmlCablesIO">Instance of cables.xml writer implementation</param>
         /// <remarks></remarks>
         void Save(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO);
-
 
         /// <summary>
         ///     Saves settings to disk, initializes default satellites.xml writer asynchronously
@@ -154,6 +151,5 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="callback">Async callback to be called after save finishes</param>
         /// <remarks></remarks>
         void SaveAsync(string folder, ISettings settings, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, AsyncCallback callback);
-
     }
 }

@@ -19,12 +19,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string SID { get; set; }
 
         /// <summary>
-        ///     Defines type of service (TV,Radio,Data, etc..)
+        ///     Defines type of service
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd693747(v=vs.85).aspx">Service types</see>
         string Type { get; set; }
 
         /// <summary>
@@ -59,6 +58,30 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         string Name { get; set; }
+
+        /// <summary>
+        ///     Transport Stream ID
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string TSID { get; set; }
+
+        /// <summary>
+        ///     Originator Network ID
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string ONID { get; set; }
+
+        /// <summary>
+        ///     Transponder NameSpace
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string NameSpace { get; set; }
 
         /// <summary>
         ///     Flags for Audio, Video, Subtitles, Provider etc..

@@ -1,16 +1,16 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
     [DataContract]
-    public class FileBouquet : IFileBouquet, INotifyPropertyChanged
+    public class FileBouquet : IFileBouquet
     {
         #region "INotifyPropertyChanged"
 
@@ -95,28 +95,26 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string FileName
         {
-            get { return _fileName; }
+            get => _fileName;
             set
             {
-                if (value == _fileName) return;
-                if (value == null)
-                    value = string.Empty;
+                if (value == _fileName)
+                    return;
+
+                value ??= string.Empty;
                 _fileName = value;
-                OnPropertyChanged("FileName");
+                OnPropertyChanged(nameof(FileName));
             }
         }
 
         /// <summary>
-        ///     Type of the boquet. Determined from FileName.
+        ///     Type of the bouquet. Determined from FileName.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
         [DataMember]
-        public Enums.BouquetType BouquetType
-        {
-            get { return GetTypeFromFileName(_fileName); }
-        }
+        public Enums.BouquetType BouquetType => GetTypeFromFileName(_fileName);
 
         /// <summary>
         ///     List of bouquet items
@@ -127,13 +125,12 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IBouquetItem> BouquetItems
         {
-            get { return _bouquetItems; }
+            get => _bouquetItems;
             set
             {
-                if (value == null)
-                    value = new List<IBouquetItem>();
+                value ??= new List<IBouquetItem>();
                 _bouquetItems = value;
-                OnPropertyChanged("BouquetItems");
+                OnPropertyChanged(nameof(BouquetItems));
             }
         }
 
@@ -146,19 +143,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
-                if (value == _name) return;
-                if (value == null)
-                    value = string.Empty;
+                if (value == _name) 
+                    return;
+
+                value ??= string.Empty;
                 _name = value;
-                OnPropertyChanged("Name");
+                OnPropertyChanged(nameof(Name));
             }
         }
 
         /// <summary>
-        ///     Determines type of bouquet by it's filename
+        ///     Determines type of bouquet by its filename
         /// </summary>
         /// <param name="fName">Filename without path</param>
         /// <returns>BouquetType enum for known filenames</returns>
@@ -166,22 +164,17 @@ namespace Krkadoni.EnigmaSettings
         protected Enums.BouquetType GetTypeFromFileName(string fName)
         {
             if (string.IsNullOrEmpty(fName))
-            {
                 return Enums.BouquetType.Unknown;
-            }
 
             if (fName.ToLower() == "bouquets")
-            {
                 return Enums.BouquetType.E1Bouquets;
-            }
+            
             if (fName.ToLower().EndsWith(".tv") || fName.ToLower().EndsWith(".tv.epl"))
-            {
                 return Enums.BouquetType.UserBouquetTv;
-            }
+            
             if (fName.ToLower().EndsWith(".radio") || fName.ToLower().EndsWith(".radio.epl"))
-            {
                 return Enums.BouquetType.UserBouquetRadio;
-            }
+            
             return Enums.BouquetType.Unknown;
         }
 

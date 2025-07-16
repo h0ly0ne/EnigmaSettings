@@ -32,6 +32,9 @@ namespace Krkadoni.EnigmaSettings
 
         private bool _isEditing;
         private string _mFlags;
+        private string _mTSID;
+        private string _mONID;
+        private string _mNameSpace;
         private bool _mLocked;
         private string _mName;
         private string _mProgNumber;
@@ -45,6 +48,9 @@ namespace Krkadoni.EnigmaSettings
         {
             if (_isEditing) return;
             _mFlags = _flags;
+            _mTSID = _TSID;
+            _mONID = _ONID;
+            _mNameSpace = _nameSpace;
             _mLocked = _locked;
             _mName = _name;
             _mProgNumber = _progNumber;
@@ -66,6 +72,9 @@ namespace Krkadoni.EnigmaSettings
             if (!_isEditing) return;
             Locked = _mLocked;
             Name = _mName;
+            TSID = _mTSID;
+            ONID = _mONID;
+            NameSpace = _mNameSpace;
             ProgNumber = _mProgNumber;
             SystemFlag = _mSystemFlag;
             ServiceSecurity = _mServiceSecurity;
@@ -98,8 +107,11 @@ namespace Krkadoni.EnigmaSettings
 
         #endregion
 
-        private readonly string _transponderId = string.Empty;
-        private string _flags = "p:";
+        private readonly string _transponderId;
+        private string _flags;
+        private string _TSID;
+        private string _ONID;
+        private string _nameSpace;
         private bool _locked;
         private string _name = string.Empty;
         private string _progNumber = "0";
@@ -138,6 +150,9 @@ namespace Krkadoni.EnigmaSettings
                     SystemFlag = sData[6].Trim();
 
                 _transponderId = string.Join(":", sData[1], sData[2], sData[3]);
+                _TSID = sData[2];
+                _ONID = sData[3];
+                _nameSpace = sData[1];
                 Name = name;
                 _flags = flags;
             }
@@ -154,38 +169,39 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SID
         {
-            get { return _sid; }
+            get => _sid;
             set
             {
-                if (value == null)
-                    value = "0";
-                if (value == _sid) return;
+                value ??= "0";
+
+                if (value == _sid)
+                    return;
                 _sid = value;
-                OnPropertyChanged("SID");
-                OnPropertyChanged("ServiceId");
+                OnPropertyChanged(nameof(SID));
+                OnPropertyChanged(nameof(ServiceId));
             }
         }
 
         /// <summary>
-        ///     Defines type of service (TV,Radio,Data, etc..)
+        ///     Defines type of service
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd693747(v=vs.85).aspx">Service types</see>
         [DataMember]
         public string Type
         {
-            get { return _type; }
+            get => _type;
             set
             {
-                if (value == null)
-                    value = "0";
-                if (value.Trim() == _type) return;
+                value ??= "0";
+
+                if (value.Trim() == _type)
+                    return;
                 _type = value.Trim();
-                OnPropertyChanged("Type");
-                OnPropertyChanged("ServiceType");
-                OnPropertyChanged("ServiceId");
+                OnPropertyChanged(nameof(Type));
+                OnPropertyChanged(nameof(ServiceType));
+                OnPropertyChanged(nameof(ServiceId));
             }
         }
 
@@ -198,14 +214,15 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string ProgNumber
         {
-            get { return _progNumber; }
+            get => _progNumber;
             set
             {
-                if (value == null)
-                    value = "0";
-                if (value == _progNumber) return;
+                value ??= "0";
+
+                if (value == _progNumber)
+                    return;
                 _progNumber = value;
-                OnPropertyChanged("ProgNumber");
+                OnPropertyChanged(nameof(ProgNumber));
             }
         }
 
@@ -218,15 +235,15 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SystemFlag
         {
-            get { return _systemFlag; }
+            get => _systemFlag;
             set
             {
-                if (value == null)
-                    value = "";
+                value ??= "";
 
-                if (value == _systemFlag) return;
+                if (value == _systemFlag)
+                    return;
                 _systemFlag = value;
-                OnPropertyChanged("SystemFlag");
+                OnPropertyChanged(nameof(SystemFlag));
             }
         }
 
@@ -319,14 +336,78 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
-                if (value == _name) return;
-                if (value == null)
-                    value = string.Empty;
+                if (value == _name)
+                    return;
+
+                value ??= string.Empty;
                 _name = value;
-                OnPropertyChanged("Name");
+                OnPropertyChanged(nameof(Name));
+            }
+        }
+
+        /// <summary>
+        ///     Transport Stream ID
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DataMember]
+        public string TSID
+        {
+            get => _TSID;
+            set
+            {
+                if (value == _TSID)
+                    return;
+
+                value ??= string.Empty;
+                _TSID = value;
+                OnPropertyChanged("TSID");
+            }
+        }
+
+        /// <summary>
+        ///     Originator Network ID
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DataMember]
+        public string ONID
+        {
+            get => _ONID;
+            set
+            {
+                if (value == _ONID)
+                    return;
+
+                value ??= string.Empty;
+                _ONID = value;
+                OnPropertyChanged("ONID");
+            }
+        }
+
+        /// <summary>
+        ///     Transponder NameSpace
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DataMember]
+        public string NameSpace
+        {
+            get => _nameSpace;
+            set
+            {
+                if (value == _nameSpace)
+                    return;
+
+                value ??= string.Empty;
+                _nameSpace = value;
+                OnPropertyChanged("NameSpace");
             }
         }
 
@@ -363,7 +444,8 @@ namespace Krkadoni.EnigmaSettings
                     string mSid = SID.TrimStart('0');
                     if (mSid.Length == 0)
                         mSid = "0";
-                    return string.Join(":", new[] {"0", mSid, "0", "0", "0"}).ToLower();
+
+                    return string.Join(":", Convert.ToInt32(Type).ToString("X"), mSid.TrimStart('0'), !string.IsNullOrEmpty(TSID) ? TSID.TrimStart('0') : "0", !string.IsNullOrEmpty(ONID) ? ONID.TrimStart('0') : "0", !string.IsNullOrEmpty(NameSpace) ? NameSpace.TrimStart('0') : "0").ToLower();
                 }
                 else
                 {
@@ -379,7 +461,7 @@ namespace Krkadoni.EnigmaSettings
                     string mNameSpc = Transponder.NameSpc.TrimStart('0');
                     if (mNameSpc.Length == 0)
                         mNameSpc = "0";
-                    return string.Join(":", new[] {Convert.ToInt32(Type).ToString("X"), mSid, mTSID, mNid, mNameSpc}).ToLower();
+                    return string.Join(":", Convert.ToInt32(Type).ToString("X"), mSid, mTSID, mNid, mNameSpc).ToLower();
                 }
             }
         }
@@ -394,30 +476,20 @@ namespace Krkadoni.EnigmaSettings
         /// </returns>
         /// <remarks></remarks>
         [DataMember]
-        public string TransponderId
-        {
-            get
-            {
-                if (Transponder == null)
-                {
-                    return _transponderId.ToLower();
-                }
-                return Transponder.TransponderId;
-            }
-        }
+        public string TransponderId => Transponder == null ? _transponderId.ToLower() : Transponder.TransponderId;
 
         [DataMember]
         public ITransponder Transponder
         {
-            get { return _transponder; }
+            get => _transponder;
             set
             {
                 if (value != _transponder)
                 {
                     _transponder = value;
-                    OnPropertyChanged("Transponder");
-                    OnPropertyChanged("TransponderId");
-                    OnPropertyChanged("ServiceId");
+                    OnPropertyChanged(nameof(Transponder));
+                    OnPropertyChanged(nameof(TransponderId));
+                    OnPropertyChanged(nameof(ServiceId));
                 }
             }
         }
@@ -431,12 +503,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public Enums.ServiceSecurity ServiceSecurity
         {
-            get { return _serviceSecurity; }
+            get => _serviceSecurity;
             set
             {
-                if (value == _serviceSecurity) return;
+                if (value == _serviceSecurity)
+                    return;
+
                 _serviceSecurity = value;
-                OnPropertyChanged("ServiceSecurity");
+                OnPropertyChanged(nameof(ServiceSecurity));
             }
         }
 
@@ -459,7 +533,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     if (fString.IndexOf(":", StringComparison.CurrentCulture) > -1 && fString.Split(':').Length >= 2)
                     {
-                        IFlag f = Activator.CreateInstance(typeof (TFlag), new object[] {fString}) as TFlag;
+                        IFlag f = Activator.CreateInstance(typeof (TFlag), fString) as TFlag;
                         if (f == null) continue;
                         mFlagList.Add(f);
                     }
@@ -477,13 +551,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public bool Locked
         {
-            get { return _locked; }
+            get => _locked;
             set
             {
                 if (value != Locked)
                 {
                     _locked = value;
-                    OnPropertyChanged("Locked");
+                    OnPropertyChanged(nameof(Locked));
                 }
             }
         }
@@ -501,30 +575,7 @@ namespace Krkadoni.EnigmaSettings
 
         public override string ToString()
         {
-            string sData;
-            if (Transponder == null)
-            {
-                sData = string.Join(":", new[] {SID, "00000000", "0000", "0000", Type, ProgNumber});
-            }
-            else
-            {
-                sData = string.Join(":", new[]
-                {
-                    SID.PadLeft(4, '0'),
-                    Transponder.NameSpc.PadRight(8, '0'),
-                    Transponder.TSID.PadLeft(4, '0'),
-                    Transponder.NID.PadLeft(4, '0'),
-                    Type,
-                    ProgNumber,
-                    SystemFlag
-                });
-            }
-            return string.Join("\t", new[]
-            {
-                sData,
-                Name,
-                Flags
-            });
+            return string.Join("\t", Transponder == null ? string.Join(":", SID, "00000000", "0000", "0000", Type, ProgNumber) : string.Join(":", SID.PadLeft(4, '0'), Transponder.NameSpc.PadRight(8, '0'), Transponder.TSID.PadLeft(4, '0'), Transponder.NID.PadLeft(4, '0'), Type, ProgNumber, SystemFlag), Name, Flags);
         }
 
         /// <summary>

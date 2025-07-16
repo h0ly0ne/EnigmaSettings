@@ -814,40 +814,6 @@ namespace Krkadoni.EnigmaSettings
                     return Convert.ToInt32(version);
             }
         }
-
-        /// <summary>
-        ///     Returns bouquet name for known bouquet types
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        protected virtual string GetBouquetNameFromFileName(string fileName)
-        {
-            switch (fileName.ToLower())
-            {
-                case BlackListFile:
-                    return "blacklist";
-                case WhiteListFile:
-                    return "whitelist";
-                case BouquetsRadioFile:
-                    return "Bouquets (Radio)";
-                case BouquetsTvFile:
-                    return "Bouquets (TV)";
-                case BouquetsFile:
-                    return "bouquets";
-                case UserBouquetRadioEpl:
-                    return "User - bouquets (Radio)";
-                case UserBouquetTvEpl:
-                    return "User - bouquets (TV)";
-                default:
-                    if (fileName.ToLower().EndsWith(".tv"))
-                    {
-                        return "TV Bouquet";
-                    }
-                    return fileName.ToLower().EndsWith(".radio") ? "Radio Bouquet" : string.Empty;
-            }
-        }
-
         #endregion
 
         #region "Reading"
@@ -2333,13 +2299,13 @@ namespace Krkadoni.EnigmaSettings
                                         .SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_to_any_service__Not_writing_it_to_bouquet_,
                                     bis.ServiceId, bouquet.Name));
                         }
-                        else if (bis.Service.Transponder == null)
-                        {
-                            Log.Warn(
-                                string.Format(
-                                    Resources.SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transponder__Not_writing_it_,
-                                    bis.Service.ToString().Replace("\t", "    "), bouquet.Name));
-                        }
+                        //else if (bis.Service.Transponder == null)
+                        //{
+                        //    Log.Warn(
+                        //        string.Format(
+                        //            Resources.SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transponder__Not_writing_it_,
+                        //            bis.Service.ToString().Replace("\t", "    "), bouquet.Name));
+                        //}
                         else
                         {
                             sContent.Append("#SERVICE " + string.Join(":", bis.FavoritesTypeFlag, bis.LineSpecifierFlag, bis.Service.ServiceId, "0", "0", "0", "") + "\n");
@@ -2405,8 +2371,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var sBouquetsTvContent = new StringBuilder();
             sBouquetsTvContent.Append("#NAME User - Bouquets (TV)" + "\n");
-            foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList()
-                )
+            foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList())
             {
                 sBouquetsTvContent.Append("#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                 Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.tv");
