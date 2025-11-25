@@ -69,7 +69,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         IInstanceFactory Factory { get; }
 
         /// <summary>
-        ///     Log4Net logger to be used for log output
+        ///     Logger to be used for log output
         /// </summary>
         /// <value></value>
         /// <returns></returns>
