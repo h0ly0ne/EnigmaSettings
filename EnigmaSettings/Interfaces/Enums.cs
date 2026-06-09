@@ -410,7 +410,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// Enigma settings version. Can be 
         /// Enigma1V1 (obsolete), 
         /// Enigma1 for Enigma1 receivers 
-        /// Enigma2Ver3 and Enigma2Ver4 for Enigma2 receivers
+        /// Enigma2Ver3, Enigma2Ver4 and Enigma2Ver5 (lamedb5) for Enigma2 receivers
         /// </summary>
         public enum SettingsVersion
         {
