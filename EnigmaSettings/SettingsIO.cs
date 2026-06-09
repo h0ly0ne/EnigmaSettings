@@ -74,8 +74,8 @@ namespace Krkadoni.EnigmaSettings
         protected const string BlackListFile = "blacklist";
         protected const string DefaultEnigma1Path = "/var/tuxbox/config/enigma/";
 
-        private static readonly System.Collections.Generic.HashSet<string> _streamFavoritesTypes =
-            new System.Collections.Generic.HashSet<string> { "4097", "5001", "5002", "8193", "8739" };
+        private static readonly HashSet<string> _streamFavoritesTypes =
+            new HashSet<string> { "4097", "5001", "5002", "8193", "8739" };
 
         #region "Events"
 
