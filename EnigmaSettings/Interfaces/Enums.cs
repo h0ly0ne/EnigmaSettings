@@ -403,7 +403,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             Enigma1V1 = 1,
             Enigma1 = 2,
             Enigma2Ver3 = 4,
-            Enigma2Ver4 = 5
+            Enigma2Ver4 = 5,
+            Enigma2Ver5 = 6
         }
 
         /// <summary>

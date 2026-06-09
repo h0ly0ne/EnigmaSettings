@@ -785,6 +785,8 @@ namespace Krkadoni.EnigmaSettings
                     return Enums.SettingsVersion.Enigma2Ver3;
                 case "4":
                     return Enums.SettingsVersion.Enigma2Ver4;
+                case "5":
+                    return Enums.SettingsVersion.Enigma2Ver5;
                 default:
                     return Enums.SettingsVersion.Unknown;
             }
@@ -808,6 +810,8 @@ namespace Krkadoni.EnigmaSettings
                     return 3;
                 case Enums.SettingsVersion.Enigma2Ver4:
                     return 4;
+                case Enums.SettingsVersion.Enigma2Ver5:
+                    return 5;
                 default:
                     return Convert.ToInt32(version);
             }
