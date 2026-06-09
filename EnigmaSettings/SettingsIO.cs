@@ -1303,7 +1303,7 @@ namespace Krkadoni.EnigmaSettings
                     }
                     if (subBqt != null)
                     {
-                        if (sData[1] == "519")
+                        if (lineType == Enums.LineSpecifier.Hidden)
                             subBqt.Hidden = true;
                         IBouquetItemFileBouquet bib = _factory.InitNewBouquetItemFileBouquet(subBqt);
                         bib.FavoritesTypeFlag = sData[0];

@@ -26,6 +26,12 @@ namespace Krkadoni.EnigmaSettings.Tests
 
             Assert.Equal(2, bq.BouquetItems.Count);
             Assert.Contains(bq.BouquetItems, i => i.LineSpecifierFlag == "832");
+
+            // round-trips on write: the 832 spacer is re-emitted
+            string outDir = Path.Combine(Path.GetTempPath(), "es_sp_" + System.Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(outDir);
+            io.Save(outDir, settings);
+            Assert.Contains("1:832:", File.ReadAllText(Path.Combine(outDir, "userbouquet.sp.tv")));
         }
 
         [Fact]
