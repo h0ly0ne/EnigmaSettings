@@ -106,33 +106,37 @@ namespace Krkadoni.EnigmaSettings.Tests
         }
 
         [Fact]
-        public void RemoveEmptyMarkers_preserves_space_spacer_but_still_drops_empty_regular_marker()
+        public void RemoveEmptyMarkers_treats_a_trailing_space_as_an_empty_marker()
         {
+            // In the removal logic a SPACE (832) is treated exactly like a marker: a marker that is
+            // followed only by a space is empty, and a trailing space is itself empty - both go.
             var f = new InstanceFactory();
             var settings = f.InitNewSettings();
             var bq = f.InitNewFileBouquet();
 
             var channel = f.InitNewBouquetItemService("1:0:1:1:3e9:1:c00000:0:0:0:");
-            var space = f.InitNewBouquetItemMarker("spacer", "0");
+            var header = f.InitNewBouquetItemMarker("Trailing", "0");
+            header.LineSpecifierFlag = "64";
+            var space = f.InitNewBouquetItemMarker("spacer", "1");
             space.LineSpecifierFlag = "832";
-            var emptyRegular = f.InitNewBouquetItemMarker("Trailing", "1");
-            emptyRegular.LineSpecifierFlag = "64";
 
             bq.BouquetItems.Add(channel);
-            bq.BouquetItems.Add(space);        // becomes the last item once the regular one is removed
-            bq.BouquetItems.Add(emptyRegular); // last item, empty -> removed
+            bq.BouquetItems.Add(header); // followed only by a space -> empty
+            bq.BouquetItems.Add(space);  // trailing -> empty
             settings.Bouquets.Add(bq);
 
             settings.RemoveEmptyMarkers();
 
-            Assert.Contains(space, bq.BouquetItems);              // SPACE spacer preserved
-            Assert.DoesNotContain(emptyRegular, bq.BouquetItems); // empty regular marker still removed
+            Assert.DoesNotContain(header, bq.BouquetItems); // removed: a marker followed only by a space
+            Assert.DoesNotContain(space, bq.BouquetItems);  // removed: trailing space treated as a marker
             Assert.Contains(channel, bq.BouquetItems);
         }
 
         [Fact]
-        public void RemoveEmptyMarkers_keeps_a_marker_that_is_only_followed_by_a_space()
+        public void RemoveEmptyMarkers_removes_a_marker_followed_by_a_space_but_keeps_a_space_before_a_channel()
         {
+            // marker = space: the header is immediately "followed by another marker" (the space) so it
+            // is empty and removed, while the space precedes a real channel and is therefore kept.
             var f = new InstanceFactory();
             var settings = f.InitNewSettings();
             var bq = f.InitNewFileBouquet();
@@ -143,15 +147,16 @@ namespace Krkadoni.EnigmaSettings.Tests
             space.LineSpecifierFlag = "832";
             var channel = f.InitNewBouquetItemService("1:0:1:1:3e9:1:c00000:0:0:0:");
 
-            bq.BouquetItems.Add(header); // followed by a SPACE, which must not count as 'another marker'
+            bq.BouquetItems.Add(header);
             bq.BouquetItems.Add(space);
             bq.BouquetItems.Add(channel);
             settings.Bouquets.Add(bq);
 
             settings.RemoveEmptyMarkers();
 
-            Assert.Contains(header, bq.BouquetItems);
-            Assert.Contains(space, bq.BouquetItems);
+            Assert.DoesNotContain(header, bq.BouquetItems); // empty: immediately followed by a (space) marker
+            Assert.Contains(space, bq.BouquetItems);        // kept: precedes a real channel
+            Assert.Contains(channel, bq.BouquetItems);
         }
     }
 }

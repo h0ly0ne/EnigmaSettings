@@ -54,9 +54,6 @@ service-type / DVB-T modulation enum set. A new xUnit test project
   alternative is now removed consistently, so it can no longer be silently re-introduced on
   save. `RemoveInvalidBouquetItems` additionally drops dangling alternative references (an
   `IBouquetItemAlternative` whose `Bouquet` is null).
-- **`RemoveEmptyMarkers` preserves SPACE (832) spacers.** SPACE entries are intentional layout
-  and are never removed; a regular marker followed only by a SPACE is no longer treated as
-  empty. Ordinary empty/duplicate markers are still removed as before.
 
 ### Notes / known limitations
 

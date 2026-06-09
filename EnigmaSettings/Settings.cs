@@ -896,10 +896,8 @@ namespace Krkadoni.EnigmaSettings
                     for (int i = bouquet.BouquetItems.Count - 1; i >= 0; i += -1)
                     {
                         var bouquetItemMarker = bouquet.BouquetItems.ElementAt(i) as IBouquetItemMarker;
-                        //we're only interested in markers
+                        //we're only interested in markers (SPACE/832 entries are markers too and are treated the same)
                         if (bouquetItemMarker == null) continue;
-                        //SPACE (832) entries are intentional layout spacers, not empty markers - never remove them
-                        if (bouquetItemMarker.LineSpecifierFlag == "832") continue;
                         if (i == bouquet.BouquetItems.Count - 1)
                         {
                             if (preserveList != null && preserveList.Count > 0 && preserveList.Contains(bouquetItemMarker))
@@ -916,8 +914,7 @@ namespace Krkadoni.EnigmaSettings
                                     bouquetItemMarker.Description, bouquet.Name));
                             }
                         }
-                        else if (bouquet.BouquetItems.ElementAt(i + 1) is IBouquetItemMarker &&
-                                 ((IBouquetItemMarker) bouquet.BouquetItems.ElementAt(i + 1)).LineSpecifierFlag != "832")
+                        else if (bouquet.BouquetItems.ElementAt(i + 1) is IBouquetItemMarker)
                         {
                             if (preserveList != null && preserveList.Count > 0 && preserveList.Contains(bouquetItemMarker))
                             {
