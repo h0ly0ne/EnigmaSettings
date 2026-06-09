@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Krkadoni.EnigmaSettings</AssemblyName>
+    <RootNamespace>Krkadoni.EnigmaSettings</RootNamespace>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);SYSLIB0011;CS0618</NoWarn>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Compile the existing library source from the original project folder -->
+    <Compile Include="..\EnigmaSettings\**\*.cs" Exclude="..\EnigmaSettings\obj\**\*.cs;..\EnigmaSettings\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Embed the resx so Resources.Designer.cs can find Krkadoni.EnigmaSettings.Resources -->
+    <EmbeddedResource Include="..\EnigmaSettings\Resources.resx">
+      <LogicalName>Krkadoni.EnigmaSettings.Resources.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
