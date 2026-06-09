@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<satellites>
+<sat name="Test 13E" flags="0" position="130">
+<transponder frequency="11013000" symbol_rate="27500000" polarization="0" fec_inner="3" system="1" modulation="2" pls_mode="1" pls_code="16416" is_id="0" t2mi_plp_id="0" t2mi_pid="4096"/>
+</sat>
+</satellites>
