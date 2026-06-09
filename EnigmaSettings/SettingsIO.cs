@@ -13,7 +13,7 @@ using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
-    public class SettingsIO : ISettingsIO
+    public partial class SettingsIO : ISettingsIO
     {
         #region "INotifyPropertyChanged"
 

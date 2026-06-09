@@ -91,6 +91,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsException.cs" />
     <Compile Include="SettingsIO.cs" />
+    <Compile Include="SettingsIO.LameDb5.cs" />
     <Compile Include="SettingsLoadedEventArgs.cs" />
     <Compile Include="SettingsLoadingEventArgs.cs" />
     <Compile Include="SettingsSavedEventArgs.cs" />

@@ -175,6 +175,9 @@
     <Compile Include="..\EnigmaSettings\SettingsIO.cs">
       <Link>SettingsIO.cs</Link>
     </Compile>
+    <Compile Include="..\EnigmaSettings\SettingsIO.LameDb5.cs">
+      <Link>SettingsIO.LameDb5.cs</Link>
+    </Compile>
     <Compile Include="..\EnigmaSettings\SettingsLoadedEventArgs.cs">
       <Link>SettingsLoadedEventArgs.cs</Link>
     </Compile>
