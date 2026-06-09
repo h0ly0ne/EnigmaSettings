@@ -442,7 +442,9 @@ namespace Krkadoni.EnigmaSettings
                     settings.MatchFileBouquetsServices();
                     ReadServicesLocked(Path.Combine(settings.SettingsDirectory, ServicesLockedFile), ref settings);
                 }
-                else if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver3 || settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                else if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver3
+                         || settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4
+                         || settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver5)
                 {
                     ReadFileBouquet(Path.Combine(settings.SettingsDirectory, BouquetsTvFile), ref settings);
                     ReadFileBouquet(Path.Combine(settings.SettingsDirectory, BouquetsRadioFile), ref settings);
@@ -868,10 +870,17 @@ namespace Krkadoni.EnigmaSettings
                 string[] settingsFileLines = Read(fileName);
                 CheckIfSettingsValid(settingsFileLines, fileName);
                 ReadSettingsVersion(settings, settingsFileLines, fileName);
-                int transponderOpenIndex;
-                int transponderEndIndex;
-                ReadTransponders(settings, settingsFileLines, fileName, out transponderOpenIndex, out transponderEndIndex);
-                ReadServices(settings, settingsFileLines, fileName, transponderOpenIndex, transponderEndIndex);
+                if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver5)
+                {
+                    ReadLameDb5(settings, settingsFileLines, fileName);
+                }
+                else
+                {
+                    int transponderOpenIndex;
+                    int transponderEndIndex;
+                    ReadTransponders(settings, settingsFileLines, fileName, out transponderOpenIndex, out transponderEndIndex);
+                    ReadServices(settings, settingsFileLines, fileName, transponderOpenIndex, transponderEndIndex);
+                }
                 Log.Debug(string.Format("Settings loaded with {0} services and {1} transponders", settings.Services.Count, settings.Transponders.Count));
                 return settings;
             }

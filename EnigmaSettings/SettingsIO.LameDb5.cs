@@ -2,6 +2,7 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System.Text;
+using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -105,6 +106,53 @@ namespace Krkadoni.EnigmaSettings
                 ? content.Substring(0, firstColon) + " " + content.Substring(firstColon + 1)
                 : content;
             return firstLine.Length > 0 && secondLine.Length > 0;
+        }
+
+        /// <summary>
+        ///     Parses a lamedb version 5 file (already read into lines) into the settings model,
+        ///     reusing the existing transponder/service object construction.
+        /// </summary>
+        protected virtual void ReadLameDb5(ISettings settings, string[] settingsFileLines, string fileName)
+        {
+            Log.Debug(string.Format("Reading lamedb v5 from {0}", fileName));
+            foreach (string raw in settingsFileLines)
+            {
+                string line = raw == null ? string.Empty : raw.Trim();
+                if (line.Length == 0 || line.StartsWith("#") || line.StartsWith("eDVB services"))
+                    continue;
+
+                if (line.StartsWith("t:"))
+                {
+                    string first, second;
+                    if (!TryParseLameDb5Transponder(line, out first, out second))
+                    {
+                        Log.Warn(string.Format("Skipping malformed v5 transponder line: {0}", line));
+                        continue;
+                    }
+                    switch (second.Trim().Substring(0, 1).ToLower())
+                    {
+                        case "s": AddTransponderDVBS(settings, first, second); break;
+                        case "t": AddTransponderDVBT(settings, first, second); break;
+                        case "c": AddTransponderDVBC(settings, first, second); break;
+                        default:
+                            Log.Warn(string.Format("Unknown v5 transponder type, adding as satellite: {0}", line));
+                            AddTransponderDVBS(settings, first, second);
+                            break;
+                    }
+                }
+                else if (line.StartsWith("s:"))
+                {
+                    string dataId, name, flags;
+                    if (!TryParseLameDb5Service(line, out dataId, out name, out flags))
+                    {
+                        Log.Warn(string.Format("Skipping malformed v5 service line: {0}", line));
+                        continue;
+                    }
+                    settings.Services.Add(_factory.InitNewService(dataId, name, flags));
+                }
+            }
+            Log.Debug(string.Format("lamedb v5 loaded with {0} services and {1} transponders",
+                settings.Services.Count, settings.Transponders.Count));
         }
 
         /// <summary>
