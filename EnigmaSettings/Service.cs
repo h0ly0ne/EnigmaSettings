@@ -271,6 +271,16 @@ namespace Krkadoni.EnigmaSettings
                         return Enums.ServiceType.AcHdNvodTimeShifted;
                     case "27":
                         return Enums.ServiceType.AcHdNvodReference;
+                    case "28":
+                        return Enums.ServiceType.AcStereoHdtv;
+                    case "29":
+                        return Enums.ServiceType.AcStereoHdNvodTimeShifted;
+                    case "30":
+                        return Enums.ServiceType.AcStereoHdNvodReference;
+                    case "31":
+                        return Enums.ServiceType.Hevc;
+                    case "32":
+                        return Enums.ServiceType.HevcUhd;
                     case "134":
                         return Enums.ServiceType.UserDefined134Bskyb;
                     case "135":

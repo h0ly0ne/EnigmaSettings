@@ -391,6 +391,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             AcHdtv = 25,
             AcHdNvodTimeShifted = 26,
             AcHdNvodReference = 27,
+            AcStereoHdtv = 28,
+            AcStereoHdNvodTimeShifted = 29,
+            AcStereoHdNvodReference = 30,
+            Hevc = 31,
+            HevcUhd = 32,
             UserDefined134Bskyb = 134,
             UserDefined135Bskyb = 135
         }
