@@ -3,6 +3,8 @@ using Xunit;
 
 namespace Krkadoni.EnigmaSettings.Tests
 {
+    // Fixtures/v5 (lamedb5) are intentionally not exercised here; they will be
+    // covered once lamedb5 parsing support is implemented in a later phase.
     public class Phase1SmokeTests
     {
         [Fact]
