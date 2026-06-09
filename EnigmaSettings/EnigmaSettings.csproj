@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BouquetItem.cs" />
     <Compile Include="BouquetItemBouquetsBouquet.cs" />
+    <Compile Include="BouquetItemAlternative.cs" />
     <Compile Include="BouquetItemFileBouquet.cs" />
     <Compile Include="BouquetItemMarker.cs" />
     <Compile Include="BouquetItemService.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Interfaces\IBouquet.cs" />
     <Compile Include="Interfaces\IBouquetItem.cs" />
     <Compile Include="Interfaces\IBouquetItemBouquetsBouquet.cs" />
+    <Compile Include="Interfaces\IBouquetItemAlternative.cs" />
     <Compile Include="Interfaces\IBouquetItemFileBouquet.cs" />
     <Compile Include="Interfaces\IBouquetItemMarker.cs" />
     <Compile Include="Interfaces\IBouquetItemService.cs" />

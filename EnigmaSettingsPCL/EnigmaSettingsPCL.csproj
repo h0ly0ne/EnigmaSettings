@@ -46,6 +46,9 @@
     <Compile Include="..\EnigmaSettings\BouquetItemBouquetsBouquet.cs">
       <Link>BouquetItemBouquetsBouquet.cs</Link>
     </Compile>
+    <Compile Include="..\EnigmaSettings\BouquetItemAlternative.cs">
+      <Link>BouquetItemAlternative.cs</Link>
+    </Compile>
     <Compile Include="..\EnigmaSettings\BouquetItemFileBouquet.cs">
       <Link>BouquetItemFileBouquet.cs</Link>
     </Compile>
@@ -96,6 +99,9 @@
     </Compile>
     <Compile Include="..\EnigmaSettings\Interfaces\IBouquetItemBouquetsBouquet.cs">
       <Link>Interfaces\IBouquetItemBouquetsBouquet.cs</Link>
+    </Compile>
+    <Compile Include="..\EnigmaSettings\Interfaces\IBouquetItemAlternative.cs">
+      <Link>Interfaces\IBouquetItemAlternative.cs</Link>
     </Compile>
     <Compile Include="..\EnigmaSettings\Interfaces\IBouquetItemFileBouquet.cs">
       <Link>Interfaces\IBouquetItemFileBouquet.cs</Link>

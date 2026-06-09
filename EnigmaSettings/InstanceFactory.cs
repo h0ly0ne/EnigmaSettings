@@ -113,6 +113,16 @@ namespace Krkadoni.EnigmaSettings
             return new BouquetItemFileBouquet(bouquet);
         }
 
+        public IBouquetItemAlternative InitNewBouquetItemAlternative(string fileName)
+        {
+            return new BouquetItemAlternative(fileName);
+        }
+
+        public IBouquetItemAlternative InitNewBouquetItemAlternative(IFileBouquet bouquet)
+        {
+            return new BouquetItemAlternative(bouquet);
+        }
+
         public IBouquetItemService InitNewBouquetItemService(IService service)
         {
             return new BouquetItemService(service);

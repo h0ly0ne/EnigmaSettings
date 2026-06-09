@@ -19,7 +19,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             Service = 1,
             Marker = 2,
             Stream = 3,
-            BouquetsBouquet = 4
+            BouquetsBouquet = 4,
+            Alternative = 5
         }
 
         /// <summary>
@@ -342,7 +343,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             InternalSortKey = 16,
             SortKeyIs1 = 32,
             Marker = 64,
-            ServiceNotPlayable = 128
+            ServiceNotPlayable = 128,
+            Alternative = 134,
+            Udp = 256,
+            Hidden = 519,
+            Space = 832
         }
 
         /// <summary>

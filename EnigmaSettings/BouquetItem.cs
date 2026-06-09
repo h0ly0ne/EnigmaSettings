@@ -158,6 +158,14 @@ namespace Krkadoni.EnigmaSettings
                         return Enums.LineSpecifier.Marker;
                     case "128":
                         return Enums.LineSpecifier.ServiceNotPlayable;
+                    case "134":
+                        return Enums.LineSpecifier.Alternative;
+                    case "256":
+                        return Enums.LineSpecifier.Udp;
+                    case "519":
+                        return Enums.LineSpecifier.Hidden;
+                    case "832":
+                        return Enums.LineSpecifier.Space;
                     default:
                         return Enums.LineSpecifier.Unknown;
                 }
