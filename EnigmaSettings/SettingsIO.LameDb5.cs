@@ -1,6 +1,7 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
+using System;
 using System.Text;
 using Krkadoni.EnigmaSettings.Interfaces;
 
@@ -85,6 +86,41 @@ namespace Krkadoni.EnigmaSettings
                 sb.Append("s:").Append(dataId).Append(",\"").Append(name).Append('"').Append(flagsPart).Append('\n');
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        ///     Writes the settings model to a lamedb version 5 file ("lamedb5").
+        ///     Reuses the v4 section builders and reshapes their output into single-line records.
+        /// </summary>
+        protected virtual void WriteLameDb5(string directory, ISettings settings)
+        {
+            Log.Debug("Writing lamedb v5 file to disk");
+            string header = SettingsFirstLine + GetSettingsVersion(settings.SettingsVersion) + "/" + "\n";
+            string transponderBlocks =
+                DVBSTranspondersToString(settings, 0)
+                + DVBCTranspondersToString(settings)
+                + DVBTTranspondersToString(settings);
+
+            var sb = new StringBuilder();
+            sb.Append(header);
+            sb.Append(TranspondersToLameDb5(transponderBlocks));
+            sb.Append(ServicesToLameDb5(ServicesToString(settings)));
+            sb.Append(EditorName + "\n");
+
+            string fi = System.IO.Path.Combine(directory, LameDb5FileName);
+            OnFileSaving(this, fi);
+            try
+            {
+                _fileHelper.WriteAllText(fi, sb.ToString());
+                Log.Debug(string.Format("Sucessfully written {0} to {1}", LameDb5FileName, fi));
+                OnFileSaved(this, fi, true);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                OnFileSaved(this, fi, false);
+                throw new SettingsException(string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, fi), ex);
+            }
         }
 
         /// <summary>

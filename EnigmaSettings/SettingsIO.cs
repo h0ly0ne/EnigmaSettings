@@ -794,6 +794,13 @@ namespace Krkadoni.EnigmaSettings
             }
         }
 
+        /// <summary>True for lamedb formats that carry the extended DVB-S2/T2 fields (v4 and v5).</summary>
+        protected static bool IsVer4OrLater(Enums.SettingsVersion version)
+        {
+            return version == Enums.SettingsVersion.Enigma2Ver4
+                || version == Enums.SettingsVersion.Enigma2Ver5;
+        }
+
         /// <summary>
         ///     Returns version number as seen in settings file for specified enum
         /// </summary>
@@ -1832,6 +1839,11 @@ namespace Krkadoni.EnigmaSettings
         protected virtual void WriteSettingsFile(string directory, ISettings settings)
         {
             Log.Debug("Writing settings file to disk");
+            if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver5)
+            {
+                WriteLameDb5(directory, settings);
+                return;
+            }
             var sContent = new StringBuilder();
             string fileName = "lamedb";
             if (settings.SettingsVersion == Enums.SettingsVersion.Enigma1 || settings.SettingsVersion == Enums.SettingsVersion.Enigma1V1)
@@ -1924,6 +1936,7 @@ namespace Krkadoni.EnigmaSettings
                             Log.Debug(string.Format("Transponder {0} is not DVBS transponder, not supported in Enigma1, skipping", tran));
                         }
                         break;
+                    case Enums.SettingsVersion.Enigma2Ver5:
                     case Enums.SettingsVersion.Enigma2Ver4:
                     case Enums.SettingsVersion.Enigma2Ver3:
                         {
@@ -1943,7 +1956,7 @@ namespace Krkadoni.EnigmaSettings
                             tran.Inversion
                         }));
                             string extraData = string.Empty;
-                            if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                            if (IsVer4OrLater(settings.SettingsVersion))
                             {
                                 if (tran.Flags != null)
                                     extraData = ":" + tran.Flags;
@@ -1964,17 +1977,17 @@ namespace Krkadoni.EnigmaSettings
                                     extraData += ":" + tran.RollOff;
                                 else
                                     extraData += ":0";
-                                if (tran.Pilot != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                if (tran.Pilot != null && IsVer4OrLater(settings.SettingsVersion))
                                     extraData += ":" + tran.Pilot;
-                                if (tran.IsId != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                if (tran.IsId != null && IsVer4OrLater(settings.SettingsVersion))
                                     extraData += ":" + tran.IsId;
-                                if (tran.PlsCode != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                if (tran.PlsCode != null && IsVer4OrLater(settings.SettingsVersion))
                                     extraData += ":" + tran.PlsCode;
-                                if (tran.PlsMode != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                if (tran.PlsMode != null && IsVer4OrLater(settings.SettingsVersion))
                                     extraData += ":" + tran.PlsMode;
-                                if (tran.T2miPlpId != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                if (tran.T2miPlpId != null && IsVer4OrLater(settings.SettingsVersion))
                                     extraData += ":" + tran.T2miPlpId;
-                                if (tran.T2miPid != null && settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+                                if (tran.T2miPid != null && IsVer4OrLater(settings.SettingsVersion))
                                     extraData += ":" + tran.T2miPid;
                             }
                             //End If
@@ -2033,6 +2046,7 @@ namespace Krkadoni.EnigmaSettings
                         }));
                         sContent.Append("\n" + "/" + "\n");
                         break;
+                    case Enums.SettingsVersion.Enigma2Ver5:
                     case Enums.SettingsVersion.Enigma2Ver4:
                         sContent.Append("\t" + "c " + string.Join(":", new[]
                         {
@@ -2092,6 +2106,7 @@ namespace Krkadoni.EnigmaSettings
                         }));
                         sContent.Append("\n" + "/" + "\n");
                         break;
+                    case Enums.SettingsVersion.Enigma2Ver5:
                     case Enums.SettingsVersion.Enigma2Ver4:
                         sContent.Append("\t" + "t " + string.Join(":", new[]
                         {
@@ -2149,6 +2164,7 @@ namespace Krkadoni.EnigmaSettings
                         }
                     }
                     break;
+                case Enums.SettingsVersion.Enigma2Ver5:
                 case Enums.SettingsVersion.Enigma2Ver4:
                 case Enums.SettingsVersion.Enigma2Ver3:
                     foreach (IService service in settings.Services.Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBS))
@@ -2252,7 +2268,7 @@ namespace Krkadoni.EnigmaSettings
                 WriteEnigma1Bouquets(directory, settings);
                 WriteServicesLocked(directory, settings);
             }
-            else if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver3 || settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4)
+            else if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver3 || settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver4 || settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver5)
             {
                 WriteTvBouquetsE2(directory, settings);
                 WriteRadioBouquetsE2(directory, settings);
