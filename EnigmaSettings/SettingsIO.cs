@@ -74,6 +74,9 @@ namespace Krkadoni.EnigmaSettings
         protected const string BlackListFile = "blacklist";
         protected const string DefaultEnigma1Path = "/var/tuxbox/config/enigma/";
 
+        private static readonly System.Collections.Generic.HashSet<string> _streamFavoritesTypes =
+            new System.Collections.Generic.HashSet<string> { "4097", "5001", "5002", "8193", "8739" };
+
         #region "Events"
 
         /// <summary>
@@ -1329,11 +1332,9 @@ namespace Krkadoni.EnigmaSettings
                             break;
                         case Enums.LineSpecifier.NormalService:
                             if (favoritesType != null
-                                && (
-                                    (Enums.FavoritesType)Enum.Parse(typeof(Enums.FavoritesType), favoritesType,true) == Enums.FavoritesType.Stream
-                                    || sData[10].IndexOf("//", StringComparison.CurrentCulture) > -1)
-                                    || (sData.Length == 12 && sData[11] != null)
-                                )
+                                && ( _streamFavoritesTypes.Contains(favoritesType)
+                                     || sData[10].IndexOf("//", StringComparison.CurrentCulture) > -1
+                                     || (sData.Length == 12 && sData[11] != null) ))
                             {
                                 //it's stream
                                 IBouquetItemStream bqis = ReadStreamReference(line, description);

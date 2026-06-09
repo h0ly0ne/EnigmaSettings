@@ -296,7 +296,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             StructureId = 0,
             DVBService = 1,
             File = 2,
-            Stream = 4097
+            Stream = 4097,
+            Stream5001 = 5001,
+            Stream5002 = 5002,
+            Stream8193 = 8193,
+            Stream8739 = 8739
         }
 
         /// <summary>
