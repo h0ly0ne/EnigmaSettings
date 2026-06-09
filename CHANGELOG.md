@@ -51,6 +51,8 @@ service-type / DVB-T modulation enum set. A new xUnit test project
   `System.IO.FileStream`, which is unavailable in Profile111. The netstandard2.0 and
   .NET Framework 4.0 builds are unaffected. (The PCL `<Compile>` includes for new
   files are kept current so the target is whole if that pre-existing break is fixed.)
-- `satellites.xml` already reads/writes the modern DVB-S2/S2X/T2MI attributes
-  (`system`, `modulation`, `pls_mode`, `pls_code`, `is_id`, `t2mi_plp_id`, `t2mi_pid`);
-  a regression test now covers it. No change was needed there.
+- `satellites.xml` reads/writes the full DVB-S2/S2X/T2MI attribute set
+  (`system`, `modulation`, `pls_mode`, `pls_code`, `is_id`, `t2mi_plp_id`, `t2mi_pid`)
+  for **lamedb5 (v5) saves** as well as v3/v4 — v4↔v5 round-trips are lossless
+  including `satellites.xml` S2X/T2MI data. A regression test now covers the v5
+  save path.

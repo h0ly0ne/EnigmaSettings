@@ -100,6 +100,16 @@ namespace Krkadoni.EnigmaSettings
                         return Enums.FavoritesType.DVBService;
                     case "2":
                         return Enums.FavoritesType.File;
+                    case "4097":
+                        return Enums.FavoritesType.Stream;
+                    case "5001":
+                        return Enums.FavoritesType.Stream5001;
+                    case "5002":
+                        return Enums.FavoritesType.Stream5002;
+                    case "8193":
+                        return Enums.FavoritesType.Stream8193;
+                    case "8739":
+                        return Enums.FavoritesType.Stream8739;
                     default:
                         return Enums.FavoritesType.Unknown;
                 }

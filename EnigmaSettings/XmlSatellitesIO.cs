@@ -149,6 +149,7 @@ namespace Krkadoni.EnigmaSettings
                             serTran.pilot = null;
                             serTran.rolloff = null;
                             break;
+                        case Enums.SettingsVersion.Enigma2Ver5:
                         case Enums.SettingsVersion.Enigma2Ver4:
                         case Enums.SettingsVersion.Enigma2Ver3:
                             serTran.fec_inner = xTran.FECInner;
