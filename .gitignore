@@ -10,3 +10,11 @@
 /EnigmaSettings/obj/Release
 /EnigmaSettingsPCL/obj/Debug/TempPE
 /EnigmaSettingsPCL/obj/Debug
+/.vs/EnigmaSettings/FileContentIndex
+/.vs/EnigmaSettings
+/EnigmaSettingsPCL/obj/Release
+
+# Build output for all projects
+**/bin/Debug/
+**/bin/Release/
+**/obj/
