@@ -36,6 +36,9 @@ service-type / DVB-T modulation enum set. A new xUnit test project
   `QPSK=0, Qam16=1, Qam64=2, Auto=3, Qam256=4` (it previously had a `Auto=1`/`QPSK=1`
   value collision and lacked `0`/`Qam256`). This only affects the convenience enum
   lookup; the raw `Modulation` string was always stored and written unchanged.
+- **`DVBSRollOffType` corrected** to the DVB-S2 roll-off coding `0.35=0, 0.25=1,
+  0.20=2, Auto=3` (it previously had `X20=3` and no `Auto`). Convenience-enum only;
+  the raw roll-off value is stored and written unchanged.
 - **`E2BouquetToString` now writes nested file-bouquet references** that were
   previously built but never appended (silent drop). Affects only file-bouquet items
   nested inside a userbouquet body (alternatives and nested sub-bouquets); normal

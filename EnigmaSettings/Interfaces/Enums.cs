@@ -152,7 +152,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
             Unknown = -2,
             X35 = 0,
             X25 = 1,
-            X20 = 3
+            X20 = 2,
+            Auto = 3
         }
 
         public enum DVBSSystemType

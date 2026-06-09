@@ -91,7 +91,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Modulation { get; set; }
 
         /// <summary>
-        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 3=0.20
+        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 2=0.20, 3=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -178,7 +178,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSModulationType ModulationType { get; }
 
         /// <summary>
-        ///     0=0.35, 1=0.25, 3=0.20
+        ///     0=0.35, 1=0.25, 2=0.20, 3=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>

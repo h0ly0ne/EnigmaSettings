@@ -233,7 +233,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=0.35, 1=0.25, 3=0.20
+        ///     0=0.35, 1=0.25, 2=0.20, 3=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
