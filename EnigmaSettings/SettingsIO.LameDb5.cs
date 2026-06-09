@@ -1,9 +1,7 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
-using System;
 using System.Text;
-using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -15,20 +13,38 @@ namespace Krkadoni.EnigmaSettings
     {
         protected const string LameDb5FileName = "lamedb5";
 
+        private static string NormalizeNewlines(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return string.Empty;
+            return s.Replace("\r\n", "\n").Replace("\r", "\n");
+        }
+
         /// <summary>
-        ///     Converts the v4 transponder block layout
-        ///     ("ns:tsid:nid" line, "\t&lt;type&gt; freq:..." line, "/" line, repeated)
-        ///     into v5 transponder records ("t:ns:tsid:nid,&lt;type&gt;:freq:...").
+        ///     Converts v4 transponder block layout into v5 transponder records
+        ///     ("t:ns:tsid:nid,&lt;type&gt;:freq:...").
         /// </summary>
+        /// <remarks>
+        ///     Accepts either the concatenated per-type block output (key line /
+        ///     "&lt;tab&gt;&lt;type&gt; freq:..." line / "/" line, repeated) or a full
+        ///     transponders section: blank lines and the "transponders", "end" and "/"
+        ///     delimiter lines are ignored, leaving clean key/content pairs.
+        /// </remarks>
         protected virtual string TranspondersToLameDb5(string v4TransponderBlocks)
         {
-            var sb = new StringBuilder();
-            string[] lines = (v4TransponderBlocks ?? string.Empty).Split('\n');
-            for (int i = 0; i + 1 < lines.Length; i += 3)
+            var rows = new System.Collections.Generic.List<string>();
+            foreach (string raw in NormalizeNewlines(v4TransponderBlocks).Split('\n'))
             {
-                string key = lines[i].Trim();
-                if (key.Length == 0) { i -= 2; continue; } // skip stray blank line, advance by 1
-                string content = lines[i + 1].TrimStart('\t', ' ');
+                string trimmed = raw.Trim();
+                if (trimmed.Length == 0 || trimmed == "/"
+                    || trimmed == SettingsTransponderOpenTag || trimmed == SettingsClosingTag)
+                    continue;
+                rows.Add(raw);
+            }
+            var sb = new StringBuilder();
+            for (int i = 0; i + 1 < rows.Count; i += 2)
+            {
+                string key = rows[i].Trim();
+                string content = rows[i + 1].Trim();
                 int sp = content.IndexOf(' ');
                 string v5Content = sp > -1
                     ? content.Substring(0, sp) + ":" + content.Substring(sp + 1)
@@ -43,22 +59,27 @@ namespace Krkadoni.EnigmaSettings
         ///     data_id line / name line / flags line) into v5 service records
         ///     ("s:data_id,&quot;name&quot;[,flags]").
         /// </summary>
+        /// <remarks>
+        ///     The service name is wrapped in double quotes without escaping; the lamedb5
+        ///     format defines no quote-escaping, so a name containing a double quote is a
+        ///     known limitation (matches the on-device format behavior).
+        /// </remarks>
         protected virtual string ServicesToLameDb5(string v4ServicesSection)
         {
-            var sb = new StringBuilder();
-            string[] lines = (v4ServicesSection ?? string.Empty).Split('\n');
+            string[] lines = NormalizeNewlines(v4ServicesSection).Split('\n');
             int start = -1;
             for (int i = 0; i < lines.Length; i++)
             {
                 if (lines[i].Trim() == SettingsServicesOpenTag) { start = i + 1; break; }
             }
             if (start < 0) return string.Empty;
+            var sb = new StringBuilder();
             for (int i = start; i + 2 < lines.Length; i += 3)
             {
                 string dataId = lines[i].Trim();
                 if (dataId.Length == 0 || dataId == SettingsClosingTag) break;
                 string name = lines[i + 1];
-                string flags = lines[i + 2];
+                string flags = lines[i + 2].Trim();
                 string flagsPart = (!string.IsNullOrEmpty(flags) && flags != "p:") ? "," + flags : string.Empty;
                 sb.Append("s:").Append(dataId).Append(",\"").Append(name).Append('"').Append(flagsPart).Append('\n');
             }

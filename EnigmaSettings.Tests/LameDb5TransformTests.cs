@@ -66,5 +66,36 @@ namespace Krkadoni.EnigmaSettings.Tests
             Assert.Equal("Two", n);
             Assert.Equal("p:", f);
         }
+
+        [Fact]
+        public void Transponder_encode_then_decode_round_trips()
+        {
+            var io = new ProbeSettingsIO();
+            string v4Block = "00c00000:03e9:0001\n\ts 11214000:23500000:0:3:192:2\n/\n";
+            string t5 = io.Transponders(v4Block).TrimEnd('\n');
+            Assert.True(io.ParseTransponder(t5, out var key, out var content));
+            Assert.Equal("00c00000:03e9:0001", key);
+            Assert.Equal("s 11214000:23500000:0:3:192:2", content);
+        }
+
+        [Fact]
+        public void Service_encode_then_decode_round_trips()
+        {
+            var io = new ProbeSettingsIO();
+            string v4 = "services\n0001:00c00000:03e9:0001:1:0\nTest One\np:Prov,C:0001\nend\n";
+            string s5 = io.Services(v4).TrimEnd('\n');
+            Assert.True(io.ParseService(s5, out var d, out var n, out var f));
+            Assert.Equal("0001:00c00000:03e9:0001:1:0", d);
+            Assert.Equal("Test One", n);
+            Assert.Equal("p:Prov,C:0001", f);
+        }
+
+        [Fact]
+        public void Transponders_ignores_section_tags_and_crlf()
+        {
+            var io = new ProbeSettingsIO();
+            string withTags = "transponders\r\n00c00000:03e9:0001\r\n\ts 11214000:23500000:0:3:192:2\r\n/\r\nend\r\n";
+            Assert.Equal("t:00c00000:03e9:0001,s:11214000:23500000:0:3:192:2\n", io.Transponders(withTags));
+        }
     }
 }
