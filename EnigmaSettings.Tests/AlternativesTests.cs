@@ -35,6 +35,12 @@ namespace Krkadoni.EnigmaSettings.Tests
             Assert.Equal("alternatives.sample.tv", Path.GetFileName(alt.FileName));
             Assert.NotNull(alt.Bouquet);
             Assert.Single(alt.Bouquet.BouquetItems);
+            // alternatives files must NOT leak into the top-level bouquet list
+            Assert.DoesNotContain(settings.Bouquets.OfType<IFileBouquet>(),
+                b => b.FileName != null && b.FileName.StartsWith("alternatives."));
+            // inner service must be matched (Fix 1)
+            var innerService = Assert.IsAssignableFrom<IBouquetItemService>(alt.Bouquet.BouquetItems.Single());
+            Assert.NotNull(innerService.Service);
         }
 
         [Fact]
@@ -52,6 +58,14 @@ namespace Krkadoni.EnigmaSettings.Tests
             Assert.Contains("1:134:", userBq);
             Assert.Contains("FROM BOUQUET \"alternatives.sample.tv\"", userBq);
             Assert.True(File.Exists(Path.Combine(outDir, "alternatives.sample.tv")));
+
+            // full round-trip: reload the saved directory and confirm the alternative + its inner service survived
+            var reloaded = io.Load(Path.Combine(outDir, "lamedb"));
+            var reBq = reloaded.Bouquets.OfType<IFileBouquet>().Single(b => b.Name == "AltTest");
+            var reAlt = Assert.IsAssignableFrom<IBouquetItemAlternative>(reBq.BouquetItems.Single());
+            Assert.NotNull(reAlt.Bouquet);
+            var reInner = Assert.IsAssignableFrom<IBouquetItemService>(reAlt.Bouquet.BouquetItems.Single());
+            Assert.NotNull(reInner.Service);
         }
     }
 }

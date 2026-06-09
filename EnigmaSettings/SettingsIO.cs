@@ -2720,6 +2720,8 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="settings">Instance of ISettings that has the bouquets we're writing</param>
         protected virtual void WriteAlternativeBouquets(string directory, ISettings settings)
         {
+            // All user bouquets that can hold alternatives are registered at the top level by the
+            // loader, so a single-level scan of settings.Bouquets covers every alternatives file.
             foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().ToList())
             {
                 foreach (IBouquetItemAlternative alt in bouquet.BouquetItems.OfType<IBouquetItemAlternative>().ToList())

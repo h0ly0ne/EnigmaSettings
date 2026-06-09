@@ -647,7 +647,11 @@ namespace Krkadoni.EnigmaSettings
 
             try
             {
-                IList<IBouquetItemService> bis = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemService>().ToList();
+                IList<IBouquetItemService> bis = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemService>()
+                    .Concat(Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemAlternative>()
+                        .Where(a => a.Bouquet != null)
+                        .SelectMany(a => a.Bouquet.BouquetItems).OfType<IBouquetItemService>())
+                    .ToList();
                 var query = bis.Join(Services, bs => bs.ServiceId.ToLower(), srv => srv.ServiceId.ToLower(), (bs, srv) => new
                 {
                     BouquetItem = bs,
