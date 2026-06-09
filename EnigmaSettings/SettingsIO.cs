@@ -1183,7 +1183,8 @@ namespace Krkadoni.EnigmaSettings
                         && fName.ToLower() != BouquetsTvFile
                         && fName.ToLower() != BouquetsRadioFile
                         && fName.ToLower() != UserBouquetTvEpl
-                        && fName.ToLower() != UserBouquetRadioEpl)
+                        && fName.ToLower() != UserBouquetRadioEpl
+                        && !fName.ToLower().StartsWith("alternatives."))
                     {
                         settings.Bouquets.Add(bqt);
                     }
@@ -1327,6 +1328,33 @@ namespace Krkadoni.EnigmaSettings
                                 else
                                 {
                                     Log.Warn(string.Format("Invalid marker {0} not added to bouquet {1}", line, bouquet.Name));
+                                }
+                            }
+                            break;
+                        case Enums.LineSpecifier.Alternative:
+                            {
+                                var altTmp = sData[10];
+                                if (altTmp.IndexOf("\"", StringComparison.CurrentCultureIgnoreCase) > -1)
+                                {
+                                    altTmp = altTmp.Substring(altTmp.IndexOf("\"", StringComparison.CurrentCultureIgnoreCase) + 1);
+                                    altTmp = altTmp.Substring(0, altTmp.IndexOf("\"", StringComparison.CurrentCultureIgnoreCase)).Trim();
+                                }
+                                string altFile = Path.GetFileName(altTmp);
+                                if (altFile != null)
+                                {
+                                    IFileBouquet altBqt = ReadFileBouquet(Path.Combine(folder, altFile), ref settings);
+                                    if (altBqt != null)
+                                    {
+                                        IBouquetItemAlternative bia = _factory.InitNewBouquetItemAlternative(altBqt);
+                                        bia.FavoritesTypeFlag = sData[0];
+                                        bia.LineSpecifierFlag = sData[1];
+                                        bouquet.BouquetItems.Add(bia);
+                                        Log.Debug(string.Format("Alternative {0} added to bouquet {1}", altFile, bouquet.Name));
+                                    }
+                                    else
+                                    {
+                                        Log.Warn(string.Format("Alternative {0} in bouquet {1} could not be read", altFile, bouquet.Name));
+                                    }
                                 }
                             }
                             break;
@@ -2274,6 +2302,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 WriteTvBouquetsE2(directory, settings);
                 WriteRadioBouquetsE2(directory, settings);
+                WriteAlternativeBouquets(directory, settings);
                 WriteWhiteList(directory, settings);
                 WriteBlackList(directory, settings);
             }
@@ -2473,21 +2502,23 @@ namespace Krkadoni.EnigmaSettings
                 {
                     case Enums.BouquetItemType.FileBouquet:
                         var bif = (IBouquetItemFileBouquet)bqItem;
-                        string reference = "#SERVICE " + string.Join(":", new[]
+                        sContent.Append("#SERVICE " + string.Join(":", new[]
                         {
-                            bif.FavoritesTypeFlag,
-                            bif.LineSpecifierFlag,
-                            "1",
-                            "0",
-                            "0",
-                            "0",
-                            "0",
-                            "0",
-                            "0",
-                            "0",
-                            bif.FileName
-                        }) + "\n";
-                        Log.Debug(string.Format("File bouquet reference {0} added to bouquet {1}", reference.Replace("\n", "\t"), bouquet.Name));
+                            bif.FavoritesTypeFlag, bif.LineSpecifierFlag,
+                            "1", "0", "0", "0", "0", "0", "0", "0",
+                            "FROM BOUQUET \"" + bif.FileName + "\" ORDER BY bouquet"
+                        }) + "\n");
+                        Log.Debug(string.Format("File bouquet reference {0} added to bouquet {1}", bif.FileName, bouquet.Name));
+                        break;
+                    case Enums.BouquetItemType.Alternative:
+                        var bia = (IBouquetItemAlternative)bqItem;
+                        sContent.Append("#SERVICE " + string.Join(":", new[]
+                        {
+                            bia.FavoritesTypeFlag, bia.LineSpecifierFlag,
+                            "1", "0", "0", "0", "0", "0", "0", "0",
+                            "FROM BOUQUET \"" + bia.FileName + "\" ORDER BY bouquet"
+                        }) + "\n");
+                        Log.Debug(string.Format("Alternative reference {0} added to bouquet {1}", bia.FileName, bouquet.Name));
                         break;
                     case Enums.BouquetItemType.Marker:
                         var bim = (IBouquetItemMarker)bqItem;
@@ -2680,6 +2711,27 @@ namespace Krkadoni.EnigmaSettings
                 if (fName != null) WriteBouquet(Path.Combine(directory, fName), bContent, bouquet.Name);
             }
             WriteBouquet(Path.Combine(directory, BouquetsRadioFile), sBouquetsRadioContent.ToString(), BouquetsRadioFile);
+        }
+
+        /// <summary>
+        ///     Writes alternatives files referenced inside user bouquets (alternatives.*.tv)
+        /// </summary>
+        /// <param name="directory">Directory where alternatives files will be saved to</param>
+        /// <param name="settings">Instance of ISettings that has the bouquets we're writing</param>
+        protected virtual void WriteAlternativeBouquets(string directory, ISettings settings)
+        {
+            foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().ToList())
+            {
+                foreach (IBouquetItemAlternative alt in bouquet.BouquetItems.OfType<IBouquetItemAlternative>().ToList())
+                {
+                    if (alt.Bouquet == null) continue;
+                    string fName = Path.GetFileName(alt.FileName);
+                    if (fName == null) continue;
+                    string content = E2BouquetToString(alt.Bouquet);
+                    WriteBouquet(Path.Combine(directory, fName), content, alt.Bouquet.Name);
+                    Log.Debug(string.Format("Alternatives file {0} written", fName));
+                }
+            }
         }
 
         /// <summary>
