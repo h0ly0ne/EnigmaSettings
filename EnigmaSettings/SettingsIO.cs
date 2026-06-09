@@ -1886,6 +1886,7 @@ namespace Krkadoni.EnigmaSettings
                     sContent.Append(DVBTTranspondersToString(settings));
                     sContent.Append(DVBSTranspondersToString(settings, -1));
                     break;
+                case Enums.SettingsVersion.Enigma2Ver5:
                 case Enums.SettingsVersion.Enigma2Ver4:
                 case Enums.SettingsVersion.Enigma2Ver3:
                     sContent.Append(DVBSTranspondersToString(settings, 0));
