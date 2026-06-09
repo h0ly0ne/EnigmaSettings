@@ -208,7 +208,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
+        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -460,7 +460,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
+        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -474,13 +474,15 @@ namespace Krkadoni.EnigmaSettings
                 switch (Modulation)
                 {
                     case "0":
-                        return Enums.DVBTModulationType.Auto;
-                    case "1":
                         return Enums.DVBTModulationType.QPSK;
-                    case "2":
+                    case "1":
                         return Enums.DVBTModulationType.Qam16;
-                    case "3":
+                    case "2":
                         return Enums.DVBTModulationType.Qam64;
+                    case "3":
+                        return Enums.DVBTModulationType.Auto;
+                    case "4":
+                        return Enums.DVBTModulationType.Qam256;
                     default:
                         return Enums.DVBTModulationType.Unknown;
                 }

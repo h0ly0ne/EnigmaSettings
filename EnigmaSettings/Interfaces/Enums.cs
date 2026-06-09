@@ -223,10 +223,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         public enum DVBTModulationType
         {
             Unknown = -2,
-            Auto = 1,
-            QPSK = 1,
-            Qam16 = 2,
-            Qam64 = 3
+            QPSK = 0,
+            Qam16 = 1,
+            Qam64 = 2,
+            Auto = 3,
+            Qam256 = 4
         }
 
         public enum DVBTTransmissionType
