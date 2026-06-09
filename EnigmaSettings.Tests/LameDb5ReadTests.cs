@@ -23,6 +23,10 @@ namespace Krkadoni.EnigmaSettings.Tests
             Assert.NotNull(one.Transponder);
             Assert.Equal("c00000", one.Transponder.NameSpc.TrimStart('0'));
 
+            var two = v5.Services.Single(s => s.Name == "Test TV Two");
+            Assert.NotNull(two.Transponder);
+            Assert.Equal("408", two.Transponder.TSID.TrimStart('0'));
+
             // bouquets use the same format regardless of lamedb version
             Assert.Contains(v5.Bouquets.OfType<IFileBouquet>(), b => b.Name == "Test");
         }

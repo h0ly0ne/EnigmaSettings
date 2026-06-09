@@ -129,13 +129,14 @@ namespace Krkadoni.EnigmaSettings
                         Log.Warn(string.Format("Skipping malformed v5 transponder line: {0}", line));
                         continue;
                     }
-                    switch (second.Trim().Substring(0, 1).ToLower())
+                    // second is non-empty and starts with the type letter per TryParseLameDb5Transponder's contract
+                    switch (second.Substring(0, 1).ToLower())
                     {
                         case "s": AddTransponderDVBS(settings, first, second); break;
                         case "t": AddTransponderDVBT(settings, first, second); break;
                         case "c": AddTransponderDVBC(settings, first, second); break;
                         default:
-                            Log.Warn(string.Format("Unknown v5 transponder type, adding as satellite: {0}", line));
+                            Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, first, second));
                             AddTransponderDVBS(settings, first, second);
                             break;
                     }
