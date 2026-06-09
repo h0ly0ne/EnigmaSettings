@@ -898,6 +898,8 @@ namespace Krkadoni.EnigmaSettings
                         var bouquetItemMarker = bouquet.BouquetItems.ElementAt(i) as IBouquetItemMarker;
                         //we're only interested in markers
                         if (bouquetItemMarker == null) continue;
+                        //SPACE (832) entries are intentional layout spacers, not empty markers - never remove them
+                        if (bouquetItemMarker.LineSpecifierFlag == "832") continue;
                         if (i == bouquet.BouquetItems.Count - 1)
                         {
                             if (preserveList != null && preserveList.Count > 0 && preserveList.Contains(bouquetItemMarker))
@@ -914,7 +916,8 @@ namespace Krkadoni.EnigmaSettings
                                     bouquetItemMarker.Description, bouquet.Name));
                             }
                         }
-                        else if (bouquet.BouquetItems.ElementAt(i + 1) is IBouquetItemMarker)
+                        else if (bouquet.BouquetItems.ElementAt(i + 1) is IBouquetItemMarker &&
+                                 ((IBouquetItemMarker) bouquet.BouquetItems.ElementAt(i + 1)).LineSpecifierFlag != "832")
                         {
                             if (preserveList != null && preserveList.Count > 0 && preserveList.Contains(bouquetItemMarker))
                             {
@@ -967,6 +970,26 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
+        ///     Returns the top-level bouquets together with the inner bouquet of every alternative
+        ///     reference they contain. Alternatives' inner bouquets are intentionally kept out of
+        ///     <see cref="Bouquets" />, so service/stream cleanup must reach them explicitly.
+        /// </summary>
+        private IList<IBouquet> AllServiceContainers()
+        {
+            var containers = new List<IBouquet>();
+            foreach (IBouquet bq in Bouquets)
+            {
+                containers.Add(bq);
+                foreach (IBouquetItemAlternative alternative in bq.BouquetItems.OfType<IBouquetItemAlternative>())
+                {
+                    if (alternative.Bouquet != null)
+                        containers.Add(alternative.Bouquet);
+                }
+            }
+            return containers;
+        }
+
+        /// <summary>
         ///     Removes all stream references from all bouquets
         /// </summary>
         /// <remarks></remarks>
@@ -976,7 +999,7 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 Log.Debug("Removing streams from bouquets");
-                foreach (IBouquet bouquet in Bouquets)
+                foreach (IBouquet bouquet in AllServiceContainers())
                 {
                     IList<IBouquetItemStream> streams = bouquet.BouquetItems.OfType<IBouquetItemStream>().ToList();
                     foreach (IBouquetItemStream stream in streams)
@@ -1006,7 +1029,7 @@ namespace Krkadoni.EnigmaSettings
                 if (service == null)
                     throw new ArgumentNullException();
                 Log.Debug(string.Format("Removing service {0} from settings", service.Name));
-                foreach (IBouquet bouquet in Bouquets)
+                foreach (IBouquet bouquet in AllServiceContainers())
                 {
                     IList<IBouquetItemService> biServices =
                         bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.ServiceId == service.ServiceId).ToList();
@@ -1050,7 +1073,7 @@ namespace Krkadoni.EnigmaSettings
                 else if (srv.Count > 0)
                 {
                     Log.Debug(string.Format("Removing {0} services from settings", srv.Count));
-                    foreach (IBouquet bouquet in Bouquets)
+                    foreach (IBouquet bouquet in AllServiceContainers())
                     {
                         IList<IBouquetItemService> bouquetServices =
                             bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => (x.Service != null)).ToList();
@@ -1097,7 +1120,7 @@ namespace Krkadoni.EnigmaSettings
                 if (transponder == null)
                     throw new ArgumentNullException();
                 Log.Debug(string.Format("Removing transponder {0} from settings", transponder.TransponderId));
-                foreach (IBouquet bouquet in Bouquets)
+                foreach (IBouquet bouquet in AllServiceContainers())
                 {
                     IList<IBouquetItemService> biServices =
                         bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.Service != null && Equals(x.Service.Transponder.TransponderId, transponder.TransponderId)).ToList();
@@ -1148,7 +1171,7 @@ namespace Krkadoni.EnigmaSettings
                 else if (trans.Count > 0)
                 {
                     Log.Debug(string.Format("Removing {0} transponders from settings", trans.Count));
-                    foreach (IBouquet bouquet in Bouquets)
+                    foreach (IBouquet bouquet in AllServiceContainers())
                     {
                         IList<IBouquetItemService> bouquetServices =
                             bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => (x.Service != null)).ToList();
@@ -1261,17 +1284,17 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Removes IBouquetItemService, IBouquetItemFileBouquet and IBouquetItemBouquetsBouquet bouquet items without valid
-        ///     reference to service or another bouquet from all bouquets
+        ///     Removes IBouquetItemService, IBouquetItemFileBouquet, IBouquetItemBouquetsBouquet and IBouquetItemAlternative
+        ///     bouquet items without valid reference to service or another bouquet, from all bouquets and from alternatives' inner bouquets
         /// </summary>
-        /// <remarks>IBouquetsBouquet, IBouquetItemMarker and IBouquetItemStream items are preserved</remarks>
+        /// <remarks>IBouquetItemMarker and IBouquetItemStream items are preserved</remarks>
         public void RemoveInvalidBouquetItems()
         {
             try
             {
                 Log.Debug("Removing bouquet items without valid reference to service or another bouquet");
 
-                foreach (IBouquet bouquet in Bouquets)
+                foreach (IBouquet bouquet in AllServiceContainers())
                 {
                     IList<IBouquetItemService> biServices = bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.Service == null).ToList();
                     foreach (IBouquetItemService bis in biServices)
@@ -1295,6 +1318,14 @@ namespace Krkadoni.EnigmaSettings
                         bouquet.BouquetItems.Remove(bibb);
                         Log.Debug(string.Format("Removed invalid reference to bouquets bouquet number {0} from bouquet {1}", bibb.BouquetOrderNumberInt,
                             bouquet));
+                    }
+
+                    IList<IBouquetItemAlternative> biAlternatives =
+                        bouquet.BouquetItems.OfType<IBouquetItemAlternative>().Where(x => x.Bouquet == null).ToList();
+                    foreach (IBouquetItemAlternative bia in biAlternatives)
+                    {
+                        bouquet.BouquetItems.Remove(bia);
+                        Log.Debug(string.Format("Removed invalid reference to alternatives file {0} from bouquet {1}", bia.FileName, bouquet));
                     }
                 }
 
