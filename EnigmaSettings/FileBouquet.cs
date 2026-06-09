@@ -29,12 +29,14 @@ namespace Krkadoni.EnigmaSettings
         private IList<IBouquetItem> _bouquetItems = new List<IBouquetItem>();
         private string _fileName = string.Empty;
         private string _name = string.Empty;
+        private bool _hidden;
 
         #region "IEditable"
 
         private bool _isEditing;
         private string _mName;
         private string _mFileName;
+        private bool _mHidden;
         private IList<IBouquetItem> _mBouquetItems;
 
         public void BeginEdit()
@@ -42,6 +44,7 @@ namespace Krkadoni.EnigmaSettings
             if (_isEditing) return;
             _mName = _name;
             _mFileName = _fileName;
+            _mHidden = _hidden;
             _mBouquetItems = new List<IBouquetItem>(_bouquetItems);
             _isEditing = true;
         }
@@ -56,6 +59,7 @@ namespace Krkadoni.EnigmaSettings
             if (!_isEditing) return;
             Name = _mName;
             FileName = _mFileName;
+            Hidden = _mHidden;
             BouquetItems.Clear();
             foreach (IBouquetItem bouquetItem in _mBouquetItems)
             {
@@ -103,6 +107,19 @@ namespace Krkadoni.EnigmaSettings
                     value = string.Empty;
                 _fileName = value;
                 OnPropertyChanged("FileName");
+            }
+        }
+
+        /// <summary>True when the bouquet is referenced as hidden (LineSpecifier 519) in bouquets.tv/radio.</summary>
+        [DataMember]
+        public bool Hidden
+        {
+            get { return _hidden; }
+            set
+            {
+                if (value == _hidden) return;
+                _hidden = value;
+                OnPropertyChanged("Hidden");
             }
         }
 

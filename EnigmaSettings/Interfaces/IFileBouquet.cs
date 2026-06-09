@@ -12,5 +12,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns>Name of the file to be read or to be saved to</returns>
         /// <remarks></remarks>
         string FileName { get; set; }
+
+        /// <summary>True when the bouquet is referenced as hidden (LineSpecifier 519) in bouquets.tv/radio.</summary>
+        bool Hidden { get; set; }
     }
 }

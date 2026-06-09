@@ -1269,7 +1269,8 @@ namespace Krkadoni.EnigmaSettings
                     12,
                     13,
                     14,
-                    15
+                    15,
+                    519
                 };
                 if (lineType == Enums.LineSpecifier.Unknown
                     || favoritesType == Convert.ToInt32(Enums.FavoritesType.Unknown).ToString(CultureInfo.CurrentCulture))
@@ -1302,6 +1303,8 @@ namespace Krkadoni.EnigmaSettings
                     }
                     if (subBqt != null)
                     {
+                        if (sData[1] == "519")
+                            subBqt.Hidden = true;
                         IBouquetItemFileBouquet bib = _factory.InitNewBouquetItemFileBouquet(subBqt);
                         bib.FavoritesTypeFlag = sData[0];
                         bib.LineSpecifierFlag = sData[1];
@@ -1328,6 +1331,16 @@ namespace Krkadoni.EnigmaSettings
                                 else
                                 {
                                     Log.Warn(string.Format("Invalid marker {0} not added to bouquet {1}", line, bouquet.Name));
+                                }
+                            }
+                            break;
+                        case Enums.LineSpecifier.Space:
+                            {
+                                IBouquetItemMarker bqim = ReadMarkerReference(line, description);
+                                if (bqim != null)
+                                {
+                                    bouquet.BouquetItems.Add(bqim);
+                                    Log.Debug(string.Format("Spacer entry preserved in bouquet {0}", bouquet.Name));
                                 }
                             }
                             break;
@@ -2647,7 +2660,8 @@ namespace Krkadoni.EnigmaSettings
             foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList()
                 )
             {
-                sBouquetsTvContent.Append("#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
+                string lineSpec = bouquet.Hidden ? "519" : "7";
+                sBouquetsTvContent.Append("#SERVICE 1:" + lineSpec + ":1:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                 Log.Debug(string.Format("Bouquet {0} added to bouquets.tv", Path.GetFileName(bouquet.FileName)));
                 string bContent = E2BouquetToString(bouquet);
                 string fName = Path.GetFileName(bouquet.FileName);
@@ -2704,7 +2718,8 @@ namespace Krkadoni.EnigmaSettings
             foreach (
                 IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetRadio).ToList())
             {
-                sBouquetsRadioContent.Append("#SERVICE 1:7:2:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
+                string lineSpec = bouquet.Hidden ? "519" : "7";
+                sBouquetsRadioContent.Append("#SERVICE 1:" + lineSpec + ":2:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                 Log.Debug(string.Format("Bouquet {0} added to bouquets.radio", Path.GetFileName(bouquet.FileName)));
                 string bContent = E2BouquetToString(bouquet);
                 string fName = Path.GetFileName(bouquet.FileName);
