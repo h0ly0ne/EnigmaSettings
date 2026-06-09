@@ -79,6 +79,67 @@ namespace Krkadoni.EnigmaSettings.Tests
         }
 
         [Fact]
+        public void RemoveStreams_drops_rtsp_and_new_type_streams_and_keeps_dvb_service()
+        {
+            // Stream detection is type- and scheme-agnostic: a new stream type (8739), an rtsp stream
+            // flagged as a stream (4097), and an rtsp stream detected purely by the "//" in its URL
+            // (favourites type 1) are all classified as streams - while a real DVB service is not.
+            string dir = TestSettings.CopyFixtureToTemp("v4");
+            File.WriteAllText(Path.Combine(dir, "bouquets.tv"),
+                "#NAME User - Bouquets (TV)\n" +
+                "#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"userbouquet.streams.tv\" ORDER BY bouquet\n");
+            File.WriteAllText(Path.Combine(dir, "userbouquet.streams.tv"),
+                "#NAME StreamMix\n" +
+                "#SERVICE 8739:0:1:0:0:0:0:0:0:0:http%3a//example.test/uhd.m3u8:UHD Stream\n" +
+                "#DESCRIPTION UHD Stream\n" +
+                "#SERVICE 4097:0:1:0:0:0:0:0:0:0:rtsp%3a//example.test/cam:RTSP Cam\n" +
+                "#DESCRIPTION RTSP Cam\n" +
+                "#SERVICE 1:0:1:0:0:0:0:0:0:0:rtsp%3a//example.test/scheme-only:Scheme Only\n" +
+                "#DESCRIPTION Scheme Only\n" +
+                "#SERVICE 1:0:1:1:3e9:1:c00000:0:0:0:\n" +
+                "#DESCRIPTION Real DVB Channel\n");
+
+            var io = TestSettings.NewIO();
+            var settings = io.Load(Path.Combine(dir, "lamedb"));
+            var bq = settings.Bouquets.OfType<IFileBouquet>().Single(b => b.Name == "StreamMix");
+
+            // all three entries are detected as streams (incl. rtsp via type flag and rtsp via scheme only)
+            Assert.Equal(3, bq.BouquetItems.OfType<IBouquetItemStream>().Count());
+
+            settings.RemoveStreams();
+
+            Assert.Empty(bq.BouquetItems.OfType<IBouquetItemStream>()); // every scheme/type removed
+            Assert.Single(bq.BouquetItems.OfType<IBouquetItemService>()); // the real DVB service is preserved
+        }
+
+        [Fact]
+        public void Saving_a_stream_preserves_the_url_scheme_before_the_slashes()
+        {
+            // Whatever precedes "//" must round-trip verbatim: an rtsp stream is written back as rtsp,
+            // never coerced to http.
+            string dir = TestSettings.CopyFixtureToTemp("v4");
+            File.WriteAllText(Path.Combine(dir, "bouquets.tv"),
+                "#NAME User - Bouquets (TV)\n" +
+                "#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET \"userbouquet.rtsp.tv\" ORDER BY bouquet\n");
+            File.WriteAllText(Path.Combine(dir, "userbouquet.rtsp.tv"),
+                "#NAME RtspBq\n" +
+                "#SERVICE 4097:0:1:0:0:0:0:0:0:0:rtsp%3a//cam.example/live:Cam\n" +
+                "#DESCRIPTION Cam\n");
+
+            var io = TestSettings.NewIO();
+            var settings = io.Load(Path.Combine(dir, "lamedb"));
+
+            string outDir = Path.Combine(Path.GetTempPath(), "es_rtsp_" + System.Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(outDir);
+            io.Save(outDir, settings);
+
+            string saved = File.ReadAllText(Path.Combine(outDir, "userbouquet.rtsp.tv"));
+            Assert.Contains("rtsp", saved);               // scheme written back as rtsp...
+            Assert.DoesNotContain("http", saved);         // ...not coerced to http
+            Assert.Contains("//cam.example/live", saved); // url body intact
+        }
+
+        [Fact]
         public void RemoveInvalidBouquetItems_drops_dangling_alternative_and_cleans_inside_valid_one()
         {
             var f = new InstanceFactory();
