@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.0.1
+
+### Fixed
+
+- **lamedb v4 service lines with a 7th `source id` field** now load. Newer enigma2
+  images (and tools such as DemonEdit) write the service reference as
+  `sid:namespace:tsid:onid:type:number:sourceid` — enigma2 itself reads it with
+  `sscanf "%x:%x:%x:%x:%d:%d:%x"`. The reader previously required exactly six fields
+  and threw *"Invalid service data"* on the first service, aborting the whole load.
+  Six or seven fields are now accepted, the value is exposed as `IService.SourceID`,
+  and it is written back on Enigma2 saves so the file round-trips faithfully
+  (classic six-field lists are unchanged).
+
 ## Unreleased — Enigma2 format modernization
 
 Brings the Enigma2 support up to date: lamedb version 5, more IPTV/stream service
