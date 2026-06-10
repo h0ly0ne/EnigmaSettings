@@ -2277,6 +2277,14 @@ namespace Krkadoni.EnigmaSettings
                         service.Type,
                         service.ProgNumber
                     });
+                    // Preserve the optional 7th field (source id) for newer enigma2 lamedb files.
+                    // It is an Enigma2-only concept, so it is not appended to Enigma1 services lines.
+                    if (!string.IsNullOrEmpty(service.SourceID)
+                        && settings.SettingsVersion != Enums.SettingsVersion.Enigma1
+                        && settings.SettingsVersion != Enums.SettingsVersion.Enigma1V1)
+                    {
+                        sData = sData + ":" + service.SourceID;
+                    }
                     sContent.Append(sData + "\n");
                     sContent.Append(service.Name + "\n");
                     if (flags.Length > 0)

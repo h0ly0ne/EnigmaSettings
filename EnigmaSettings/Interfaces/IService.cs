@@ -36,6 +36,15 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string ProgNumber { get; set; }
 
         /// <summary>
+        ///     Source id - optional 7th field of the service reference line in newer enigma2 lamedb files
+        ///     (sid:namespace:tsid:onid:type:number:sourceid). Empty when not present in the source file.
+        /// </summary>
+        /// <value></value>
+        /// <returns>Hex string as stored in the lamedb, or empty when absent</returns>
+        /// <remarks></remarks>
+        string SourceID { get; set; }
+
+        /// <summary>
         ///     1 -TV, 2-radio, 3-data
         /// </summary>
         /// <value></value>

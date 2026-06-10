@@ -35,6 +35,7 @@ namespace Krkadoni.EnigmaSettings
         private bool _mLocked;
         private string _mName;
         private string _mProgNumber;
+        private string _mSourceId;
         private Enums.ServiceSecurity _mServiceSecurity;
         private string _mSid;
         private ITransponder _mTransponder;
@@ -47,6 +48,7 @@ namespace Krkadoni.EnigmaSettings
             _mLocked = _locked;
             _mName = _name;
             _mProgNumber = _progNumber;
+            _mSourceId = _sourceId;
             _mServiceSecurity = _serviceSecurity;
             _mSid = _sid;
             _mTransponder = _transponder;
@@ -65,6 +67,7 @@ namespace Krkadoni.EnigmaSettings
             Locked = _mLocked;
             Name = _mName;
             ProgNumber = _mProgNumber;
+            SourceID = _mSourceId;
             ServiceSecurity = _mServiceSecurity;
             SID = _mSid;
             Transponder = _mTransponder;
@@ -100,6 +103,7 @@ namespace Krkadoni.EnigmaSettings
         private bool _locked;
         private string _name = string.Empty;
         private string _progNumber = "0";
+        private string _sourceId = string.Empty;
         private Enums.ServiceSecurity _serviceSecurity = Enums.ServiceSecurity.None;
         private string _sid = "0";
         private ITransponder _transponder;
@@ -108,10 +112,17 @@ namespace Krkadoni.EnigmaSettings
         /// <summary>
         ///     Initializes service properties from 1st line of service in lamedb
         /// </summary>
-        /// <param name="serviceData">In format 0xSID:0xNAMESPACE:0xTSID:0xNID:type:prognumber</param>
+        /// <param name="serviceData">In format 0xSID:0xNAMESPACE:0xTSID:0xNID:type:prognumber[:0xsourceid]</param>
         /// <param name="name"></param>
         /// <param name="flags"></param>
-        /// <remarks>Throws argument null exception and argument exception if ServiceData is null, empty or invalid</remarks>
+        /// <remarks>
+        ///     Throws argument null exception and argument exception if ServiceData is null, empty or invalid.
+        ///     Newer enigma2 lamedb files (still tagged "eDVB services /4/", e.g. produced by DemonEdit)
+        ///     add a 7th field, the source id, to the reference line:
+        ///     sid:namespace:tsid:onid:type:number:sourceid. enigma2 reads it with
+        ///     sscanf(line, "%x:%x:%x:%x:%d:%d:%x", ...) - the 7th value defaults to 0 when absent - so we
+        ///     accept six or seven fields and preserve the source id verbatim for a faithful save round-trip.
+        /// </remarks>
         /// <exception cref="ArgumentNullException">Throws argument null exception if serviceData or name is null/empty</exception>
         /// <exception cref="ArgumentException">Throws argument exception if serviceData is invalid</exception>
         public Service(string serviceData, string name, string flags)
@@ -122,11 +133,13 @@ namespace Krkadoni.EnigmaSettings
                 //throw new ArgumentNullException(Resources.Service_New_Service_name_cannot_be_empty);
                 name = string.Empty;
             string[] sData = serviceData.Split(':');
-            if (sData.Length != 6)
+            if (sData.Length < 6)
                 throw new ArgumentException(Resources.Service_ServiceData_Invalid_service_data_);
             SID = sData[0].Trim();
             Type = sData[4].Trim();
             ProgNumber = sData[5].Trim();
+            if (sData.Length >= 7)
+                SourceID = sData[6].Trim();
             _transponderId = string.Join(":", new[]
             {
                 sData[1],
@@ -198,6 +211,28 @@ namespace Krkadoni.EnigmaSettings
                 if (value == _progNumber) return;
                 _progNumber = value;
                 OnPropertyChanged("ProgNumber");
+            }
+        }
+
+        /// <summary>
+        ///     Source id - optional 7th field of the service reference line in newer enigma2 lamedb files
+        ///     (sid:namespace:tsid:onid:type:number:sourceid). Empty when the line carried only the classic
+        ///     six fields, in which case it is not written back out.
+        /// </summary>
+        /// <value></value>
+        /// <returns>Hex string exactly as stored in the lamedb, or empty when not present</returns>
+        /// <remarks>enigma2 defaults this to 0 when absent</remarks>
+        [DataMember]
+        public string SourceID
+        {
+            get { return _sourceId; }
+            set
+            {
+                if (value == null)
+                    value = string.Empty;
+                if (value == _sourceId) return;
+                _sourceId = value;
+                OnPropertyChanged("SourceID");
             }
         }
 
@@ -499,6 +534,8 @@ namespace Krkadoni.EnigmaSettings
                     ProgNumber
                 });
             }
+            if (_sourceId.Length > 0)
+                sData = sData + ":" + _sourceId;
             return string.Join("\t", new[]
             {
                 sData,
