@@ -12,6 +12,8 @@
     <FileVersion>1.1.0.1</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <LangVersion>latest</LangVersion>
+    <Platforms>AnyCPU</Platforms>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
