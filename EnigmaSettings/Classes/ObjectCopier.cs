@@ -15,17 +15,15 @@ namespace Krkadoni.EnigmaSettings
     /// Copyright by Stephen Inglish, licensed under CPOL license
     public static class ObjectCopier
     {
-
         /// Perform a deep Copy of the object.
         /// <span class="code-SummaryComment"><typeparam name="T">The type of object being copied.</typeparam></span>
         /// <span class="code-SummaryComment"><param name="source">The object instance to copy.</param></span>
         /// <span class="code-SummaryComment"><returns>The copied object.</returns></span>
+        [Obsolete("Obsolete")]
         public static T Clone<T>(T source)
         {
             if (!typeof(T).IsSerializable)
-            {
-                throw new ArgumentException("The type must be serializable.", "source");
-            }
+                throw new ArgumentException(@"The type must be serializable.", nameof(source));
 
             // Don't serialize a null object, simply return the default for that object
             if (Object.ReferenceEquals(source, null))
