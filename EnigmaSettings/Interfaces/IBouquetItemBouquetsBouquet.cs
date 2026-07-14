@@ -6,7 +6,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
     public interface IBouquetItemBouquetsBouquet : IBouquetItem
     {
         /// <summary>
-        ///     Reference to matcing bouquet instance
+        ///     Reference to matching bouquet instance
         /// </summary>
         /// <value></value>
         /// <returns></returns>

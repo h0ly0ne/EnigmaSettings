@@ -19,7 +19,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string SID { get; set; }
 
         /// <summary>
-        ///     Defines type of service (TV,Radio,Data, etc..)
+        ///     Defines type of service
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -60,6 +60,30 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         string Name { get; set; }
+
+        /// <summary>
+        ///     Transport Stream ID
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string TSID { get; set; }
+
+        /// <summary>
+        ///     Originator Network ID
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string ONID { get; set; }
+
+        /// <summary>
+        ///     Transponder NameSpace
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        string NameSpace { get; set; }
 
         /// <summary>
         ///     Flags for Audio, Video, Subtitles, Provider etc..
@@ -121,7 +145,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         bool Locked { get; set; }
 
         /// <summary>
-        ///     Updates Flags property from items in list
+        ///     Update Flags property from items in list
         /// </summary>
         /// <param name="flagsList"></param>
         /// <remarks>Should be called when Flags are updated in list</remarks>

@@ -24,7 +24,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <summary>
         ///     Orbital position value as integer
         /// </summary>
-        /// <value>Position as integer number with length 3 (ie. 19.2E = 192) </value>
+        /// <value>Position as integer number with length 3 (e.g. 19.2E = 192) </value>
         /// <returns></returns>
         /// <remarks></remarks>
         int OrbitalPositionInt { get; set; }
@@ -91,7 +91,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Modulation { get; set; }
 
         /// <summary>
-        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 2=0.20, 3=Auto
+        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 3=0.20
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -132,7 +132,6 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string T2miPid { get; set; }
 
         /// <summary>
-        /// <summary>
         ///     0=Horizontal, 1=Vertical, 2=Circular Left, 3=Circular right
         /// </summary>
         /// <value></value>
@@ -148,7 +147,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
-        Enums.DVBSFECType FECType { get; }
+        Enums.DVBSCFECType FECType { get; }
 
         /// <summary>
         ///     0=Auto, 1=On, 2=Off
@@ -157,7 +156,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
-        Enums.DVBSInversionType InversionType { get; }
+        Enums.DVBSCInversionType InversionType { get; }
 
         /// <summary>
         ///     0=DVB-S 1=DVB-S2
@@ -178,7 +177,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSModulationType ModulationType { get; }
 
         /// <summary>
-        ///     0=0.35, 1=0.25, 2=0.20, 3=Auto
+        ///     0=0.35, 1=0.25, 3=0.20
         /// </summary>
         /// <value></value>
         /// <returns></returns>

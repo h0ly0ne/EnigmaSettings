@@ -22,6 +22,5 @@ namespace Krkadoni.EnigmaSettings.Interfaces
        bool FolderExists(string path);
 
        void CreateFolder(string path);
-
     }
 }

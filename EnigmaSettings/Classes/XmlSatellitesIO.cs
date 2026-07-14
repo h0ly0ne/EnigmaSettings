@@ -1,0 +1,296 @@
+// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Full license text can be found at http://opensource.org/licenses/MIT
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+
+using Krkadoni.EnigmaSettings.Interfaces;
+
+namespace Krkadoni.EnigmaSettings
+{
+
+    /// <summary>
+    ///     Used to load or save satellites from/to satellites.xml file
+    /// </summary>
+    /// <remarks></remarks>
+    public class XmlSatellitesIO : IXmlSatellitesIO
+    {
+        private static IFileHelper _fileProvider;
+
+        /// <summary>
+        ///     Initializes new instance with custom factory implementation
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="fileProvider"></param>
+        /// <remarks></remarks>
+        /// <exception cref="ArgumentNullException">Throws argument null exception if factory is null</exception>
+        public XmlSatellitesIO(IInstanceFactory factory, IFileHelper fileProvider)
+        {
+            Factory = factory ?? throw new ArgumentNullException(Resources.SettingsIO_New_Invalid_instance_factory_);
+            _fileProvider = fileProvider ?? throw new ArgumentNullException(Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
+        }
+
+        /// <summary>
+        ///     Implementation of instance factory used to instantiate objects
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public IInstanceFactory Factory { get; }
+
+        /// <summary>
+        ///     Loads satellites and transponders from satellites.xml file
+        /// </summary>
+        /// <param name="fileName">Full path to satellites.xml file on disk</param>
+        /// <returns>List of IXmlSatellite objects and corresponding transponders for each satellite</returns>
+        /// <remarks></remarks>
+        public IList<IXmlSatellite> LoadSatellitesFromFile(string fileName)
+        {
+            var sats = new List<IXmlSatellite>();
+            SerializerSatellites ss = SerializerSatellites.LoadFromFile(fileName);
+            foreach (SerializerSatellites.SerializerSatellite sSat in ss.sat)
+            {
+                var sat = new XmlSatellite
+                {
+                    Name = sSat.name,
+                    Flags = sSat.flags,
+                    Position = sSat.position
+                };
+                foreach (SerializerSatellites.SerializerTransponder sTran in sSat.transponders)
+                {
+                    IXmlTransponder xmlTran = Factory.InitNewXmlTransponder();
+                    xmlTran.FEC = sTran.fec;
+                    xmlTran.Frequency = sTran.frequency;
+                    xmlTran.Inversion = sTran.inversion;
+                    xmlTran.Modulation = sTran.modulation;
+                    xmlTran.Pilot = sTran.pilot;
+                    xmlTran.Polarization = sTran.polarization;
+                    xmlTran.RollOff = sTran.rolloff;
+                    xmlTran.SymbolRate = sTran.symbol_rate;
+                    xmlTran.System = sTran.system;
+                    xmlTran.IsId = sTran.is_id;
+                    xmlTran.PlsCode = sTran.pls_code;
+                    xmlTran.PlsMode = sTran.pls_mode;
+                    xmlTran.T2miPid = sTran.t2mi_pid;
+                    xmlTran.T2miPlpId = sTran.t2mi_plp_id;
+                    sat.Transponders.Add(xmlTran);
+                }
+                sats.Add(sat);
+            }
+            return sats;
+        }
+
+        /// <summary>
+        ///     Saves satellites and transponders to satellites.xml file
+        /// </summary>
+        /// <param name="fileName">Full path to satellites.xml file on disk</param>
+        /// <param name="settings">
+        ///     Settings instance with the list of IXmlSatellite objects and corresponding transponders for each
+        ///     satellite
+        /// </param>
+        /// <remarks></remarks>
+        public void SaveSatellitesToFile(string fileName, ISettings settings)
+        {
+            // cloning objects to avoid modifying referenced ones while saving
+            var ss = new SerializerSatellites();
+            foreach (IXmlSatellite xSat in settings.Satellites)
+            {
+                var sSat = new SerializerSatellites.SerializerSatellite
+                {
+                    flags = xSat.Flags,
+                    name = xSat.Name,
+                    position = xSat.Position
+                };
+
+                foreach (IXmlTransponder xTran in xSat.Transponders)
+                {
+                    var serTran = new SerializerSatellites.SerializerTransponder
+                    {
+                        frequency = xTran.Frequency,
+                        symbol_rate = xTran.SymbolRate,
+                        polarization = xTran.Polarization
+                    };
+
+                    switch (settings.SettingsVersion)
+                    {
+                        case Enums.SettingsVersion.Enigma1Ver1:
+                        case Enums.SettingsVersion.Enigma1Ver2:
+                            switch (xTran.FEC)
+                            {
+                                case "0":
+                                case "1":
+                                case "2":
+                                case "3":
+                                case "4":
+                                case "5":
+                                    serTran.fec = xTran.FEC;
+                                    break;
+                                default:
+                                    serTran.fec = "0";
+                                    break;
+                            }
+                            serTran.inversion = null;
+                            serTran.modulation = null;
+                            serTran.system = null;
+                            serTran.pilot = null;
+                            serTran.rolloff = null;
+                            break;
+                        case Enums.SettingsVersion.Enigma2Ver3:
+                        case Enums.SettingsVersion.Enigma2Ver4:
+                        case Enums.SettingsVersion.Enigma2Ver5:
+                            serTran.fec = xTran.FEC;
+                            serTran.inversion = xTran.Inversion;// ?? "2";
+                            serTran.modulation = xTran.Modulation;// ?? "1";
+                            serTran.system = xTran.System ?? "0";
+                            serTran.pilot = xTran.Pilot;
+                            serTran.rolloff = xTran.RollOff;
+                            serTran.is_id = xTran.IsId;
+                            serTran.pls_code = xTran.PlsCode;
+                            serTran.pls_mode = xTran.PlsMode;
+                            serTran.t2mi_plp_id = xTran.T2miPlpId;
+                            serTran.t2mi_pid = xTran.T2miPid;
+                            break;
+                    }
+                    sSat.transponders.Add(serTran);
+                }
+                ss.sat.Add(sSat);
+            }
+            ss.SaveToFile(fileName);
+        }
+
+        #region "Serialization"
+        /// <summary>
+        /// Internal helper class that contains all deserialized objects and performs (de)serialization
+        /// </summary>
+        [XmlRoot("satellites"), XmlType("satellites")]
+        public class SerializerSatellites
+        {
+            /// <summary>
+            /// Helper class representing satellite item from list of satellites
+            /// </summary>
+            [XmlElement("sat", Form = XmlSchemaForm.Unqualified)]
+            public List<SerializerSatellite> sat { get; set; } = new();
+
+            private static XmlSerializer Serializer
+            {
+                get
+                {
+                    field ??= new XmlSerializer(typeof(SerializerSatellites));
+                    return field;
+                }
+            }
+
+            #region "Serialize/Deserialize"
+            /// <summary>
+            ///     Serializes current SerializerSatellites object into an XML document
+            /// </summary>
+            /// <returns>string XML value</returns>
+            public virtual string Serialize()
+            {
+                var memoryStream = new MemoryStream();
+                var xmlSettings = new XmlWriterSettings {Indent = true, Encoding = Encoding.GetEncoding("ISO-8859-1")};
+                var xmlTextWriter = XmlWriter.Create(memoryStream, xmlSettings); //  (memoryStream, Encoding.GetEncoding("ISO-8859-1")) { Formatting = Formatting.Indented };
+                // XmlTextWriter xmlTextWriter = New XmlTextWriter(memoryStream, New UTF8Encoding(True))
+                var ns = new XmlSerializerNamespaces();
+                ns.Add("", "");
+                Serializer.Serialize(xmlTextWriter, this, ns);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                using var streamReader = new StreamReader(memoryStream);
+
+                return streamReader.ReadToEnd();
+            }
+
+            public static SerializerSatellites Deserialize(string xml)
+            {
+                return (SerializerSatellites)Serializer.Deserialize(XmlReader.Create(new StringReader(xml)));
+            }
+
+            public virtual void SaveToFile(string fileName)
+            {
+                _fileProvider.WriteAllText(fileName, Serialize());
+            }
+
+            public static SerializerSatellites LoadFromFile(string fileName)
+            {
+                string strXMLSerialized;
+                using (var srCurrentStreamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read), Encoding.GetEncoding("ISO-8859-1")))
+                {
+                    strXMLSerialized = srCurrentStreamReader.ReadToEnd();
+                }
+                return Deserialize(strXMLSerialized);
+            }
+            #endregion
+
+            #region "Subclases"
+            [XmlType("sat")]
+            public class SerializerSatellite
+            {
+                [XmlElement("transponder", Form = XmlSchemaForm.Unqualified)]
+                public List<SerializerTransponder> transponders { get; set; } = new();
+
+                [XmlAttribute]
+                public string name { get; set; }
+
+                [XmlAttribute]
+                public string flags { get; set; }
+
+                [XmlAttribute]
+                public string position { get; set; }
+            }
+
+            [DataContract, XmlType("transponder")]
+            public class SerializerTransponder
+            {
+                [XmlAttribute]
+                public string frequency { get; set; }
+
+                [XmlAttribute]
+                public string symbol_rate { get; set; }
+
+                [XmlAttribute]
+                public string polarization { get; set; }
+
+                [XmlAttribute]
+                public string fec { get; set; }
+
+                [XmlAttribute]
+                public string inversion { get; set; }
+
+                [XmlAttribute]
+                public string modulation { get; set; }
+
+                [XmlAttribute]
+                public string system { get; set; }
+
+                [XmlAttribute]
+                public string pilot { get; set; }
+
+                [XmlAttribute]
+                public string rolloff { get; set; }
+
+               [XmlAttribute]
+                public string is_id { get; set; }
+
+                [XmlAttribute]
+                public string pls_code { get; set; }
+
+                [XmlAttribute]
+                public string pls_mode { get; set; }
+
+                [XmlAttribute]
+                public string t2mi_plp_id { get; set; }
+
+                [XmlAttribute]
+                public string t2mi_pid { get; set; }
+            }
+            #endregion
+        }
+        #endregion
+    }
+}

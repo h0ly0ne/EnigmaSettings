@@ -38,6 +38,5 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// </summary>
         /// <returns></returns>
         object ShallowCopy();
-
     }
 }

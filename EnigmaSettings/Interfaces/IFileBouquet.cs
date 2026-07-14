@@ -13,7 +13,12 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <remarks></remarks>
         string FileName { get; set; }
 
-        /// <summary>True when the bouquet is referenced as hidden (LineSpecifier 519) in bouquets.tv/radio.</summary>
+        /// <summary>
+        ///     True when the bouquet is referenced as hidden (LineSpecifier 519) in bouquets.tv/radio.
+        /// </summary>
+        /// <value></value>
+        /// <returns>Current hidden status</returns>
+        /// <remarks></remarks>
         bool Hidden { get; set; }
     }
 }

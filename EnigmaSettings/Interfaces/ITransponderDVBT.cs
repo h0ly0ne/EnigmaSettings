@@ -33,7 +33,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string FECLow { get; set; }
 
         /// <summary>
-        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
+        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -123,7 +123,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTFECLowType FECLowType { get; }
 
         /// <summary>
-        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
+        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
         /// </summary>
         /// <value></value>
         /// <returns></returns>

@@ -5,22 +5,24 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 {
     /// <summary>
     ///     Initializes objects for specified interfaces.
-    ///     Used as primitive DI instead of full blown DI for speed
+    ///     Used as primitive DI instead of full-blown DI for speed
     /// </summary>
     /// <remarks></remarks>
     public interface IInstanceFactory
     {
-        IXmlSatellite InitNewxmlSatellite();
+        IXmlSatellite InitNewXmlSatellite();
+        
+        IXmlCable InitNewXmlCable();
 
-        IXmlTransponder InitNewxmlTransponder();
+        IXmlTransponder InitNewXmlTransponder();
 
-        IXmlTransponder InitNewxmlTransponder(ITransponderDVBS transponder);
+        IXmlTransponder InitNewXmlTransponder(ITransponderDVBS transponder);
+
+        IXmlTransponder InitNewXmlTransponder(ITransponderDVBC transponder);
 
         IBouquetItemFileBouquet InitNewBouquetItemFileBouquet(string fSileName);
 
         IBouquetItemFileBouquet InitNewBouquetItemFileBouquet(IFileBouquet bouquet);
-
-        IBouquetItemAlternative InitNewBouquetItemAlternative(string fileName);
 
         IBouquetItemAlternative InitNewBouquetItemAlternative(IFileBouquet bouquet);
 
@@ -38,6 +40,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
         IBouquetsBouquet InitNewBouquetsBouquet();
 
+        ITransponderIPTV InitNewTransponderIPTV(string transponderData, string transponderFrequency);
+
         ITransponderDVBC InitNewTransponderDVBC(string transponderData, string transponderFrequency);
 
         ITransponderDVBS InitNewTransponderDVBS(string transponderData, string transponderFrequency);
@@ -49,6 +53,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         ISettings InitNewSettings();
 
         IXmlSatellitesIO InitNewXmlSatelliteIO(IFileHelper fileProvider);
+
+        IXmlCablesIO InitNewXmlCableIO(IFileHelper fileProvider);
 
         IBouquetItemBouquetsBouquet InitNewBouquetItemBouquetsBouquet(int bouquetOrderNumber);
 

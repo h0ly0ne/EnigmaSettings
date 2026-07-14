@@ -1,0 +1,166 @@
+// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Full license text can be found at http://opensource.org/licenses/MIT
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.Serialization;
+
+using Krkadoni.EnigmaSettings.Interfaces;
+
+namespace Krkadoni.EnigmaSettings
+{
+    [DataContract]
+    public class BouquetsBouquet : IBouquetsBouquet
+    {
+        #region "INotifyPropertyChanged"
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+        #region "IEditable"
+        private bool _isEditing;
+        private bool _mLocked;
+        private string _mName;
+        private IList<IBouquetItem> _mBouquetItems;
+
+        public void BeginEdit()
+        {
+            if (_isEditing)
+                return;
+
+            _mLocked = _locked;
+            _mName = _name;
+            _mBouquetItems = new List<IBouquetItem>(_bouquetItems);
+            _isEditing = true;
+        }
+
+        public void EndEdit()
+        {
+            _isEditing = false;
+        }
+
+        public void CancelEdit()
+        {
+            if (!_isEditing)
+                return;
+
+            Name = _mName;
+            Locked = _mLocked;
+            BouquetItems.Clear();
+
+            foreach (var bouquetItem in _mBouquetItems)
+            {
+                BouquetItems.Add(bouquetItem);
+            }
+
+            _isEditing = false;
+        }
+        #endregion
+
+        #region "ICloneable"
+        /// <summary>
+        /// Performs Memberwise Clone on the object
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            var bb = new BouquetsBouquet { Name = Name, Locked = Locked, BouquetItems = new List<IBouquetItem>() };
+
+            foreach (var bouquetItem in BouquetItems)
+            {
+                bb.BouquetItems.Add((IBouquetItem)bouquetItem.Clone());
+            }
+
+            return bb;
+        }
+        #endregion
+
+        private IList<IBouquetItem> _bouquetItems = new List<IBouquetItem>();
+        private bool _locked;
+        private string _name = string.Empty;
+
+        /// <summary>
+        ///     List of bouquet items
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DataMember]
+        public IList<IBouquetItem> BouquetItems
+        {
+            get => _bouquetItems;
+            set {                 
+                value ??= new List<IBouquetItem>();
+                _bouquetItems = value;
+                OnPropertyChanged(nameof(BouquetItems));
+            }
+        }
+
+        /// <summary>
+        ///     Type of settings file
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DataMember]
+        public Enums.BouquetType BouquetType => Enums.BouquetType.E1BouquetsBouquet;
+
+        /// <summary>
+        ///     Bouquet name
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        /// <exception cref="ArgumentException">Throws argument exception if name is null or empty</exception>
+        [DataMember]
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentException();
+
+                if (value == _name)
+                    return;
+
+                _name = value;
+                OnPropertyChanged(nameof(Name));
+            }
+        }
+
+        /// <summary>
+        ///     Determines if bouquet is locked.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks>Locked bouquets are stored inside services.locked file</remarks>
+        [DataMember]
+        public bool Locked
+        {
+            get => _locked;
+            set
+            {
+                if (value == _locked)
+                    return;
+
+                _locked = value;
+                OnPropertyChanged(nameof(Locked));
+            }
+        }
+
+        /// <summary>
+        /// Performs MemberwiseClone
+        /// </summary>
+        /// <returns></returns>
+        public object ShallowCopy()
+        {
+            return MemberwiseClone();
+        }
+    }
+}

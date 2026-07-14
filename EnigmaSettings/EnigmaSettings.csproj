@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+	<TargetFramework>net10.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>Krkadoni.EnigmaSettings</RootNamespace>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>EnigmaSettings</AssemblyTitle>
     <Description>Enigma1 &amp; Enigma2 settings management utility</Description>
     <Company>Krkadoni.com</Company>
@@ -12,20 +11,17 @@
     <AssemblyVersion>1.1.0.1</AssemblyVersion>
     <FileVersion>1.1.0.1</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <NoWarn>1591;</NoWarn>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="Resources.Designer.cs">
+    <Compile Update="Resources\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources.resx">
+    <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
@@ -33,7 +29,6 @@
   </ItemGroup>
   <ItemGroup Label="Compile items now included by globbing that were not in the original project file">
     <Compile Remove="ObjectCopier.cs" />
-    <Compile Remove="Interfaces\IPathProvider.cs" />
     <Compile Remove="DesktopPathProvider.cs" />
   </ItemGroup>
 </Project>

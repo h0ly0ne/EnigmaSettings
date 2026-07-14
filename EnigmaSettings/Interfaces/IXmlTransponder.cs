@@ -40,7 +40,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
-        string FECInner { get; set; }
+        string FEC { get; set; }
 
         /// <summary>
         ///     0=Auto, 1=On, 2=Off
@@ -79,7 +79,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Pilot { get; set; }
 
         /// <summary>
-        ///     0=0.35, 1=0.25, 2=0.20, 3=Auto
+        ///     0=0.35, 1=0.25, 3=0.20
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -117,6 +117,5 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// </summary>
         /// <returns></returns>
         object ShallowCopy();
-
     }
 }

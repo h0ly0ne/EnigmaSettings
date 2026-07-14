@@ -2,7 +2,6 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
      
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
@@ -13,7 +12,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
     public interface IXmlSatellitesIO
     {
         /// <summary>
-        ///     Implementation of instance factory used to instatiate objects
+        ///     Implementation of instance factory used to instantiate objects
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -24,7 +23,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         ///     Loads satellites and transponders from satellites.xml file
         /// </summary>
         /// <param name="fileName">Full path to satellites.xml file on disk</param>
-        /// <returns>List of IXMLSatellite objects and corresponding transponders for each satellite</returns>
+        /// <returns>List of IXmlSatellite objects and corresponding transponders for each satellite</returns>
         /// <remarks></remarks>
         IList<IXmlSatellite> LoadSatellitesFromFile(string fileName);
 
@@ -33,7 +32,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// </summary>
         /// <param name="fileName">Full path to satellites.xml file on disk</param>
         /// <param name="settings">
-        ///     Settings instance with the list of IXMLSatellite objects and corresponding transponders for each
+        ///     Settings instance with the list of IXmlSatellite objects and corresponding transponders for each
         ///     satellite
         /// </param>
         /// <remarks></remarks>
