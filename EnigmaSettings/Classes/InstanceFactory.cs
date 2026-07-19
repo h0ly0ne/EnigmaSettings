@@ -12,6 +12,11 @@ namespace Krkadoni.EnigmaSettings
             return new FileBouquet();
         }
 
+        public IFileBouquet InitNewFileBouquet(string name, string filename)
+        {
+            return new FileBouquet() { Name = name, FileName = filename };
+        }
+
         public IBouquetItemMarker InitNewBouquetItemMarker(string description, string markerNumber)
         {
             return new BouquetItemMarker(description, markerNumber);

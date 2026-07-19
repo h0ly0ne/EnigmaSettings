@@ -38,6 +38,8 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 
         IFileBouquet InitNewFileBouquet();
 
+        IFileBouquet InitNewFileBouquet(string name, string filename);
+
         IBouquetsBouquet InitNewBouquetsBouquet();
 
         ITransponderIPTV InitNewTransponderIPTV(string transponderData, string transponderFrequency);

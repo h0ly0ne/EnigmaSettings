@@ -14,8 +14,6 @@ namespace Krkadoni.EnigmaSettings
     // existing builders/parsers use and the v5 "t:" / "s:" line records.
     public partial class SettingsIO
     {
-        protected const string LameDb5FileName = "lamedb5";
-
         private static string NormalizeNewlines(string s)
         {
             if (string.IsNullOrEmpty(s))
@@ -104,11 +102,16 @@ namespace Krkadoni.EnigmaSettings
         ///     Writes the settings model to a lamedb version 5 file ("lamedb5").
         ///     Reuses the v4 section builders and reshapes their output into single-line records.
         /// </summary>
-        protected virtual void WriteLameDb5(string directory, ISettings settings)
+        protected virtual void WriteLameDb5(string directory, ISettings settings, string strLocalFilenameOverride)
         {
             Log.Debug("Writing lamedb v5 file to disk");
+
+            string LameDb5FileName = "lamedb5";
             string header = SettingsFirstLine + GetSettingsVersion(settings.SettingsVersion) + "/" + "\n";
             string transponderBlocks = DVBSTranspondersToString(settings, 0) + DVBCTranspondersToString(settings) + DVBTTranspondersToString(settings);
+
+            if(!string.IsNullOrEmpty(strLocalFilenameOverride))
+                LameDb5FileName = strLocalFilenameOverride;
 
             var sb = new StringBuilder();
             sb.Append(header);

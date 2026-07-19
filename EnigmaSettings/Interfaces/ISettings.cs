@@ -31,7 +31,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        string SettingsDirectory { get; }
+        string SettingsDirectory { get; set; }
 
         /// <summary>
         ///     Version of the settings file

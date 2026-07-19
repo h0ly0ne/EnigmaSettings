@@ -159,6 +159,7 @@ namespace Krkadoni.EnigmaSettings
         private static readonly ILog NullLogger = new NullLogger();
 
         private string _settingsFileName = string.Empty;
+        private string _settingsDirectory = string.Empty;
         private Enums.SettingsVersion _settingsVersion = Enums.SettingsVersion.Unknown;
 
         /// <summary>
@@ -214,18 +215,27 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (string.IsNullOrEmpty(SettingsFileName))
-                    return string.Empty;
+                if (string.IsNullOrEmpty(_settingsDirectory))
+                {
+                    if (string.IsNullOrEmpty(SettingsFileName))
+                        return string.Empty;
 
-                try
-                {
-                    return Path.GetDirectoryName(SettingsFileName);
+                    try
+                    {
+                        return Path.GetDirectoryName(SettingsFileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex.Message, ex);
+                        return string.Empty;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Log.Error(ex.Message, ex);
-                    return string.Empty;
-                }
+                else
+                    return _settingsDirectory;
+            }
+            set
+            {
+                _settingsDirectory = value;
             }
         }
 
@@ -812,7 +822,8 @@ namespace Krkadoni.EnigmaSettings
         /// <summary>
         ///     Renumbers file names for all file bouquets that have filename starting with 'userbouquet.dbe'
         /// </summary>
-        /// <remarks>Preserves path in filename if any is set</remarks>
+        /// <remarks>Preserv
+        /// es path in filename if any is set</remarks>
         /// <exception cref="SettingsException"></exception>
         public void RenumberBouquetFileNames()
         {
