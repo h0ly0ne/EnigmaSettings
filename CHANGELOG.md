@@ -16,6 +16,20 @@
   `isInvisible` 512) instead of a fixed list of values, the flag is written back as read, and lines
   that still cannot be used are logged as warnings instead of disappearing.
 - Markers without description (e.g. spacers `1:832`) no longer get an empty `#DESCRIPTION` line.
+- **An empty `satellites.xml` / `cables.xml` was written when the list had no satellites / cables**
+  (e.g. loaded without these files). Uploaded to the receiver it wipes its satellite list, so DVB-S
+  tuning no longer works; it also made a second load + save differ from the first. The files are
+  now only written when there is something to write (logged otherwise).
+- **lamedb version 3 shifted the DVB-S2 fields.** Enigma2 parses v3 like v4, with `flags` as the
+  7th field of an `s` line; the v3 writer left out `flags` and wrote system / modulation / roll-off
+  right after the inversion, so Enigma2 and the library itself read them one position off
+  (v4 → v3 → v4 lost modulation, roll-off and pilot). v3 is now written in the v4 line format, as
+  Enigma2 reads it (Enigma2 itself only writes v4 / v5).
+- **Saved files match Enigma2's own output more closely:** bouquet service references in upper case
+  hex (`C00000`, as `eServiceReference::toString` writes them; Enigma2 reads both), no empty
+  `satfeed=""` in `cables.xml`, XML attributes in the order of the files shipped with Enigma2
+  images, and transponder fields that are not set written as `0` instead of left empty (`::`).
+  Loading and saving an Enigma2 list now only changes the editor line at the end of lamedb.
 - **A single broken entry no longer fails the whole load.** Broken transponder and service entries in
   lamedb (v3/v4/v5), bouquet lines with too few fields (`#SERVICE 1:64`, `#SERVICE 1:0`,
   `#SERVICE 4097:0`), and broken lines in `whitelist` / `blacklist`, `services.locked` and the

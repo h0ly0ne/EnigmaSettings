@@ -102,7 +102,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     flags = xCab.Flags,
                     name = xCab.Name,
-                    satfeed = xCab.SatFeed,
+                    satfeed = string.IsNullOrEmpty(xCab.SatFeed) ? null : xCab.SatFeed,
                     countrycode = xCab.CountryCode
                 };
 
@@ -188,20 +188,22 @@ namespace Krkadoni.EnigmaSettings
                 [XmlAttribute]
                 public string symbol_rate { get; set; }
 
+                [XmlAttribute]
+                public string modulation { get; set; }
+
                 /// <summary>Enigma reads and writes the FEC as "fec_inner"</summary>
                 [XmlAttribute("fec_inner")]
                 public string fec { get; set; }
 
-                /// <summary>Attribute "fec" written by older versions of this library, read only as fallback</summary>
-                [XmlAttribute("fec")]
-                public string fec_legacy { get; set; }
                 [XmlAttribute]
                 public string inversion { get; set; }
+
                 [XmlAttribute]
                 public string system { get; set; }
 
-                [XmlAttribute]
-                public string modulation { get; set; }
+                /// <summary>Attribute "fec" written by older versions of this library, read only as fallback</summary>
+                [XmlAttribute("fec")]
+                public string fec_legacy { get; set; }
             }
             #endregion
         }

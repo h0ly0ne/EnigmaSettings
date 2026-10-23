@@ -214,43 +214,45 @@ namespace Krkadoni.EnigmaSettings
                 [XmlAttribute("fec_inner")]
                 public string fec { get; set; }
 
-                /// <summary>Attribute "fec" written by older versions of this library, read only as fallback</summary>
-                [XmlAttribute("fec")]
-                public string fec_legacy { get; set; }
-
                 [XmlAttribute]
-                public string inversion { get; set; }
+                public string system { get; set; }
 
                 [XmlAttribute]
                 public string modulation { get; set; }
 
                 [XmlAttribute]
-                public string system { get; set; }
+                public string rolloff { get; set; }
 
                 [XmlAttribute]
                 public string pilot { get; set; }
 
                 [XmlAttribute]
-                public string rolloff { get; set; }
+                public string inversion { get; set; }
 
-               [XmlAttribute]
+                [XmlAttribute]
                 public string is_id { get; set; }
 
                 [XmlAttribute]
-                public string pls_code { get; set; }
+                public string pls_mode { get; set; }
 
                 [XmlAttribute]
-                public string pls_mode { get; set; }
+                public string pls_code { get; set; }
 
                 [XmlAttribute]
                 public string t2mi_plp_id { get; set; }
 
                 [XmlAttribute]
                 public string t2mi_pid { get; set; }
+
                 [XmlAttribute]
                 public string tsid { get; set; }
+
                 [XmlAttribute]
                 public string onid { get; set; }
+
+                /// <summary>Attribute "fec" written by older versions of this library, read only as fallback</summary>
+                [XmlAttribute("fec")]
+                public string fec_legacy { get; set; }
             }
             #endregion
         }

@@ -575,11 +575,16 @@ namespace Krkadoni.EnigmaSettings
                     if (bLocalEnableBouquetFiles)
                         WriteBouquets(folder, settings);
 
-                    if (bLocalEnableSatellitesFile)
+                    // an empty satellites.xml / cables.xml would wipe the satellite / cable list of the receiver
+                    if (bLocalEnableSatellitesFile && settings.Satellites.Count > 0)
                         xmlSatellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
+                    else if (bLocalEnableSatellitesFile)
+                        Log.Info($"No satellites, {SatelliteXmlFileName} not written");
 
-                    if (bLocalEnableCablesFile)
+                    if (bLocalEnableCablesFile && settings.Cables.Count > 0)
                         xmlCablesIO.SaveCablesToFile(Path.Combine(folder, CablesXmlFileName), settings);
+                    else if (bLocalEnableCablesFile)
+                        Log.Info($"No cables, {CablesXmlFileName} not written");
 
                     st.Stop();
                     Log.Info($"Settings saved successfully in {st.ElapsedMilliseconds} ms.");

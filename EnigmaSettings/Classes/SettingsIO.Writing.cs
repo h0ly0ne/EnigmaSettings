@@ -89,6 +89,14 @@ namespace Krkadoni.EnigmaSettings
             return sContent.ToString();
         }
 
+        /// <summary>
+        ///     "0" for a transponder field that is not set (Enigma2 reads missing / empty fields as 0)
+        /// </summary>
+        private static string ZeroIfEmpty(string value)
+        {
+            return string.IsNullOrEmpty(value) ? "0" : value;
+        }
+
         protected virtual string DVBSTranspondersToString(ISettings settings, int positionOrder)
         {
             var sContent = new StringBuilder();
@@ -121,15 +129,8 @@ namespace Krkadoni.EnigmaSettings
                     {
                         sContent.Append(string.Join(":", tran.NameSpc, tran.TSID, tran.NID) + "\n");
                         sContent.Append("\t" + "s " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Polarization, tran.FEC, tran.OrbitalPositionInt.ToString(CultureInfo.InvariantCulture), tran.Inversion));
-                        string extraData = string.Empty;
-
-                        if (IsVer4OrLater(settings.SettingsVersion))
-                        {
-                            if (tran.Flags != null)
-                                extraData = ":" + tran.Flags;
-                            else
-                                extraData = ":0";
-                        }
+                        // flags is the 7th field in v3 and v4 alike (Enigma2 parses both the same way)
+                        string extraData = ":" + ZeroIfEmpty(tran.Flags);
 
                         if (tran.SystemType == Enums.DVBSSystemType.DVBS2)
                         {
@@ -148,22 +149,22 @@ namespace Krkadoni.EnigmaSettings
                             else
                                 extraData += ":0";
 
-                            if (tran.Pilot != null && IsVer4OrLater(settings.SettingsVersion))
+                            if (tran.Pilot != null)
                                 extraData += ":" + tran.Pilot;
 
-                            if (tran.IsId != null && IsVer4OrLater(settings.SettingsVersion))
+                            if (tran.IsId != null)
                                 extraData += ":" + tran.IsId;
 
-                            if (tran.PlsCode != null && IsVer4OrLater(settings.SettingsVersion))
+                            if (tran.PlsCode != null)
                                 extraData += ":" + tran.PlsCode;
 
-                            if (tran.PlsMode != null && IsVer4OrLater(settings.SettingsVersion))
+                            if (tran.PlsMode != null)
                                 extraData += ":" + tran.PlsMode;
 
-                            if (tran.T2miPlpId != null && IsVer4OrLater(settings.SettingsVersion))
+                            if (tran.T2miPlpId != null)
                                 extraData += ":" + tran.T2miPlpId;
 
-                            if (tran.T2miPid != null && IsVer4OrLater(settings.SettingsVersion))
+                            if (tran.T2miPid != null)
                                 extraData += ":" + tran.T2miPid;
                         }
 
@@ -199,12 +200,10 @@ namespace Krkadoni.EnigmaSettings
                         break;
                     }
                     case Enums.SettingsVersion.Enigma2Ver3:
-                        sContent.Append("\t" + "c " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Inversion, tran.Modulation, tran.FEC));
-                        sContent.Append("\n" + "/" + "\n");
-                        break;
                     case Enums.SettingsVersion.Enigma2Ver4:
                     case Enums.SettingsVersion.Enigma2Ver5:
-                        sContent.Append("\t" + "c " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Inversion, tran.Modulation, tran.FEC, tran.Flags, tran.System));
+                        // all fields like Enigma2 writes them; values that are not set are written as 0 (Enigma2 default)
+                        sContent.Append("\t" + "c " + string.Join(":", new[] { tran.Frequency, tran.SymbolRate, tran.Inversion, tran.Modulation, tran.FEC, tran.Flags, tran.System }.Select(ZeroIfEmpty)));
                         sContent.Append("\n" + "/" + "\n");
                         break;
                 }
@@ -226,12 +225,10 @@ namespace Krkadoni.EnigmaSettings
                         sContent.Append("\n" + "/" + "\n");
                         break;
                     case Enums.SettingsVersion.Enigma2Ver3:
-                        sContent.Append("\t" + "t " + string.Join(":", tran.Frequency, tran.Bandwidth, tran.FECHigh, tran.FECLow, tran.Modulation, tran.Transmission, tran.GuardInterval, tran.Hierarchy, tran.Inversion));
-                        sContent.Append("\n" + "/" + "\n");
-                        break;
                     case Enums.SettingsVersion.Enigma2Ver4:
                     case Enums.SettingsVersion.Enigma2Ver5:
-                        sContent.Append("\t" + "t " + string.Join(":", tran.Frequency, tran.Bandwidth, tran.FECHigh, tran.FECLow, tran.Modulation, tran.Transmission, tran.GuardInterval, tran.Hierarchy, tran.Inversion, tran.Flags, tran.System, tran.PlpId));
+                        // all fields like Enigma2 writes them; values that are not set are written as 0 (Enigma2 default)
+                        sContent.Append("\t" + "t " + string.Join(":", new[] { tran.Frequency, tran.Bandwidth, tran.FECHigh, tran.FECLow, tran.Modulation, tran.Transmission, tran.GuardInterval, tran.Hierarchy, tran.Inversion, tran.Flags, tran.System, tran.PlpId }.Select(ZeroIfEmpty)));
                         sContent.Append("\n" + "/" + "\n");
                         break;
                 }
@@ -516,7 +513,8 @@ namespace Krkadoni.EnigmaSettings
             if (string.IsNullOrEmpty(bis.ServiceId))
                 return;
 
-            sContent.Append(serviceTag).Append(string.Join(":", bis.FavoritesTypeFlag, bis.LineSpecifierFlag, bis.ServiceId, "0", "0", "0", "")).Append('\n');
+            // hex values of the reference in upper case, as Enigma2 writes them (eServiceReference::toString)
+            sContent.Append(serviceTag).Append(string.Join(":", bis.FavoritesTypeFlag, bis.LineSpecifierFlag, bis.ServiceId.ToUpperInvariant(), "0", "0", "0", "")).Append('\n');
 
             if (!string.IsNullOrEmpty(bis.Description))
                 sContent.Append(descriptionTag).Append(bis.Description).Append('\n');
