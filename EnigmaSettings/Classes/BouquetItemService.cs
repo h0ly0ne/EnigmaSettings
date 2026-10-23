@@ -16,6 +16,7 @@ namespace Krkadoni.EnigmaSettings
         #region "IEditable"
         private bool _isEditing;
         private IService _mService;
+        private string _mDescription;
 
         public override void BeginEdit()
         {
@@ -24,6 +25,7 @@ namespace Krkadoni.EnigmaSettings
                 return;
 
             _mService = _service;
+            _mDescription = _description;
             _isEditing = true;
         }
 
@@ -40,6 +42,7 @@ namespace Krkadoni.EnigmaSettings
                 return;
 
             Service = _mService;
+            Description = _mDescription;
             _isEditing = false;
         }
         #endregion
@@ -51,7 +54,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            var bis = (IBouquetItemService)MemberwiseClone();
+            var bis = (IBouquetItemService)CloneWithoutSubscribers();
             bis.Service = (IService)Service?.Clone();
             return bis;
         }
@@ -163,6 +166,27 @@ namespace Krkadoni.EnigmaSettings
                 OnPropertyChanged(nameof(Service));
             }
         }
+
+        /// <summary>
+        ///     Name shown for this service in the bouquet (#DESCRIPTION line), empty when the service name is used
+        /// </summary>
+        [DataMember]
+        public string Description
+        {
+            get => _description;
+            set
+            {
+                value ??= string.Empty;
+
+                if (value == _description)
+                    return;
+
+                _description = value;
+                OnPropertyChanged(nameof(Description));
+            }
+        }
+
+        private string _description = string.Empty;
 
         /// <summary>
         ///     Return line in format ready to be written to bouquet

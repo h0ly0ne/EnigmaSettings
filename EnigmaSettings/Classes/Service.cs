@@ -19,6 +19,17 @@ namespace Krkadoni.EnigmaSettings
         #region "INotifyPropertyChanged"
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        ///     MemberwiseClone without the PropertyChanged subscribers of this instance,
+        ///     so changes on the copy are not reported to listeners of the original
+        /// </summary>
+        protected object CloneWithoutSubscribers()
+        {
+            var clone = (Service<TFlag>)MemberwiseClone();
+            clone.PropertyChanged = null;
+            return clone;
+        }
+
         protected void OnPropertyChanged(String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -100,7 +111,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object Clone()
         {
-            var s = (IService)MemberwiseClone();
+            var s = (IService)CloneWithoutSubscribers();
             s.Transponder = (ITransponder)Transponder?.Clone();
             return s;
         }
@@ -462,40 +473,23 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (Transponder == null)
-                {
-                    string mSid = SID.TrimStart('0');
-                    
-                    if (mSid.Length == 0)
-                        mSid = "0";
+                string type = int.TryParse(Type, NumberStyles.Integer, CultureInfo.InvariantCulture, out var typeInt)
+                    ? typeInt.ToString("X", CultureInfo.InvariantCulture)
+                    : "0";
 
-                    return string.Join(":", Convert.ToInt32(Type, CultureInfo.InvariantCulture).ToString("X", CultureInfo.InvariantCulture), mSid.TrimStart('0'), !string.IsNullOrEmpty(TSID) ? TSID.TrimStart('0') : "0", !string.IsNullOrEmpty(ONID) ? ONID.TrimStart('0') : "0", !string.IsNullOrEmpty(NameSpace) ? NameSpace.TrimStart('0') : "0").ToLowerInvariant();
-                }
-                else
-                {
-                    string mSid = SID.TrimStart('0');
-
-                    if (mSid.Length == 0)
-                        mSid = "0";
-
-                    string mTSID = Transponder.TSID.TrimStart('0');
-
-                    if (mTSID.Length == 0)
-                        mTSID = "0";
-
-                    string mNid = Transponder.NID.TrimStart('0');
-
-                    if (mNid.Length == 0)
-                        mNid = "0";
-
-                    string mNameSpc = Transponder.NameSpc.TrimStart('0');
-
-                    if (mNameSpc.Length == 0)
-                        mNameSpc = "0";
-
-                    return string.Join(":", Convert.ToInt32(Type, CultureInfo.InvariantCulture).ToString("X", CultureInfo.InvariantCulture), mSid, mTSID, mNid, mNameSpc).ToLowerInvariant();
-                }
+                return Transponder == null
+                    ? string.Join(":", type, HexField(SID), HexField(TSID), HexField(ONID), HexField(NameSpace)).ToLowerInvariant()
+                    : string.Join(":", type, HexField(SID), HexField(Transponder.TSID), HexField(Transponder.NID), HexField(Transponder.NameSpc)).ToLowerInvariant();
             }
+        }
+
+        /// <summary>
+        ///     Hex field of a service reference without leading zeros ("0" when empty)
+        /// </summary>
+        private static string HexField(string value)
+        {
+            string trimmed = value?.TrimStart('0') ?? string.Empty;
+            return trimmed.Length == 0 ? "0" : trimmed;
         }
 
         /// <summary>
@@ -557,24 +551,32 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                string[] fStrings = _flags.Split(',');
                 var mFlagList = new List<IFlag>();
 
-                // ReSharper disable once LoopCanBeConvertedToQuery
-                foreach (string fString  in fStrings)
+                if (string.IsNullOrEmpty(_flags))
+                    return new ReadOnlyCollection<IFlag>(mFlagList);
+
+                foreach (string fString in _flags.Split(','))
                 {
-                    if (fString.IndexOf(':') > -1 && fString.Split(':').Length >= 2)
-                    {
-                        IFlag f = Activator.CreateInstance(typeof (TFlag), fString) as TFlag;
-
-                        if (f == null)
-                            continue;
-
+                    if (fString.Contains(':') && FlagFactory(fString) is { } f)
                         mFlagList.Add(f);
-                    }
                 }
+
                 return new ReadOnlyCollection<IFlag>(mFlagList);
             }
+        }
+
+        // TFlag(string) constructor, looked up once per flag type instead of Activator.CreateInstance per flag
+        private static readonly Func<string, TFlag> FlagFactory = CreateFlagFactory();
+
+        private static Func<string, TFlag> CreateFlagFactory()
+        {
+            var ctor = typeof(TFlag).GetConstructor([typeof(string)]);
+            if (ctor == null)
+                return _ => null;
+
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(string), "flagString");
+            return System.Linq.Expressions.Expression.Lambda<Func<string, TFlag>>(System.Linq.Expressions.Expression.New(ctor, parameter), parameter).Compile();
         }
 
         /// <summary>
@@ -603,14 +605,14 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public void UpdateFlags(IList<IFlag> flagsList)
         {
-            _flags = string.Join(",", FlagList.Select(x => x.FlagString).ToArray());
+            _flags = flagsList == null ? string.Empty : string.Join(",", flagsList.Where(x => x != null).Select(x => x.FlagString));
             OnPropertyChanged(nameof(Flags));
             OnPropertyChanged(nameof(FlagList));
         }
 
         public override string ToString()
         {
-            var sData = Transponder == null ? string.Join(":", SID, "00000000", "0000", "0000", Type, ProgNumber) : string.Join(":", SID.PadLeft(4, '0'), Transponder.NameSpc.PadRight(8, '0'), Transponder.TSID.PadLeft(4, '0'), Transponder.NID.PadLeft(4, '0'), Type, ProgNumber);
+            var sData = Transponder == null ? string.Join(":", SID, "00000000", "0000", "0000", Type, ProgNumber) : string.Join(":", SID.PadLeft(4, '0'), Transponder.NameSpc.PadLeft(8, '0'), Transponder.TSID.PadLeft(4, '0'), Transponder.NID.PadLeft(4, '0'), Type, ProgNumber);
 
             if (_sourceId.Length > 0)
                 sData = sData + ":" + _sourceId;
@@ -624,7 +626,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
     }
 }

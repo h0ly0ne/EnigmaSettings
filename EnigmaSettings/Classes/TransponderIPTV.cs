@@ -66,7 +66,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            var transponder = (ITransponderIPTV)MemberwiseClone();
+            var transponder = (ITransponderIPTV)CloneWithoutSubscribers();
             return transponder;
         }
         #endregion

@@ -113,6 +113,16 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string T2miPid { get; set; }
 
         /// <summary>
+        ///     Transport stream id (satellites.xml attribute "tsid"), optional
+        /// </summary>
+        string Tsid { get; set; }
+
+        /// <summary>
+        ///     Original network id (satellites.xml attribute "onid"), optional
+        /// </summary>
+        string Onid { get; set; }
+
+        /// <summary>
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>

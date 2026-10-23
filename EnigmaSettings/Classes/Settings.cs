@@ -19,6 +19,17 @@ namespace Krkadoni.EnigmaSettings
         #region "INotifyPropertyChanged"
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        ///     MemberwiseClone without the PropertyChanged subscribers of this instance,
+        ///     so changes on the copy are not reported to listeners of the original
+        /// </summary>
+        protected object CloneWithoutSubscribers()
+        {
+            var clone = (Settings)MemberwiseClone();
+            clone.PropertyChanged = null;
+            return clone;
+        }
+
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -107,7 +118,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object Clone()
         {
-            var settings = (ISettings)MemberwiseClone();
+            var settings = (ISettings)CloneWithoutSubscribers();
             settings.Bouquets = new List<IBouquet>();
             settings.Satellites = new List<IXmlSatellite>();
             settings.Cables = new List<IXmlCable>();
@@ -115,35 +126,81 @@ namespace Krkadoni.EnigmaSettings
             settings.Transponders = new List<ITransponder>();
             settings.Log = this.Log;
 
-            foreach (var bouquet in Bouquets)
+            // every reference inside the copy (service -> transponder -> satellite, bouquet item -> service / bouquet)
+            // must point to the copied object, not to the original one or to a second, unrelated copy
+            var satelliteMap = new Dictionary<IXmlSatellite, IXmlSatellite>(ReferenceEqualityComparer.Instance);
+            var transponderMap = new Dictionary<ITransponder, ITransponder>(ReferenceEqualityComparer.Instance);
+            var serviceMap = new Dictionary<IService, IService>(ReferenceEqualityComparer.Instance);
+            var bouquetMap = new Dictionary<IBouquet, IBouquet>(ReferenceEqualityComparer.Instance);
+
+            foreach (var satellite in Satellites.Where(x => x != null))
             {
-                if (bouquet != null)
-                    settings.Bouquets.Add((IBouquet)bouquet.Clone());
+                var copy = (IXmlSatellite)satellite.Clone();
+                satelliteMap[satellite] = copy;
+                settings.Satellites.Add(copy);
             }
 
-            foreach (var satellite in Satellites)
+            foreach (var cable in Cables.Where(x => x != null))
+                settings.Cables.Add((IXmlCable)cable.Clone());
+
+            foreach (var transponder in Transponders.Where(x => x != null))
             {
-                if (satellite != null)
-                    settings.Satellites.Add((IXmlSatellite)satellite.Clone());
+                var copy = (ITransponder)transponder.Clone();
+                if (transponder is ITransponderDVBS { Satellite: not null } dvbs && satelliteMap.TryGetValue(dvbs.Satellite, out var satellite))
+                    ((ITransponderDVBS)copy).Satellite = satellite;
+
+                transponderMap[transponder] = copy;
+                settings.Transponders.Add(copy);
             }
 
-            foreach (var cable in Cables)
+            foreach (var service in Services.Where(x => x != null))
             {
-                if (cable != null)
-                    settings.Cables.Add((IXmlCable)cable.Clone());
+                var copy = (IService)service.Clone();
+                if (service.Transponder != null && transponderMap.TryGetValue(service.Transponder, out var transponder))
+                    copy.Transponder = transponder;
+
+                serviceMap[service] = copy;
+                settings.Services.Add(copy);
             }
 
-            foreach (var service in Services)
+            IBouquet MapBouquet(IBouquet original)
             {
-                if (service != null)
-                    settings.Services.Add((IService)service.Clone());
+                if (bouquetMap.TryGetValue(original, out var mapped))
+                    return mapped;
+
+                // items are copied flat (their own Clone() copies services / sub bouquets a second time)
+                // and then pointed to the copies made here
+                var copy = (IBouquet)original.Clone();
+                copy.BouquetItems = original.BouquetItems.Where(x => x != null).Select(x => (IBouquetItem)x.ShallowCopy()).ToList();
+                bouquetMap[original] = copy;
+                RelinkItems(copy);
+                return copy;
             }
 
-            foreach (var transponder in Transponders)
+            void RelinkItems(IBouquet bouquet)
             {
-                if (transponder != null)
-                    settings.Transponders.Add((ITransponder)transponder.Clone());
+                foreach (var item in bouquet.BouquetItems)
+                {
+                    switch (item)
+                    {
+                        case IBouquetItemService { Service: not null } bis when serviceMap.TryGetValue(bis.Service, out var service):
+                            bis.Service = service;
+                            break;
+                        case IBouquetItemFileBouquet { Bouquet: not null } bif:
+                            bif.Bouquet = (IFileBouquet)MapBouquet(bif.Bouquet);
+                            break;
+                        case IBouquetItemAlternative { Bouquet: not null } bia:
+                            bia.Bouquet = (IFileBouquet)MapBouquet(bia.Bouquet);
+                            break;
+                        case IBouquetItemBouquetsBouquet { Bouquet: not null } bib:
+                            bib.Bouquet = (IBouquetsBouquet)MapBouquet(bib.Bouquet);
+                            break;
+                    }
+                }
             }
+
+            foreach (var bouquet in Bouquets.Where(x => x != null))
+                settings.Bouquets.Add(MapBouquet(bouquet));
 
             return settings;
         }
@@ -235,7 +292,11 @@ namespace Krkadoni.EnigmaSettings
             }
             set
             {
+                if (value == _settingsDirectory)
+                    return;
+
                 _settingsDirectory = value;
+                OnPropertyChanged(nameof(SettingsDirectory));
             }
         }
 
@@ -1512,7 +1573,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
         #endregion
     }

@@ -414,6 +414,8 @@ namespace Krkadoni.EnigmaSettings
                     }
                 }
 
+                _bouquetReadContext = new BouquetReadContext();
+
                 if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
                 {
                     ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetTvEpl), ref settings);
@@ -450,6 +452,10 @@ namespace Krkadoni.EnigmaSettings
                 OnSettingsLoaded(this, settingsFile, false, null);
                 Log.Error(string.Format(Resources.Settings_Load_Failed_to_load_settings_from__0_, settingsFile), ex);
                 throw new SettingsException(string.Format(Resources.Settings_Load_Failed_to_load_settings_from__0_, settingsFile), ex);
+            }
+            finally
+            {
+                _bouquetReadContext = null;
             }
         }
 
@@ -1215,8 +1221,24 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks>Adds bouquet to Bouquets list if not already in it, otherwise updates existing</remarks>
         protected virtual IFileBouquet ReadFileBouquet(string fileName, ref ISettings settings)
         {
+            bool ownsContext = _bouquetReadContext == null;
+            if (ownsContext)
+                _bouquetReadContext = new BouquetReadContext();
+
+            string fullPath = Path.GetFullPath(fileName);
             try
             {
+                // every bouquet file is read once per load: a second reference gets the same instance
+                // and a reference back to a bouquet that is still being read (a cycle) is not followed
+                if (_bouquetReadContext.Read.TryGetValue(fullPath, out var alreadyRead))
+                {
+                    if (!_bouquetReadContext.InProgress.Contains(fullPath))
+                        return alreadyRead;
+
+                    Log.Warn($"Bouquet {Path.GetFileName(fileName)} references itself (directly or through sub bouquets), reference ignored");
+                    return null;
+                }
+
                 IFileBouquet bqt = Factory.InitNewFileBouquet();
                 string fName = Path.GetFileName(fileName);
                 bqt.FileName = fName;
@@ -1243,7 +1265,7 @@ namespace Krkadoni.EnigmaSettings
                 }
                 IFileBouquet existing =
                     settings.Bouquets.OfType<IFileBouquet>()
-                        .SingleOrDefault(x => String.Equals(x.FileName, fName, StringComparison.Ordinal));
+                        .FirstOrDefault(x => String.Equals(x.FileName, fName, StringComparison.Ordinal));
                 if (existing != null)
                 {
                     bqt = existing;
@@ -1261,6 +1283,9 @@ namespace Krkadoni.EnigmaSettings
                         settings.Bouquets.Add(bqt);
                     }
                 }
+
+                _bouquetReadContext.Read[fullPath] = bqt;
+                _bouquetReadContext.InProgress.Add(fullPath);
 
                 if (Log.IsDebugEnabled) Log.Debug($"Reading bouquet {bqt.FileName}");
                 string[] bouquetLines = Read(fileName, true);
@@ -1295,7 +1320,38 @@ namespace Krkadoni.EnigmaSettings
                 Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.Settings_ReadBouquet_Failed_to_read_bouquet__0_, Path.GetFileName(fileName)), ex);
             }
+            finally
+            {
+                _bouquetReadContext?.InProgress.Remove(fullPath);
+                if (ownsContext)
+                    _bouquetReadContext = null;
+            }
         }
+
+        /// <summary>
+        ///     Bouquet files read during the current load (per thread, so parallel loads don't interfere)
+        /// </summary>
+        private sealed class BouquetReadContext
+        {
+            public readonly Dictionary<string, IFileBouquet> Read = new(StringComparer.OrdinalIgnoreCase);
+            public readonly HashSet<string> InProgress = new(StringComparer.OrdinalIgnoreCase);
+            public readonly HashSet<string> Listed = new(StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        ///     True for the files that list the top level bouquets (bouquets.tv/.radio, userbouquets.*.epl)
+        /// </summary>
+        protected static bool IsBouquetList(string fileName)
+        {
+            string name = Path.GetFileName(fileName);
+            return string.Equals(name, BouquetsTvFile, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, BouquetsRadioFile, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, UserBouquetTvEpl, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, UserBouquetRadioEpl, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [ThreadStatic]
+        private static BouquetReadContext _bouquetReadContext;
 
         /// <summary>
         ///     Determines type of line and initializes corresponding bouquet item type
@@ -1365,6 +1421,19 @@ namespace Krkadoni.EnigmaSettings
 
                         if (lineType == Enums.LineSpecifier.Hidden)
                             subBqt.Hidden = true;
+
+                        // listed in bouquets.tv / .radio (or E1 userbouquets.*.epl) wins over being referenced
+                        // from another bouquet, whichever is read first
+                        string subPath = Path.GetFullPath(Path.Combine(folder, fName));
+                        if (IsBouquetList(bouquet.FileName))
+                        {
+                            subBqt.IsSubBouquet = false;
+                            _bouquetReadContext?.Listed.Add(subPath);
+                        }
+                        else if (_bouquetReadContext == null || !_bouquetReadContext.Listed.Contains(subPath))
+                        {
+                            subBqt.IsSubBouquet = true;
+                        }
 
                         IBouquetItemFileBouquet bib = Factory.InitNewBouquetItemFileBouquet(subBqt);
                         bib.FavoritesTypeFlag = sData[0];
@@ -1453,6 +1522,7 @@ namespace Krkadoni.EnigmaSettings
                                 IBouquetItemService bqis = ReadServiceReference(line);
                                 if (bqis != null)
                                 {
+                                    bqis.Description = StripDescriptionTag(description);
                                     bouquet.BouquetItems.Add(bqis);
                                     if (Log.IsDebugEnabled) Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
                                 }
@@ -1473,6 +1543,20 @@ namespace Krkadoni.EnigmaSettings
             }
             else
                 Log.Warn(string.Format(Resources.Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_, Path.GetFileName(bouquet.FileName), line));
+        }
+
+        /// <summary>
+        ///     Text of a #DESCRIPTION line without the tag (with or without colon)
+        /// </summary>
+        protected static string StripDescriptionTag(string descriptionLine)
+        {
+            if (string.IsNullOrEmpty(descriptionLine))
+                return string.Empty;
+
+            if (descriptionLine.StartsWith("#DESCRIPTION:", StringComparison.OrdinalIgnoreCase))
+                return descriptionLine.Substring(13).Trim();
+
+            return descriptionLine.StartsWith("#DESCRIPTION", StringComparison.OrdinalIgnoreCase) ? descriptionLine.Substring(12).Trim() : descriptionLine.Trim();
         }
 
         /// <summary>
@@ -2464,6 +2548,8 @@ namespace Krkadoni.EnigmaSettings
                         else
                         {
                             sContent.Append("#SERVICE " + string.Join(":", bis.FavoritesTypeFlag, bis.LineSpecifierFlag, bis.Service.ServiceId, "0", "0", "0", "") + "\n");
+                            if (!string.IsNullOrEmpty(bis.Description))
+                                sContent.Append("#DESCRIPTION " + bis.Description + "\n");
                             if (Log.IsDebugEnabled) Log.Debug($"Service {bis.Service.ServiceId}\t{bis.Service.Name} added to bouquet {bouquet.Name}");
                         }
                         break;
@@ -2526,11 +2612,10 @@ namespace Krkadoni.EnigmaSettings
         {
             var sBouquetsTvContent = new StringBuilder();
             sBouquetsTvContent.Append("#NAME User - Bouquets (TV)" + "\n");
-            HashSet<IFileBouquet> nested = FindNestedBouquets(settings);
             foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList())
             {
                 // sub bouquets are referenced by their parent bouquet only
-                if (!nested.Contains(bouquet))
+                if (!bouquet.IsSubBouquet)
                 {
                     sBouquetsTvContent.Append("#SERVICE 1:" + (bouquet.Hidden ? "519" : "7") + ":1:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                     if (Log.IsDebugEnabled) Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.tv");
@@ -2587,12 +2672,11 @@ namespace Krkadoni.EnigmaSettings
         {
             var sBouquetsRadioContent = new StringBuilder();
             sBouquetsRadioContent.Append("#NAME User - Bouquets (Radio)" + "\n");
-            HashSet<IFileBouquet> nested = FindNestedBouquets(settings);
             foreach (
                 IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetRadio).ToList())
             {
                 // sub bouquets are referenced by their parent bouquet only
-                if (!nested.Contains(bouquet))
+                if (!bouquet.IsSubBouquet)
                 {
                     sBouquetsRadioContent.Append("#SERVICE 1:" + (bouquet.Hidden ? "519" : "7") + ":2:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
                     if (Log.IsDebugEnabled) Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.radio");
@@ -2602,19 +2686,6 @@ namespace Krkadoni.EnigmaSettings
                 if (fName != null) WriteBouquet(Path.Combine(directory, fName), bContent, bouquet.Name);
             }
             WriteBouquet(Path.Combine(directory, BouquetsRadioFile), sBouquetsRadioContent.ToString(), BouquetsRadioFile);
-        }
-
-        /// <summary>
-        ///     Bouquets that are referenced from another bouquet (sub bouquets); they are written as files
-        ///     but not listed in bouquets.tv / bouquets.radio
-        /// </summary>
-        protected static HashSet<IFileBouquet> FindNestedBouquets(ISettings settings)
-        {
-            return new HashSet<IFileBouquet>(settings.Bouquets
-                .SelectMany(x => x.BouquetItems)
-                .OfType<IBouquetItemFileBouquet>()
-                .Where(x => x.Bouquet != null)
-                .Select(x => x.Bouquet));
         }
 
         /// <summary>

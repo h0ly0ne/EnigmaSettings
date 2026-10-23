@@ -68,7 +68,9 @@ namespace Krkadoni.EnigmaSettings
                 {
                     var xmlTran = Factory.InitNewXmlTransponder();
 
-                    xmlTran.FEC = sTran.fec;
+                    xmlTran.FEC = sTran.fec ?? sTran.fec_legacy;
+                    xmlTran.Inversion = sTran.inversion;
+                    xmlTran.System = sTran.system;
                     xmlTran.Frequency = sTran.frequency;
                     xmlTran.Modulation = sTran.modulation;
                     xmlTran.SymbolRate = sTran.symbol_rate;
@@ -132,6 +134,8 @@ namespace Krkadoni.EnigmaSettings
                             {
                                 serTran.fec = xTran.FEC;
                                 serTran.modulation = xTran.Modulation;
+                                serTran.inversion = xTran.Inversion;
+                                serTran.system = xTran.System;
                                 break;
                             }
                     }
@@ -225,8 +229,17 @@ namespace Krkadoni.EnigmaSettings
                 [XmlAttribute]
                 public string symbol_rate { get; set; }
 
-                [XmlAttribute]
+                /// <summary>Enigma reads and writes the FEC as "fec_inner"</summary>
+                [XmlAttribute("fec_inner")]
                 public string fec { get; set; }
+
+                /// <summary>Attribute "fec" written by older versions of this library, read only as fallback</summary>
+                [XmlAttribute("fec")]
+                public string fec_legacy { get; set; }
+                [XmlAttribute]
+                public string inversion { get; set; }
+                [XmlAttribute]
+                public string system { get; set; }
 
                 [XmlAttribute]
                 public string modulation { get; set; }

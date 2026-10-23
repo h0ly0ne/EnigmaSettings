@@ -55,7 +55,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            var bibb = (IBouquetItemBouquetsBouquet)MemberwiseClone();
+            var bibb = (IBouquetItemBouquetsBouquet)CloneWithoutSubscribers();
             bibb.Bouquet = (IBouquetsBouquet)Bouquet?.Clone();
             return bibb;
         }

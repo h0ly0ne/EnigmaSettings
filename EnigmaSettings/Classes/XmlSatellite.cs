@@ -17,6 +17,17 @@ namespace Krkadoni.EnigmaSettings
         #region "INotifyPropertyChanged"
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        ///     MemberwiseClone without the PropertyChanged subscribers of this instance,
+        ///     so changes on the copy are not reported to listeners of the original
+        /// </summary>
+        protected object CloneWithoutSubscribers()
+        {
+            var clone = (XmlSatellite)MemberwiseClone();
+            clone.PropertyChanged = null;
+            return clone;
+        }
+
         protected void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -69,7 +80,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object Clone()
         {
-            var sat = (IXmlSatellite)MemberwiseClone();
+            var sat = (IXmlSatellite)CloneWithoutSubscribers();
             sat.Transponders = new List<IXmlTransponder>();
 
             foreach (var xmlTransponder in Transponders)
@@ -162,25 +173,12 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (Position == null || !int.TryParse(Position, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+                if (Position == null || !int.TryParse(Position, NumberStyles.Integer, CultureInfo.InvariantCulture, out var position))
                     return string.Empty;
 
-                string pos = Math.Abs(Convert.ToInt32(Position, CultureInfo.InvariantCulture)).ToString(CultureInfo.InvariantCulture);
-                
-                if (pos.EndsWith('0'))
-                    pos = pos.Substring(0, pos.Length - 1);
-                else
-                {
-                    pos = pos.Substring(0, pos.Length - 1) + "." + pos.Substring(pos.Length - 1);
-                
-                    if (pos.StartsWith('.'))
-                        pos = "0" + pos;
-                }
-
-                if (Convert.ToInt32(Position, CultureInfo.InvariantCulture) < 0)
-                    return pos + "° W";
-                
-                return pos + "° E";
+                // positions are stored in tenths of a degree, west negative (e.g. 192 = 19.2° E, -300 = 30.0° W)
+                string pos = (Math.Abs(position) / 10m).ToString("0.0", CultureInfo.InvariantCulture);
+                return position < 0 ? pos + "° W" : pos + "° E";
             }
         }
 
@@ -208,7 +206,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
     }
 }

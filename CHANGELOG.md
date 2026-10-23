@@ -54,8 +54,11 @@
   to their transponders.
 - `AddMissingXmlTranspondersSatellites` threw for transponders without satellite (position 0) and
   for non-numeric frequencies.
-- **Sub bouquets were promoted to the main list on save.** Bouquets referenced from another
-  bouquet are written as files but no longer listed in `bouquets.tv` / `bouquets.radio`.
+- **Sub bouquets were promoted to the main list on save.** The loader now records in the new
+  `IFileBouquet.IsSubBouquet` whether a bouquet is only referenced from another bouquet; such
+  bouquets are written as files but not listed in `bouquets.tv` / `bouquets.radio`. A bouquet
+  that is listed there and also referenced from another bouquet stays listed. Set
+  `IsSubBouquet = true` for sub bouquets created through the API.
 - **Stream URLs set through the API broke the bouquet line.** `IBouquetItemStream.URL` is now
   always the decoded URL and is encoded like Enigma2 does when written (`:` / `%` / control
   characters as `%xx`). Previously `URL` returned the encoded form after loading, and a plain URL
@@ -66,6 +69,29 @@
 - `CalculatedNameSpace` / ONID-TSID validation treated orbital position 0 as 360.0°.
 - `RenumberBouquetFileNames` numbered by file name text (`dbe10` before `dbe2`) instead of the
   bouquet order.
+- **`satellites.xml` / `cables.xml` used the wrong FEC attribute.** Enigma reads and writes
+  `fec_inner`; the library used `fec`, so the FEC was never read and written under a name Enigma
+  ignores. `fec_inner` is used now (`fec` from files written by older versions is still read).
+  `tsid` / `onid` of satellite transponders and `inversion` / `system` of cable transponders are
+  kept (new `IXmlTransponder.Tsid` / `Onid`).
+- **A bouquet that references itself (directly or through sub bouquets) crashed the process** with
+  an uncatchable `StackOverflowException`. The reference is now ignored with a warning, and a
+  bouquet referenced several times is read once per load and shared.
+- **Custom service names in bouquets were lost.** A `#DESCRIPTION` line after a normal service
+  (renamed channel) is kept in the new `IBouquetItemService.Description` and written back.
+- **`Settings.Clone()` produced an inconsistent copy.** Every copied service had its own transponder
+  copy instead of the one in `Transponders`, copied transponders had their own satellite copies,
+  and bouquet items still pointed to the original services and sub bouquets. Saving a modified
+  copy (e.g. after `ChangeSatellitePosition`) wrote services with the old namespace. All references
+  of the copy now point to the copied objects.
+- **Copies raised `PropertyChanged` on the subscribers of the original** (`MemberwiseClone` copied
+  the event). `Clone()` / `ShallowCopy()` of all model types start without subscribers.
+- **`IService.UpdateFlags(list)` ignored the list** and rebuilt the flags from the current ones.
+- **`IFlag.FlagInt` corrupted `c:` flags** (hex value converted to decimal, type byte lost, values
+  with A-F threw). `c:` is written as 6 hex digits, `f:` as hex.
+- `IFlag.FlagValue` cut values containing `:` (e.g. provider `Sky:DE`).
+- `IService.ServiceId` of a service without transponder had empty fields for zero values
+  (`1:::1:c00000`).
 
 ### Changed
 
@@ -91,6 +117,11 @@
 - `IFileBouquet.BouquetType` is cached per file name instead of being recomputed on every access.
 - `RemoveStreams`, `RemoveInvalidBouquetItems` and `RemoveEmptyBouquets` remove in one pass per list.
 - Settings files are no longer deleted before writing (the atomic write replaces them).
+- `IService.FlagList` creates flags through a compiled constructor delegate instead of
+  `Activator.CreateInstance` and returns an empty list when no flags are set (was a
+  `NullReferenceException`).
+- `ISettings.SettingsDirectory` raises `PropertyChanged`.
+- `IXmlSatellite.PositionString` always shows one decimal (`13.0° E`, `0.0° E` instead of `13° E` / `° E`).
 
 ### Breaking
 
@@ -98,6 +129,9 @@
 - Values of the DVB-T enums, `DVBSRollOffType.X20` and `DVBSPilotType` changed to the Enigma2
   coding (see Fixed). Code that persisted or compared the numeric enum values must be adjusted.
 - `IBouquetItemStream.URL` returns the decoded URL (see Fixed).
+- New interface members `IXmlTransponder.Tsid` / `Onid`, `IBouquetItemService.Description` and
+  `IFileBouquet.IsSubBouquet`;
+  own implementations of these interfaces must add them.
 
 ### Removed (breaking)
 

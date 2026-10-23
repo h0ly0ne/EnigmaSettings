@@ -16,6 +16,17 @@ namespace Krkadoni.EnigmaSettings
         #region "INotifyPropertyChanged"
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        ///     MemberwiseClone without the PropertyChanged subscribers of this instance,
+        ///     so changes on the copy are not reported to listeners of the original
+        /// </summary>
+        protected object CloneWithoutSubscribers()
+        {
+            var clone = (Flag)MemberwiseClone();
+            clone.PropertyChanged = null;
+            return clone;
+        }
+
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -65,7 +76,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object Clone()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
         #endregion
 
@@ -258,7 +269,8 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string FlagValue
         {
-            get => FlagString.Length > 0 ? FlagString.Split(':')[1] : string.Empty;
+            // the value may itself contain ':' (e.g. provider names), only the first one separates the type
+            get => FlagString.Length > 0 ? FlagString.Split(':', 2)[1] : string.Empty;
             set
             {
                 if (FlagString.Length == 0)
@@ -300,16 +312,15 @@ namespace Krkadoni.EnigmaSettings
                 if (FlagString.Length == 0)
                     throw new ArgumentException(Resources.Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_);
 
-                switch (FlagType)
+                // c: and f: values are hex like the getter reads them (c: as 2 digit type + 4 digit value)
+                string flagValue = FlagType switch
                 {
-                    case Enums.FlagType.C:
-                        value = Convert.ToInt32(value.ToString("X", CultureInfo.InvariantCulture).PadLeft(6, '0'), CultureInfo.InvariantCulture);
-                        break;
-                    case Enums.FlagType.F:
-                        value = Convert.ToInt32(value.ToString("X", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
-                        break;
-                }
-                FlagString = FlagString.Split(':')[0] + ":" + value;
+                    Enums.FlagType.C => value.ToString("x6", CultureInfo.InvariantCulture),
+                    Enums.FlagType.F => value.ToString("x", CultureInfo.InvariantCulture),
+                    _ => value.ToString(CultureInfo.InvariantCulture)
+                };
+
+                FlagString = FlagString.Split(':')[0] + ":" + flagValue;
             }
         }
 
@@ -351,7 +362,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
     }
 }

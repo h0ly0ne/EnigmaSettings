@@ -75,7 +75,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
         #endregion
 

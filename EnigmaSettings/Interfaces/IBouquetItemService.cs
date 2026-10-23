@@ -20,5 +20,10 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns></returns>
         /// <remarks></remarks>
         IService Service { get; set; }
+
+        /// <summary>
+        ///     Name shown for this service in the bouquet (#DESCRIPTION line), empty when the service name is used
+        /// </summary>
+        string Description { get; set; }
     }
 }

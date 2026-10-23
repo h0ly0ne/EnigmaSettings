@@ -65,7 +65,7 @@ namespace Krkadoni.EnigmaSettings
                 foreach (SerializerSatellites.SerializerTransponder sTran in sSat.transponders)
                 {
                     IXmlTransponder xmlTran = Factory.InitNewXmlTransponder();
-                    xmlTran.FEC = sTran.fec;
+                    xmlTran.FEC = sTran.fec ?? sTran.fec_legacy;
                     xmlTran.Frequency = sTran.frequency;
                     xmlTran.Inversion = sTran.inversion;
                     xmlTran.Modulation = sTran.modulation;
@@ -79,6 +79,8 @@ namespace Krkadoni.EnigmaSettings
                     xmlTran.PlsMode = sTran.pls_mode;
                     xmlTran.T2miPid = sTran.t2mi_pid;
                     xmlTran.T2miPlpId = sTran.t2mi_plp_id;
+                    xmlTran.Tsid = sTran.tsid;
+                    xmlTran.Onid = sTran.onid;
                     sat.Transponders.Add(xmlTran);
                 }
                 sats.Add(sat);
@@ -155,6 +157,8 @@ namespace Krkadoni.EnigmaSettings
                             serTran.pls_mode = xTran.PlsMode;
                             serTran.t2mi_plp_id = xTran.T2miPlpId;
                             serTran.t2mi_pid = xTran.T2miPid;
+                            serTran.tsid = xTran.Tsid;
+                            serTran.onid = xTran.Onid;
                             break;
                     }
                     sSat.transponders.Add(serTran);
@@ -252,8 +256,13 @@ namespace Krkadoni.EnigmaSettings
                 [XmlAttribute]
                 public string polarization { get; set; }
 
-                [XmlAttribute]
+                /// <summary>Enigma reads and writes the FEC as "fec_inner"</summary>
+                [XmlAttribute("fec_inner")]
                 public string fec { get; set; }
+
+                /// <summary>Attribute "fec" written by older versions of this library, read only as fallback</summary>
+                [XmlAttribute("fec")]
+                public string fec_legacy { get; set; }
 
                 [XmlAttribute]
                 public string inversion { get; set; }
@@ -284,6 +293,10 @@ namespace Krkadoni.EnigmaSettings
 
                 [XmlAttribute]
                 public string t2mi_pid { get; set; }
+                [XmlAttribute]
+                public string tsid { get; set; }
+                [XmlAttribute]
+                public string onid { get; set; }
             }
             #endregion
         }

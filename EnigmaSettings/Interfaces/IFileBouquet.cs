@@ -20,5 +20,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <returns>Current hidden status</returns>
         /// <remarks></remarks>
         bool Hidden { get; set; }
+
+        /// <summary>
+        ///     True when the bouquet is only referenced from another bouquet (sub bouquet); it is then written
+        ///     as a file but not listed in bouquets.tv / bouquets.radio. False for bouquets listed there.
+        /// </summary>
+        bool IsSubBouquet { get; set; }
     }
 }

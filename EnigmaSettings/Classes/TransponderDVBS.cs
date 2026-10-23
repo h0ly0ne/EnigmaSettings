@@ -97,7 +97,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            var transponder = (ITransponderDVBS)MemberwiseClone();
+            var transponder = (ITransponderDVBS)CloneWithoutSubscribers();
             transponder.Satellite = (IXmlSatellite)Satellite?.Clone();
             return transponder;
         }

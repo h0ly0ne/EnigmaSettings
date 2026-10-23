@@ -14,6 +14,17 @@ namespace Krkadoni.EnigmaSettings
         #region "INotifyPropertyChanged"
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        ///     MemberwiseClone without the PropertyChanged subscribers of this instance,
+        ///     so changes on the copy are not reported to listeners of the original
+        /// </summary>
+        protected object CloneWithoutSubscribers()
+        {
+            var clone = (XmlTransponder)MemberwiseClone();
+            clone.PropertyChanged = null;
+            return clone;
+        }
+
         protected void OnPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -95,7 +106,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object Clone()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
         #endregion
 
@@ -387,12 +398,49 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
+        ///     Transport stream id (satellites.xml attribute "tsid"), optional
+        /// </summary>
+        [DataMember]
+        public string Tsid
+        {
+            get => _tsid;
+            set
+            {
+                if (value == _tsid)
+                    return;
+
+                _tsid = value;
+                OnPropertyChanged(nameof(Tsid));
+            }
+        }
+
+        /// <summary>
+        ///     Original network id (satellites.xml attribute "onid"), optional
+        /// </summary>
+        [DataMember]
+        public string Onid
+        {
+            get => _onid;
+            set
+            {
+                if (value == _onid)
+                    return;
+
+                _onid = value;
+                OnPropertyChanged(nameof(Onid));
+            }
+        }
+
+        private string _tsid;
+        private string _onid;
+
+        /// <summary>
         /// Performs MemberwiseClone on current object
         /// </summary>
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
     }
 }

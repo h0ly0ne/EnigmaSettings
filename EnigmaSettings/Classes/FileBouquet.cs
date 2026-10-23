@@ -16,6 +16,17 @@ namespace Krkadoni.EnigmaSettings
         #region "INotifyPropertyChanged"
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        ///     MemberwiseClone without the PropertyChanged subscribers of this instance,
+        ///     so changes on the copy are not reported to listeners of the original
+        /// </summary>
+        protected object CloneWithoutSubscribers()
+        {
+            var clone = (FileBouquet)MemberwiseClone();
+            clone.PropertyChanged = null;
+            return clone;
+        }
+
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -77,7 +88,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object Clone()
         {
-            var fb = (IFileBouquet)MemberwiseClone();
+            var fb = (IFileBouquet)CloneWithoutSubscribers();
             fb.BouquetItems = new List<IBouquetItem>();
 
             foreach (var bouquetItem in BouquetItems)
@@ -127,6 +138,26 @@ namespace Krkadoni.EnigmaSettings
                 OnPropertyChanged(nameof(Hidden));
             }
         }
+
+        /// <summary>
+        ///     True when the bouquet is only referenced from another bouquet (sub bouquet); it is then written
+        ///     as a file but not listed in bouquets.tv / bouquets.radio. False for bouquets listed there.
+        /// </summary>
+        [DataMember]
+        public bool IsSubBouquet
+        {
+            get => _isSubBouquet;
+            set
+            {
+                if (value == _isSubBouquet)
+                    return;
+
+                _isSubBouquet = value;
+                OnPropertyChanged(nameof(IsSubBouquet));
+            }
+        }
+
+        private bool _isSubBouquet;
 
         /// <summary>
         ///     Type of the bouquet. Determined from FileName.
@@ -208,7 +239,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public object ShallowCopy()
         {
-            return MemberwiseClone();
+            return CloneWithoutSubscribers();
         }
     }
 }

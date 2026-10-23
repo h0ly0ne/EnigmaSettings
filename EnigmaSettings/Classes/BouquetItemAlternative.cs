@@ -50,7 +50,7 @@ namespace Krkadoni.EnigmaSettings
         #region "ICloneable"
         public new object Clone()
         {
-            var clone = (IBouquetItemAlternative)MemberwiseClone();
+            var clone = (IBouquetItemAlternative)CloneWithoutSubscribers();
             clone.Bouquet = (IFileBouquet)Bouquet?.Clone();
             return clone;
         }

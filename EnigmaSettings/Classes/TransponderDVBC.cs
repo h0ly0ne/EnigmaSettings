@@ -60,7 +60,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         public new object Clone()
         {
-            var transponder = (ITransponderDVBC)MemberwiseClone();
+            var transponder = (ITransponderDVBC)CloneWithoutSubscribers();
             return transponder;
         }
         #endregion
