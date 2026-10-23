@@ -116,7 +116,7 @@ namespace Krkadoni.EnigmaSettings
             if (string.IsNullOrEmpty(bouquetLine) || description == null)
                 throw new ArgumentNullException(nameof(bouquetLine));
 
-            if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
+            if (bouquetLine.StartsWith("#SERVICE", StringComparison.OrdinalIgnoreCase))
                 bouquetLine = bouquetLine.Substring(9).Trim();
 
             string[] sData = bouquetLine.Trim().Split(':');

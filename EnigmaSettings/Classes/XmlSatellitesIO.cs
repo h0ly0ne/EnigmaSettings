@@ -173,59 +173,13 @@ namespace Krkadoni.EnigmaSettings
         /// Internal helper class that contains all deserialized objects and performs (de)serialization
         /// </summary>
         [XmlRoot("satellites"), XmlType("satellites")]
-        public class SerializerSatellites
+        public class SerializerSatellites : XmlFileRoot<SerializerSatellites>
         {
             /// <summary>
             /// Helper class representing satellite item from list of satellites
             /// </summary>
             [XmlElement("sat", Form = XmlSchemaForm.Unqualified)]
             public List<SerializerSatellite> sat { get; set; } = new();
-
-            private static XmlSerializer Serializer
-            {
-                get
-                {
-                    field ??= new XmlSerializer(typeof(SerializerSatellites));
-                    return field;
-                }
-            }
-
-            #region "Serialize/Deserialize"
-            /// <summary>
-            ///     Serializes current SerializerSatellites object into an XML document
-            /// </summary>
-            /// <returns>string XML value</returns>
-            public virtual string Serialize()
-            {
-                return XmlFileSerializer.Serialize(Serializer, this);
-            }
-
-            public static SerializerSatellites Deserialize(string xml)
-            {
-                using var reader = XmlReader.Create(new StringReader(xml));
-                return (SerializerSatellites)Serializer.Deserialize(reader);
-            }
-
-            public virtual void SaveToFile(string fileName)
-            {
-                SaveToFile(fileName, new FileHelper());
-            }
-
-            public virtual void SaveToFile(string fileName, IFileHelper fileHelper)
-            {
-                XmlFileSerializer.Save(fileHelper, fileName, Serialize());
-            }
-
-            public static SerializerSatellites LoadFromFile(string fileName)
-            {
-                return LoadFromFile(fileName, new FileHelper());
-            }
-
-            public static SerializerSatellites LoadFromFile(string fileName, IFileHelper fileHelper)
-            {
-                return XmlFileSerializer.Load<SerializerSatellites>(fileHelper, Serializer, fileName);
-            }
-            #endregion
 
             #region "Subclases"
             [XmlType("sat")]

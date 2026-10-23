@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Krkadoni.EnigmaSettings.Interfaces;
-using static Krkadoni.EnigmaSettings.Enums;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -722,7 +721,6 @@ namespace Krkadoni.EnigmaSettings
             st.Stop();
 
             if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
-           // Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
 
             if (fileLines.Length == 0)
             {
@@ -772,7 +770,6 @@ namespace Krkadoni.EnigmaSettings
             st.Stop();
 
             if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
-            //Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
 
             if (fileText.Length == 0)
             {
@@ -916,10 +913,10 @@ namespace Krkadoni.EnigmaSettings
                 case UserBouquetTvEpl:
                     return "User - bouquets (TV)";
                 default:
-                    if (fileName.ToLowerInvariant().EndsWith(".tv", StringComparison.Ordinal))
+                    if (fileName.EndsWith(".tv", StringComparison.OrdinalIgnoreCase))
                         return "TV Bouquet";
                     
-                    return fileName.ToLowerInvariant().EndsWith(".radio", StringComparison.Ordinal) ? "Radio Bouquet" : string.Empty;
+                    return fileName.EndsWith(".radio", StringComparison.OrdinalIgnoreCase) ? "Radio Bouquet" : string.Empty;
             }
         }
         #endregion

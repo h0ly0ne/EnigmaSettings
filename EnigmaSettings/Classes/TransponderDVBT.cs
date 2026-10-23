@@ -118,9 +118,21 @@ namespace Krkadoni.EnigmaSettings
             TSID = tData[1];
             NID = tData[2];
 
-            if (transponderFrequency.Trim().ToLowerInvariant().StartsWith('s'))
+            if (transponderFrequency.Trim().StartsWith('s'))
             {
+                // Enigma1 stores only frequency and inversion; everything else is "auto" in Enigma2 coding,
+                // so a conversion to Enigma2 does not force 8 MHz / QPSK / 2k / FEC 1/2
                 Frequency = tFreq[0].Split(' ')[1];
+                Bandwidth = ((int)Enums.DVBTBandwidthType.Auto).ToString(CultureInfo.InvariantCulture);
+                FECHigh = ((int)Enums.DVBTFECHighType.Auto).ToString(CultureInfo.InvariantCulture);
+                FECLow = ((int)Enums.DVBTFECLowType.Auto).ToString(CultureInfo.InvariantCulture);
+                Modulation = ((int)Enums.DVBTModulationType.Auto).ToString(CultureInfo.InvariantCulture);
+                Transmission = ((int)Enums.DVBTTransmissionType.Auto).ToString(CultureInfo.InvariantCulture);
+                GuardInterval = ((int)Enums.DVBTGuardIntervalType.Auto).ToString(CultureInfo.InvariantCulture);
+                Hierarchy = ((int)Enums.DVBTHierarchyType.Auto).ToString(CultureInfo.InvariantCulture);
+                Flags = "0";
+                System = "0";
+                PlpId = "0";
 
                 if (tFreq.Length > 5)
                     Inversion = tFreq[5];

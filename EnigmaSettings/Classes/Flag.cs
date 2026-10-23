@@ -107,7 +107,7 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (!FlagString.ToLowerInvariant().StartsWith("f:", StringComparison.Ordinal))
+                if (!FlagString.StartsWith("f:", StringComparison.OrdinalIgnoreCase))
                     return Enums.FFlagType.None;
 
                 if (FlagValue.TrimStart('0').Length == 0)
@@ -194,7 +194,7 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (!FlagString.ToLowerInvariant().StartsWith("c:", StringComparison.Ordinal))
+                if (!FlagString.StartsWith("c:", StringComparison.OrdinalIgnoreCase))
                     return Enums.CFlagType.None;
 
                 if (FlagValue.Trim('0').Length == 0)

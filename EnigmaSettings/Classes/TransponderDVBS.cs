@@ -147,7 +147,7 @@ namespace Krkadoni.EnigmaSettings
             string[] tData = transponderData.Split(':');
             string[] tFreq = transponderFrequency.Split(':');
 
-            if (!tFreq[0].Split(' ')[0].Trim().ToLowerInvariant().StartsWith('s'))
+            if (!tFreq[0].Split(' ')[0].TrimStart().StartsWith("s", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException(Resources.Transponder_New_Invalid_transponder_type_);
 
             NameSpc = tData[0];

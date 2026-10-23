@@ -99,6 +99,19 @@
   are not in lamedb (or have no transponder) are written back unchanged, including their
   `#DESCRIPTION`, like Enigma does. Use `ISettings.RemoveInvalidBouquetItems()` to remove them.
 - `InstanceFactory.InitNewXmlTransponder(ITransponderDVBC)` copies inversion and system.
+- **Enigma1 → Enigma2 conversion wrote wrong tuning data.** Enigma1 terrestrial transponders only
+  store frequency and inversion; the missing fields were written as `0`, which Enigma2 reads as
+  8 MHz / FEC 1/2 / QPSK / 2k / 1/32 / no hierarchy. They are now set to "auto" (and flags,
+  system, PLP to 0). Enigma1 cable transponders are converted to Enigma2 units (frequency / 100,
+  symbol rate / 10 — the Enigma1 writer multiplies again) with auto modulation, so they are no
+  longer written as `c 11300000:69000000:2::0::`.
+- `FindSatelliteTransponders` / `FindCableTransponders` sorted the frequency as text
+  (`10700000` before `9750000`).
+- `FindTranspondersForSatellite` / `FindServicesForSatellite` threw a `FormatException` for a
+  satellite with a non-numeric position; they return an empty list now.
+- `FindBouquetsWithDuplicateFilename` compares the file name without directory and ignoring case,
+  so two bouquets that end up in the same file on Windows (`userbouquet.Fav.tv` /
+  `userbouquet.fav.tv`) are reported and `Save` refuses them instead of silently overwriting one.
 
 ### Changed
 
@@ -141,6 +154,12 @@
 - `SettingsIO` split into `SettingsIO.cs`, `SettingsIO.Reading.cs` and `SettingsIO.Writing.cs`.
 - `SettingsIO.ReadText`, `DeleteFileIfExists` and `GetBouquetNameFromFileName` are no longer used
   and marked `[Obsolete]`.
+- Prefix / suffix checks use `StartsWith` / `EndsWith` with `OrdinalIgnoreCase` instead of
+  upper-/lower-casing a copy of every line (reading 48 000 bouquet entries: 129 ms / 68 MB →
+  112 ms / 59 MB).
+- `SerializerSatellites` / `SerializerCables` derive from the new `XmlFileRoot<T>` that holds the
+  shared serializer, `Serialize`, `Deserialize`, `LoadFromFile` and `SaveToFile`.
+- Removed 7 unused resource strings, commented-out code and unused `using static` directives.
 
 ### Breaking
 

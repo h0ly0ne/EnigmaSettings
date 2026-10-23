@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Krkadoni.EnigmaSettings.Interfaces;
-using static Krkadoni.EnigmaSettings.Enums;
 
 namespace Krkadoni.EnigmaSettings
 {

@@ -2,6 +2,7 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
+using System.Linq;
 using System.Runtime.Serialization;
 
 using Krkadoni.EnigmaSettings.Interfaces;
@@ -92,7 +93,7 @@ namespace Krkadoni.EnigmaSettings
             TSID = tData[1];
             NID = tData[2];
 
-            if (transponderFrequency.Trim().ToLowerInvariant().StartsWith('c'))
+            if (transponderFrequency.TrimStart().StartsWith("c", StringComparison.OrdinalIgnoreCase))
             {
                 Frequency = tFreq[0].Split(' ')[1].Trim();
                 SymbolRate = tFreq[1];
@@ -109,15 +110,33 @@ namespace Krkadoni.EnigmaSettings
             }
             else if (transponderFrequency.Trim().StartsWith('s'))
             {
-                // Enigma1 stores cable transponders as satellite lines: s frequency:symbolrate:15:fec:0:inversion
-                Frequency = tFreq[0].Trim().Substring(1).Trim();
+                // Enigma1 stores cable transponders as satellite lines: s frequency:symbolrate:15:fec:0:inversion,
+                // frequency in 10 Hz and symbol rate in 0.1 symbols/s. They are kept in Enigma2 units (kHz,
+                // symbols/s) like the Enigma1 writer expects them (it multiplies by 100 / 10 again).
+                Frequency = DivideUnit(tFreq[0].Trim().Substring(1).Trim(), "00");
                 if (tFreq.Length > 1)
-                    SymbolRate = tFreq[1];
+                    SymbolRate = DivideUnit(tFreq[1], "0");
                 if (tFreq.Length > 3)
                     FEC = tFreq[3];
                 if (tFreq.Length > 5)
                     Inversion = tFreq[5];
+
+                // not stored by Enigma1: auto modulation, default flags and system (DVB-C annex A)
+                Modulation = "0";
+                Flags = "0";
+                System = "0";
             }
+        }
+
+        /// <summary>
+        ///     Removes the unit suffix ("00" = /100, "0" = /10) from an Enigma1 number; other values are kept as they are
+        /// </summary>
+        private static string DivideUnit(string value, string suffix)
+        {
+            value = value?.Trim() ?? string.Empty;
+            return value.Length > suffix.Length && value.EndsWith(suffix, StringComparison.Ordinal) && value.All(char.IsDigit)
+                ? value.Substring(0, value.Length - suffix.Length)
+                : value;
         }
 
         /// <summary>

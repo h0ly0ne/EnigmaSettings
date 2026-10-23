@@ -97,7 +97,7 @@ namespace Krkadoni.EnigmaSettings
             TSID = tData[1];
             NID = tData[2];
 
-            if (transponderFrequency.Trim().ToLowerInvariant().StartsWith('s'))
+            if (transponderFrequency.TrimStart().StartsWith("s", StringComparison.OrdinalIgnoreCase))
             {
                 Frequency = tFreq[0].Split(' ')[1].Trim();
                 SymbolRate = tFreq[1];

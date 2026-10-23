@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Krkadoni.EnigmaSettings.Interfaces;
-using static Krkadoni.EnigmaSettings.Enums;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -158,18 +157,18 @@ namespace Krkadoni.EnigmaSettings
                             // DVBT & DVBC transponders in Enigma1 are saved as satellite transponders
                             if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
                             {
-                                if (settingsFileLines[i].ToLowerInvariant().StartsWith("ffff", StringComparison.Ordinal))
+                                if (settingsFileLines[i].StartsWith("ffff", StringComparison.OrdinalIgnoreCase))
                                     AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else if (settingsFileLines[i].ToLowerInvariant().StartsWith("eeee", StringComparison.Ordinal))
+                                else if (settingsFileLines[i].StartsWith("eeee", StringComparison.OrdinalIgnoreCase))
                                     AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else if (settingsFileLines[i].ToLowerInvariant().StartsWith("0000", StringComparison.Ordinal))
+                                else if (settingsFileLines[i].StartsWith("0000", StringComparison.OrdinalIgnoreCase))
                                     AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
                                 else
                                     AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
                             }
                             else
                             {
-                                if (settingsFileLines[i].ToLowerInvariant().StartsWith("0000", StringComparison.Ordinal))
+                                if (settingsFileLines[i].StartsWith("0000", StringComparison.OrdinalIgnoreCase))
                                     AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
                                 else
                                     AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
@@ -378,7 +377,7 @@ namespace Krkadoni.EnigmaSettings
                         && !string.Equals(fName, BouquetsRadioFile, StringComparison.OrdinalIgnoreCase)
                         && !string.Equals(fName, UserBouquetTvEpl, StringComparison.OrdinalIgnoreCase)
                         && !string.Equals(fName, UserBouquetRadioEpl, StringComparison.OrdinalIgnoreCase)
-                        && !fName.ToLowerInvariant().StartsWith("alternatives.", StringComparison.Ordinal))
+                        && !fName.StartsWith("alternatives.", StringComparison.OrdinalIgnoreCase))
                     {
                         settings.Bouquets.Add(bqt);
                     }
@@ -401,7 +400,7 @@ namespace Krkadoni.EnigmaSettings
                     for (int i = 0; i <= cnt - 1; i++)
                     {
                         string line = bouquetLines[i];
-                        if (line.Trim().Length > 0)
+                        if (!string.IsNullOrWhiteSpace(line))
                         {
                             DetectAndReadReference(dir, ref bqt, bouquetLines, i, settings);
                         }
@@ -468,7 +467,7 @@ namespace Krkadoni.EnigmaSettings
             string description = string.Empty;
             int bCount = bouquetLines.Length;
             string nextLine = index < (bCount - 1) ? bouquetLines[index + 1] : string.Empty;
-            if (nextLine.ToUpperInvariant().StartsWith("#DESCRIPTION", StringComparison.Ordinal))
+            if (nextLine.StartsWith("#DESCRIPTION", StringComparison.OrdinalIgnoreCase))
                 description = bouquetLines[index + 1];
 
             if (line.StartsWith("#NAME", StringComparison.Ordinal))
@@ -694,7 +693,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
+                if (bouquetLine.StartsWith("#SERVICE", StringComparison.OrdinalIgnoreCase))
                     bouquetLine = bouquetLine.Substring(9).Trim();
                 description = StripDescriptionTag(description);
                 string[] sData = bouquetLine.Split(':');
@@ -723,7 +722,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
+                if (bouquetLine.StartsWith("#SERVICE", StringComparison.OrdinalIgnoreCase))
                     bouquetLine = bouquetLine.Substring(9).Trim();
                 description = StripDescriptionTag(description);
                 string[] sData = bouquetLine.Split(':');
@@ -888,7 +887,7 @@ namespace Krkadoni.EnigmaSettings
             var fName = Path.GetFileName(fileName);
 
             string[] bouquetFileLines = Read(fileName);
-            sLocked.AddRange(bouquetFileLines.Where(x => x.Trim().Length > 0).Select(ReadServiceReference).Where(bqis => bqis != null));
+            sLocked.AddRange(bouquetFileLines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(ReadServiceReference).Where(bqis => bqis != null));
 
             if (!sLocked.Any()) return;
             bool blackListed = (string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase));
@@ -963,7 +962,7 @@ namespace Krkadoni.EnigmaSettings
                         {
                             Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, fileName));
                         }
-                        else if (srv.LineSpecifierType.ToString().ToLowerInvariant().StartsWith("isdirectory", StringComparison.Ordinal))
+                        else if (srv.LineSpecifierType.ToString().StartsWith("isdirectory", StringComparison.OrdinalIgnoreCase))
                         {
                             if (Log.IsDebugEnabled) Log.Debug($"Found reference to locked bouquet {line} in {fileName}");
                             try

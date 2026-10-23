@@ -151,54 +151,13 @@ namespace Krkadoni.EnigmaSettings
         /// Internal helper class that contains all deserialized objects and performs (de)serialization
         /// </summary>
         [XmlRoot("cables"), XmlType("cables")]
-        public class SerializerCables
+        public class SerializerCables : XmlFileRoot<SerializerCables>
         {
-            private static XmlSerializer _cSerializer;
-
             /// <summary>
             /// Helper class representing cable item from list of cables
             /// </summary>
             [XmlElement("cable", Form = XmlSchemaForm.Unqualified)]
             public List<SerializerCable> cab { get; set; } = [];
-
-            private static XmlSerializer Serializer => _cSerializer ??= new XmlSerializer(typeof(SerializerCables));
-
-            #region "Serialize/Deserialize"
-            /// <summary>
-            ///     Serializes current SerializerCables object into an XML document
-            /// </summary>
-            /// <returns>string XML value</returns>
-            public virtual string Serialize()
-            {
-                return XmlFileSerializer.Serialize(Serializer, this);
-            }
-
-            public static SerializerCables Deserialize(string xml)
-            {
-                using var reader = XmlReader.Create(new StringReader(xml));
-                return (SerializerCables)Serializer.Deserialize(reader);
-            }
-
-            public virtual void SaveToFile(string fileName)
-            {
-                SaveToFile(fileName, new FileHelper());
-            }
-
-            public virtual void SaveToFile(string fileName, IFileHelper fileHelper)
-            {
-                XmlFileSerializer.Save(fileHelper, fileName, Serialize());
-            }
-
-            public static SerializerCables LoadFromFile(string fileName)
-            {
-                return LoadFromFile(fileName, new FileHelper());
-            }
-
-            public static SerializerCables LoadFromFile(string fileName, IFileHelper fileHelper)
-            {
-                return XmlFileSerializer.Load<SerializerCables>(fileHelper, Serializer, fileName);
-            }
-            #endregion
 
             #region "Subclases"
             [XmlType("cable")]

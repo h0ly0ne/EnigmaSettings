@@ -87,14 +87,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service name cannot be empty ähnelt.
-        /// </summary>
-        public static string Service_New_Service_name_cannot_be_empty {
-            get {
-                return ResourceManager.GetString("Service_New_Service_name_cannot_be_empty", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid service data. ähnelt.
@@ -114,33 +106,8 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Added new transponder {0} for previously missing cable ähnelt.
-        /// </summary>
-        public static string Settings_AddMissingXMLCables_Added_new_transponder__0__for_previously_missing_cable {
-            get {
-                return ResourceManager.GetString("Settings_AddMissingXMLCables_Added_new_transponder__0__for_previously_missing_cab" +
-                        "le", resourceCulture);
-            }
-        }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Failed to update missing XML cables ähnelt.
-        /// </summary>
-        public static string Settings_AddMissingXMLCables_Failed_to_update_missing_XML_cables {
-            get {
-                return ResourceManager.GetString("Settings_AddMissingXMLCables_Failed_to_update_missing_XML_cables", resourceCulture);
-            }
-        }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die New cable added to cables ähnelt.
-        /// </summary>
-        public static string Settings_AddMissingXMLCables_New_cable__added_to_cables {
-            get {
-                return ResourceManager.GetString("Settings_AddMissingXMLCables_New_cable__added_to_cables", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Added new transponder {0} for previously missing satellite {1} ähnelt.
@@ -597,15 +564,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service {0} in bouquet {1} has no matching transponder. Not writing it. ähnelt.
-        /// </summary>
-        public static string SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transponder__Not_writing_it_ {
-            get {
-                return ResourceManager.GetString("SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__has_no_matching_transpond" +
-                        "er__Not_writing_it_", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Service {0} in bouquet {1} is not supported in Enigma1. Not writing it. ähnelt.
@@ -617,15 +575,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Service reference {0} in bouquet {1} is not matched to any service. Not writing it to bouquet. ähnelt.
-        /// </summary>
-        public static string SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_to_any_service__Not_writing_it_to_bouquet_ {
-            get {
-                return ResourceManager.GetString("SettingsIO_E1BouquetToString_Service_reference__0__in_bouquet__1__is_not_matched_" +
-                        "to_any_service__Not_writing_it_to_bouquet_", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid instance factory! ähnelt.
@@ -915,15 +864,6 @@ namespace Krkadoni.EnigmaSettings {
         public static string XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider {
             get {
                 return ResourceManager.GetString("XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Invalid path provider ähnelt.
-        /// </summary>
-        public static string XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider {
-            get {
-                return ResourceManager.GetString("XmlSatellitesIO_XmlSatellitesIO_Invalid_path_provider", resourceCulture);
             }
         }
     }

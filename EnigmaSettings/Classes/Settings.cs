@@ -413,6 +413,20 @@ namespace Krkadoni.EnigmaSettings
 
         #region "Public methods"
         /// <summary>
+        ///     Numeric value of a frequency / symbol rate string for sorting (non numeric values sort last)
+        /// </summary>
+        private static long NumericValue(string value)
+        {
+            return long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number) ? number : long.MaxValue;
+        }
+
+        private static bool TryGetPosition(IXmlSatellite satellite, out int position)
+        {
+            position = 0;
+            return satellite?.Position != null && int.TryParse(satellite.Position, NumberStyles.Integer, CultureInfo.InvariantCulture, out position);
+        }
+
+        /// <summary>
         ///     Returns list of satellite transponders from list with all transponders
         /// </summary>
         /// <returns>Will return new list each time as a result of LINQ query</returns>
@@ -421,7 +435,7 @@ namespace Krkadoni.EnigmaSettings
         {
             return
                 new List<ITransponderDVBS>(
-                    Transponders.OfType<ITransponderDVBS>().OrderBy(x => x.OrbitalPositionInt).ThenBy(x => x.Frequency).ToList());
+                    Transponders.OfType<ITransponderDVBS>().OrderBy(x => x.OrbitalPositionInt).ThenBy(x => NumericValue(x.Frequency)).ToList());
         }
 
         /// <summary>
@@ -433,7 +447,7 @@ namespace Krkadoni.EnigmaSettings
         {
             return
                 new List<ITransponderDVBC>(
-                    Transponders.OfType<ITransponderDVBC>().OrderBy(x => x.Frequency).ToList());
+                    Transponders.OfType<ITransponderDVBC>().OrderBy(x => NumericValue(x.Frequency)).ToList());
         }
 
         /// <summary>
@@ -445,7 +459,7 @@ namespace Krkadoni.EnigmaSettings
         {
             return
                 new List<ITransponderDVBS>(
-                    FindSatelliteTransponders().Where(x => x.OrbitalPositionInt == Convert.ToInt32(satellite.Position, CultureInfo.InvariantCulture)).ToList());
+                    FindSatelliteTransponders().Where(x => TryGetPosition(satellite, out var position) && x.OrbitalPositionInt == position).ToList());
         }
 
         /// <summary>
@@ -457,7 +471,7 @@ namespace Krkadoni.EnigmaSettings
         {
             return
                 new List<IService>(
-                    Services.Where(x => x.Transponder is ITransponderDVBS dvbs && dvbs.OrbitalPositionInt == Convert.ToInt32(satellite.Position, CultureInfo.InvariantCulture)).ToList());
+                    Services.Where(x => x.Transponder is ITransponderDVBS dvbs && TryGetPosition(satellite, out var position) && dvbs.OrbitalPositionInt == position).ToList());
         }
 
         /// <summary>
@@ -511,14 +525,15 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 Log.Debug("Searching for bouquets with duplicate filenames");
-                var fileNames = Bouquets.OfType<IFileBouquet>().GroupBy(x => x.FileName).Where(g => g.Count() > 1).Select(grp => grp.Key).ToList();
+                var duplicates = Bouquets.OfType<IFileBouquet>().GroupBy(x => Path.GetFileName(x.FileName), StringComparer.OrdinalIgnoreCase).Where(g => g.Count() > 1).ToList();
+                var fileNames = duplicates.Select(grp => grp.Key).ToList();
 
                 foreach (var fileName in fileNames)
                 {
                     if (Log.IsDebugEnabled) Log.Debug($"Bouquet filename {fileName} is not unique.");
                 }
 
-                return Bouquets.OfType<IFileBouquet>().GroupBy(x => x.FileName).Where(grp => grp.Count() > 1).SelectMany(grp => grp).ToList();
+                return duplicates.SelectMany(grp => grp).ToList();
             }
             catch (Exception ex)
             {
