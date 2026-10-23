@@ -30,7 +30,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Polarization values</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string Polarization { get; set; }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string FEC { get; set; }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string Inversion { get; set; }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string Modulation { get; set; }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">System types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string System { get; set; }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Pilot types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string Pilot { get; set; }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">RollOff types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         string RollOff { get; set; }
 
         /// <summary>

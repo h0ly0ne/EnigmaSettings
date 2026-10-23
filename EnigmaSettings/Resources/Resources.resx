@@ -132,9 +132,6 @@
   <data name="Service_ServiceData_Service_data_cannot_be_empty_" xml:space="preserve">
     <value>Service data cannot be empty.</value>
   </data>
-  <data name="SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_" xml:space="preserve">
-    <value>File {0} already exists and could not be deleted!</value>
-  </data>
   <data name="SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigma1__Not_writing_it_" xml:space="preserve">
     <value>Service {0} in bouquet {1} is not supported in Enigma1. Not writing it.</value>
   </data>
@@ -245,9 +242,6 @@
   </data>
   <data name="Settings_LoadSettings_File__0__does_not_exist_" xml:space="preserve">
     <value>File {0} does not exist</value>
-  </data>
-  <data name="Settings_LoadSettings_Invalid_filename_" xml:space="preserve">
-    <value>Invalid filename!</value>
   </data>
   <data name="Settings_Load_Failed_to_load_settings_from__0_" xml:space="preserve">
     <value>Failed to load settings from {0}</value>

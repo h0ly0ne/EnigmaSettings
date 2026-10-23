@@ -111,7 +111,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Bandwidth values</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string Bandwidth
         {
@@ -135,7 +135,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string FECHigh
         {
@@ -159,7 +159,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string FECLow
         {
@@ -183,7 +183,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string Modulation
         {
@@ -207,7 +207,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Transmission types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string Transmission
         {
@@ -231,7 +231,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Guard interval types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string GuardInterval
         {
@@ -255,7 +255,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Hierarchy types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string Hierarchy
         {
@@ -279,7 +279,7 @@ namespace Krkadoni.EnigmaSettings
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
         public string Inversion
         {

@@ -743,77 +743,6 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Reads file content into string array
-        /// </summary>
-        /// <param name="fileName">Full path to file on disk</param>
-        /// <param name="warnEmpty"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <exception cref="ArgumentNullException">Throws ArgumentNullException if fileName is null </exception>
-        /// <exception cref="ArgumentException">Throws ArgumentException if file does not exist</exception>
-        [Obsolete("No longer used by SettingsIO, will be removed in a future version")]
-        protected virtual string ReadText(string fileName, bool warnEmpty = true)
-        {
-            if (fileName == null)
-                throw new ArgumentNullException(nameof(fileName), Resources.Settings_Read_Filename_cannot_be_empty_);
-
-            if (!_fileHelper.Exists(fileName))
-                throw new ArgumentException(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, fileName));
-            OnFileLoading(this, fileName);
-            if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
-
-            var st = new Stopwatch();
-            string fileText;
-            st.Start();
-
-            try
-            {
-                fileText = _fileHelper.ReadAllText(fileName);
-            }
-            catch (Exception ex) when (ex is not SettingsException)
-            {
-                OnFileLoaded(this, fileName, false);
-                throw new SettingsException(string.Format(Resources.Settings_Read_Failed_to_read_file__0__1__2_, fileName, "", ""), ex);
-            }
-
-            st.Stop();
-
-            if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
-
-            if (fileText.Length == 0)
-            {
-                if (warnEmpty)
-                    Log.Warn(string.Format(Resources.Settings_ReadServicesFile_File__0__is_empty_, fileName));
-            }
-            OnFileLoaded(this, fileName, true);
-            return fileText;
-        }
-
-        /// <summary>
-        ///     Checks if file exists on disk, if it does tries to delete it
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <remarks></remarks>
-        /// <exception cref="SettingsException">Throws SettingsException if unable to delete existing file</exception>
-        [Obsolete("No longer used by SettingsIO, will be removed in a future version")]
-        protected virtual void DeleteFileIfExists(string fileName)
-        {
-            if (_fileHelper.Exists(fileName))
-            {
-                try
-                {
-                    _fileHelper.Delete(fileName);
-                    if (Log.IsDebugEnabled) Log.Debug($"Existing file {fileName} successfully deleted");
-                }
-                catch (Exception ex) when (ex is not SettingsException)
-                {
-                    throw new SettingsException(
-                        string.Format(Resources.SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_, fileName), ex);
-                }
-            }
-        }
-
-        /// <summary>
         ///     Writes text to specified file with specified encoding
         /// </summary>
         /// <param name="fileName">Full path to file on disk</param>
@@ -864,6 +793,8 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>True for lamedb formats that carry the extended DVB-S2/T2 fields (v4 and v5).</summary>
+        /// <remarks>v3 is written in the v4 line format as Enigma2 reads it, so the distinction is no longer needed.</remarks>
+        [Obsolete("No longer used by SettingsIO (v3 is written like v4), will be removed in a future version")]
         protected static bool IsVer4OrLater(Enums.SettingsVersion version)
         {
             return version is Enums.SettingsVersion.Enigma2Ver4 or Enums.SettingsVersion.Enigma2Ver5;
@@ -891,39 +822,6 @@ namespace Krkadoni.EnigmaSettings
                     return 5;
                 default:
                     return Convert.ToInt32(version, CultureInfo.InvariantCulture);
-            }
-        }
-
-        /// <summary>
-        ///     Returns bouquet name for known bouquet types
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        [Obsolete("No longer used by SettingsIO, will be removed in a future version")]
-        protected virtual string GetBouquetNameFromFileName(string fileName)
-        {
-            switch (fileName.ToLowerInvariant())
-            {
-                case BlackListFile:
-                    return "blacklist";
-                case WhiteListFile:
-                    return "whitelist";
-                case BouquetsRadioFile:
-                    return "Bouquets (Radio)";
-                case BouquetsTvFile:
-                    return "Bouquets (TV)";
-                case BouquetsFile:
-                    return "bouquets";
-                case UserBouquetRadioEpl:
-                    return "User - bouquets (Radio)";
-                case UserBouquetTvEpl:
-                    return "User - bouquets (TV)";
-                default:
-                    if (fileName.EndsWith(".tv", StringComparison.OrdinalIgnoreCase))
-                        return "TV Bouquet";
-                    
-                    return fileName.EndsWith(".radio", StringComparison.OrdinalIgnoreCase) ? "Radio Bouquet" : string.Empty;
             }
         }
         #endregion

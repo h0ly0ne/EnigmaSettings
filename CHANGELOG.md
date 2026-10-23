@@ -198,8 +198,11 @@
   one list writer per format for TV and radio); `#DESCRIPTION` parsing shared by markers, streams
   and services.
 - `SettingsIO` split into `SettingsIO.cs`, `SettingsIO.Reading.cs` and `SettingsIO.Writing.cs`.
-- `SettingsIO.ReadText`, `DeleteFileIfExists` and `GetBouquetNameFromFileName` are no longer used
-  and marked `[Obsolete]`.
+- `SettingsIO.IsVer4OrLater` is no longer used (v3 is written like v4) and marked `[Obsolete]`.
+- XML documentation of the transponder values refers to the Enigma2 source
+  (`lib/dvb/frontendparms.h`) instead of the forum post the old (partly wrong) value tables came from,
+  which is no longer reachable.
+- Removed 2 more resource strings that are no longer used.
 - Prefix / suffix checks use `StartsWith` / `EndsWith` with `OrdinalIgnoreCase` instead of
   upper-/lower-casing a copy of every line (reading 48 000 bouquet entries: 129 ms / 68 MB →
   112 ms / 59 MB).
@@ -237,6 +240,8 @@
 
 ### Removed (breaking)
 
+- `SettingsIO.ReadText`, `DeleteFileIfExists` and `GetBouquetNameFromFileName` (protected virtual) —
+  no longer used by `SettingsIO`; subclasses that call or override them must use their own code.
 - `ObjectCopier` — it relied on `BinaryFormatter` (removed in .NET 9) and no library type is
   `[Serializable]`, so it threw for every input. Use `ICloneable.Clone()` on the model types.
 

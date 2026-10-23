@@ -194,14 +194,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Invalid filename! ähnelt.
-        /// </summary>
-        public static string Settings_LoadSettings_Invalid_filename_ {
-            get {
-                return ResourceManager.GetString("Settings_LoadSettings_Invalid_filename_", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bouquet service {0} not found in settings ähnelt.
@@ -555,14 +547,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die File {0} already exists and could not be deleted! ähnelt.
-        /// </summary>
-        public static string SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_ {
-            get {
-                return ResourceManager.GetString("SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_", resourceCulture);
-            }
-        }
         
         
         /// <summary>
