@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 
 using Krkadoni.EnigmaSettings.Interfaces;
@@ -39,8 +40,27 @@ namespace Krkadoni.EnigmaSettings
         public void WriteAllText(string path, string contents, Encoding encoding)
         {
             string tempPath = path + ".tmp";
-            File.WriteAllText(tempPath, contents, encoding);
-            File.Move(tempPath, path, true);
+            try
+            {
+                File.WriteAllText(tempPath, contents, encoding);
+                File.Move(tempPath, path, true);
+            }
+            catch
+            {
+                // e.g. read-only target: the original file stays untouched, the temporary copy must not stay behind
+                try
+                {
+                    File.Delete(tempPath);
+                }
+                catch (IOException)
+                {
+                }
+                catch (UnauthorizedAccessException)
+                {
+                }
+
+                throw;
+            }
         }
 
         public Stream OpenRead(string path)

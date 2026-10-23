@@ -29,11 +29,10 @@ namespace Krkadoni.EnigmaSettings
             if (!string.IsNullOrEmpty(strLocalFilenameOverride))
                 fileName = strLocalFilenameOverride;
 
-            if (settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver5)
-            {
-                WriteLameDb5(directory, settings, strLocalFilenameOverride);
-                return;
-            }
+            // Enigma2 only ever loads "lamedb" (the format is taken from its header) and writes lamedb5 as an
+            // additional file, so version 5 is saved the same way: lamedb in version 4 plus lamedb5 next to it
+            bool lameDb5 = settings.SettingsVersion == Enums.SettingsVersion.Enigma2Ver5;
+            int headerVersion = lameDb5 ? GetSettingsVersion(Enums.SettingsVersion.Enigma2Ver4) : GetSettingsVersion(settings.SettingsVersion);
 
             var sContent = new StringBuilder();
             var fi = Path.Combine(directory, fileName);
@@ -41,7 +40,7 @@ namespace Krkadoni.EnigmaSettings
 
             try
             {
-                sContent.Append(SettingsFirstLine + GetSettingsVersion(settings.SettingsVersion) + "/" + "\n");
+                sContent.Append(SettingsFirstLine + headerVersion + "/" + "\n");
                 sContent.Append(TranspondersToString(settings));
                 sContent.Append(ServicesToString(settings));
                 sContent.Append(EditorName + "\n");
@@ -57,6 +56,9 @@ namespace Krkadoni.EnigmaSettings
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, Path.Combine(directory, fileName)), ex);
             }
+
+            if (lameDb5)
+                WriteLameDb5(directory, settings, fileName + "5");
         }
 
         protected virtual string TranspondersToString(ISettings settings)

@@ -4,6 +4,13 @@
 
 ### Fixed
 
+- **A list saved as version 5 was ignored by the receiver.** Enigma2 (OpenPLi, OpenATV) only loads
+  `lamedb` and takes the format from its header; `lamedb5` is never opened, it is only written as an
+  additional file. Saving version 5 now does the same as Enigma2: `lamedb` in version 4 plus `lamedb5`
+  next to it (with a file name override `x`: `x` and `x5`). Previously only `lamedb5` was written, so
+  the receiver kept using its old `lamedb`.
+- `FileHelper` removes its temporary file when writing fails (e.g. read-only target); the original
+  file stays untouched.
 - **Enigma1 `bouquets` file could never be read.** The parser cut the content with an end
   offset computed before an earlier `Substring`, so every E1 list with a `bouquets` file failed
   with `ArgumentOutOfRangeException`. It is now parsed line by line (LF and CRLF).
@@ -211,7 +218,8 @@ service-type / DVB-T modulation enum set.
 
 - **lamedb5 (`eDVB services /5/`)** read and write. It is version-driven: set
   `settings.SettingsVersion = Enums.SettingsVersion.Enigma2Ver5` and `Save(...)`
-  writes a file named `lamedb5`; `Load(...)` of a `/5/` file is auto-detected.
+  writes `lamedb` (version 4) plus `lamedb5` like Enigma2 does (see Unreleased); `Load(...)` of a
+  `/5/` file is auto-detected.
   v4↔v5 conversion is lossless (load one version, set the other, save).
 - `SettingsVersion.Enigma2Ver5`.
 - **Service alternatives** (`#SERVICE 1:134:…:FROM BOUQUET "alternatives.*"`): new
