@@ -143,9 +143,11 @@ namespace Krkadoni.EnigmaSettings
             foreach (var cable in Cables.Where(x => x != null))
                 settings.Cables.Add((IXmlCable)cable.Clone());
 
+            // flat copies plus relinking: the deep Clone() of a transponder / service / bouquet item would copy
+            // satellites, transponders and services again for every single reference
             foreach (var transponder in Transponders.Where(x => x != null))
             {
-                var copy = (ITransponder)transponder.Clone();
+                var copy = (ITransponder)transponder.ShallowCopy();
                 if (transponder is ITransponderDVBS { Satellite: not null } dvbs && satelliteMap.TryGetValue(dvbs.Satellite, out var satellite))
                     ((ITransponderDVBS)copy).Satellite = satellite;
 
@@ -155,7 +157,7 @@ namespace Krkadoni.EnigmaSettings
 
             foreach (var service in Services.Where(x => x != null))
             {
-                var copy = (IService)service.Clone();
+                var copy = (IService)service.ShallowCopy();
                 if (service.Transponder != null && transponderMap.TryGetValue(service.Transponder, out var transponder))
                     copy.Transponder = transponder;
 
@@ -168,9 +170,7 @@ namespace Krkadoni.EnigmaSettings
                 if (bouquetMap.TryGetValue(original, out var mapped))
                     return mapped;
 
-                // items are copied flat (their own Clone() copies services / sub bouquets a second time)
-                // and then pointed to the copies made here
-                var copy = (IBouquet)original.Clone();
+                var copy = (IBouquet)original.ShallowCopy();
                 copy.BouquetItems = original.BouquetItems.Where(x => x != null).Select(x => (IBouquetItem)x.ShallowCopy()).ToList();
                 bouquetMap[original] = copy;
                 RelinkItems(copy);

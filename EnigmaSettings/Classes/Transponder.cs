@@ -73,7 +73,7 @@ namespace Krkadoni.EnigmaSettings
         /// Performs Memberwise Clone on the object
         /// </summary>
         /// <returns></returns>
-        public object Clone()
+        public virtual object Clone()
         {
             return CloneWithoutSubscribers();
         }
@@ -103,6 +103,7 @@ namespace Krkadoni.EnigmaSettings
                     return;
 
                 _nameSpc = value;
+                _transponderId = null;
                 OnPropertyChanged(nameof(NameSpc));
                 OnPropertyChanged(nameof(TransponderId));
             }
@@ -126,6 +127,7 @@ namespace Krkadoni.EnigmaSettings
                     return;
 
                 _tsid = value;
+                _transponderId = null;
                 OnPropertyChanged(nameof(TSID));
                 OnPropertyChanged(nameof(TransponderId));
             }
@@ -149,6 +151,7 @@ namespace Krkadoni.EnigmaSettings
                     return;
 
                 _nid = value;
+                _transponderId = null;
                 OnPropertyChanged(nameof(NID));
                 OnPropertyChanged(nameof(TransponderId));
             }
@@ -192,7 +195,10 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>Returns 1st line of transponder info for services file</returns>
         /// <remarks>Used to match transponder to service</remarks>
         [DataMember]
-        public string TransponderId => string.Join(":", NameSpc, TSID, NID).ToLowerInvariant();
+        public string TransponderId => _transponderId ??= string.Join(":", NameSpc, TSID, NID).ToLowerInvariant();
+
+        // cached, used as join key for every service while loading and matching
+        private string _transponderId;
 
         /// <summary>
         /// Performs MemberwiseClone on current object

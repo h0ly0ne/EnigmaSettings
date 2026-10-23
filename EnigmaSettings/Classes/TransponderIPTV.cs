@@ -64,7 +64,7 @@ namespace Krkadoni.EnigmaSettings
         /// Performs deep Clone on the object
         /// </summary>
         /// <returns></returns>
-        public new object Clone()
+        public override object Clone()
         {
             var transponder = (ITransponderIPTV)CloneWithoutSubscribers();
             return transponder;

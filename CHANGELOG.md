@@ -92,6 +92,13 @@
 - `IFlag.FlagValue` cut values containing `:` (e.g. provider `Sky:DE`).
 - `IService.ServiceId` of a service without transponder had empty fields for zero values
   (`1:::1:c00000`).
+- **Enigma1 cable transponders were not read** (Enigma1 stores them as `s` lines with an `ffff`
+  namespace, only `c` lines were parsed): frequency was `0`, symbol rate `null`, and saving the list
+  failed with a `NullReferenceException`.
+- **Bouquet entries without matching service were dropped on save.** References to services that
+  are not in lamedb (or have no transponder) are written back unchanged, including their
+  `#DESCRIPTION`, like Enigma does. Use `ISettings.RemoveInvalidBouquetItems()` to remove them.
+- `InstanceFactory.InitNewXmlTransponder(ITransponderDVBC)` copies inversion and system.
 
 ### Changed
 
@@ -122,6 +129,18 @@
   `NullReferenceException`).
 - `ISettings.SettingsDirectory` raises `PropertyChanged`.
 - `IXmlSatellite.PositionString` always shows one decimal (`13.0° E`, `0.0° E` instead of `13° E` / `° E`).
+- `Settings.Clone()` copies flat and relinks instead of deep-cloning every reference
+  (48 000 services / 120 bouquets: 808 ms and 2.4 GB allocations before, 36 ms and 23 MB now).
+- `Clone()` of bouquet items and transponders is `virtual` / `override` instead of `new`, so the
+  same (deep) copy is made whether it is called through the class or an interface.
+- `ITransponder.TransponderId` is cached until `NameSpc`, `TSID` or `NID` change.
+- `IService.ServiceType` maps the numeric type directly instead of a 35-case switch.
+- Enigma1 and Enigma2 bouquet writers share one implementation (`BouquetToString`,
+  one list writer per format for TV and radio); `#DESCRIPTION` parsing shared by markers, streams
+  and services.
+- `SettingsIO` split into `SettingsIO.cs`, `SettingsIO.Reading.cs` and `SettingsIO.Writing.cs`.
+- `SettingsIO.ReadText`, `DeleteFileIfExists` and `GetBouquetNameFromFileName` are no longer used
+  and marked `[Obsolete]`.
 
 ### Breaking
 

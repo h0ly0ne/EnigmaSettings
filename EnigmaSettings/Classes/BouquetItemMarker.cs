@@ -54,7 +54,7 @@ namespace Krkadoni.EnigmaSettings
         /// Performs Memberwise Clone on the object
         /// </summary>
         /// <returns></returns>
-        public new object Clone()
+        public override object Clone()
         {
             return CloneWithoutSubscribers();
         }

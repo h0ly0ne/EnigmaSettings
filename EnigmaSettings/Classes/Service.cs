@@ -279,87 +279,10 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         /// <see href="http://msdn.microsoft.com/en-us/library/windows/desktop/dd693747(v=vs.85).aspx">Service types</see>
         [DataMember]
-        public Enums.ServiceType ServiceType
-        {
-            get
-            {
-                switch (Type)
-                {
-                    case "1":
-                        return Enums.ServiceType.Tv;
-                    case "2":
-                        return Enums.ServiceType.Radio;
-                    case "3":
-                        return Enums.ServiceType.Data;
-                    case "0":
-                        return Enums.ServiceType.Reserved0;
-                    case "4":
-                        return Enums.ServiceType.NvodMpeg2Sd;
-                    case "5":
-                        return Enums.ServiceType.NvodTimeShifted;
-                    case "6":
-                        return Enums.ServiceType.Mosaic;
-                    case "7":
-                        return Enums.ServiceType.Reserved7;
-                    case "8":
-                        return Enums.ServiceType.Reserved8;
-                    case "9":
-                        return Enums.ServiceType.Reserved9;
-                    case "10":
-                        return Enums.ServiceType.AcRadio;
-                    case "11":
-                        return Enums.ServiceType.AcMosaic;
-                    case "12":
-                        return Enums.ServiceType.DataBroadcastService;
-                    case "13":
-                        return Enums.ServiceType.ReservedCi;
-                    case "14":
-                        return Enums.ServiceType.RcsMap;
-                    case "15":
-                        return Enums.ServiceType.RcsFls;
-                    case "16":
-                        return Enums.ServiceType.DVBMhp;
-                    case "17":
-                        return Enums.ServiceType.Mpeg2Hd;
-                    case "18":
-                        return Enums.ServiceType.Reserved18;
-                    case "19":
-                        return Enums.ServiceType.Reserved19;
-                    case "20":
-                        return Enums.ServiceType.Reserved20;
-                    case "21":
-                        return Enums.ServiceType.Reserved21;
-                    case "22":
-                        return Enums.ServiceType.AcSdtv;
-                    case "23":
-                        return Enums.ServiceType.AcSdNvodTimeShifted;
-                    case "24":
-                        return Enums.ServiceType.AcSdNvodReference;
-                    case "25":
-                        return Enums.ServiceType.AcHdtv;
-                    case "26":
-                        return Enums.ServiceType.AcHdNvodTimeShifted;
-                    case "27":
-                        return Enums.ServiceType.AcHdNvodReference;
-                    case "28":
-                        return Enums.ServiceType.AcStereoHdtv;
-                    case "29":
-                        return Enums.ServiceType.AcStereoHdNvodTimeShifted;
-                    case "30":
-                        return Enums.ServiceType.AcStereoHdNvodReference;
-                    case "31":
-                        return Enums.ServiceType.Hevc;
-                    case "32":
-                        return Enums.ServiceType.HevcUhd;
-                    case "134":
-                        return Enums.ServiceType.UserDefined134Bskyb;
-                    case "135":
-                        return Enums.ServiceType.UserDefined135Bskyb;
-                    default:
-                        return Enums.ServiceType.Unknown;
-                }
-            }
-        }
+        public Enums.ServiceType ServiceType =>
+            int.TryParse(Type, NumberStyles.Integer, CultureInfo.InvariantCulture, out var code) && code >= 0 && Enum.IsDefined((Enums.ServiceType)code)
+                ? (Enums.ServiceType)code
+                : Enums.ServiceType.Unknown;
 
         /// <summary>
         ///     Service name (2nd line in settings file)

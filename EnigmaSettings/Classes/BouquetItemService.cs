@@ -52,7 +52,7 @@ namespace Krkadoni.EnigmaSettings
         /// Performs deep Clone on the object
         /// </summary>
         /// <returns></returns>
-        public new object Clone()
+        public override object Clone()
         {
             var bis = (IBouquetItemService)CloneWithoutSubscribers();
             bis.Service = (IService)Service?.Clone();

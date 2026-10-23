@@ -58,7 +58,7 @@ namespace Krkadoni.EnigmaSettings
         /// Performs deep Clone on the object
         /// </summary>
         /// <returns></returns>
-        public new object Clone()
+        public override object Clone()
         {
             var transponder = (ITransponderDVBC)CloneWithoutSubscribers();
             return transponder;
@@ -106,6 +106,17 @@ namespace Krkadoni.EnigmaSettings
                     Flags = tFreq[5];
                 if (tFreq.Length > 6)
                     System = tFreq[6];
+            }
+            else if (transponderFrequency.Trim().StartsWith('s'))
+            {
+                // Enigma1 stores cable transponders as satellite lines: s frequency:symbolrate:15:fec:0:inversion
+                Frequency = tFreq[0].Trim().Substring(1).Trim();
+                if (tFreq.Length > 1)
+                    SymbolRate = tFreq[1];
+                if (tFreq.Length > 3)
+                    FEC = tFreq[3];
+                if (tFreq.Length > 5)
+                    Inversion = tFreq[5];
             }
         }
 

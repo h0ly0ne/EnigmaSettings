@@ -1,0 +1,1097 @@
+// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Full license text can be found at http://opensource.org/licenses/MIT
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Krkadoni.EnigmaSettings.Interfaces;
+using static Krkadoni.EnigmaSettings.Enums;
+
+namespace Krkadoni.EnigmaSettings
+{
+    // Reading of lamedb / services, bouquets, whitelist / blacklist and services.locked
+    public partial class SettingsIO
+    {
+        #region "Reading"
+        /// <summary>
+        ///     Reads file content from the disk, parses content, sets version number, initializes new lists of transponders and
+        ///     services
+        /// </summary>
+        /// <param name="fileName">Full path to settings file on the disk</param>
+        /// <remarks>Does not match transponders and services</remarks>
+        protected virtual ISettings ReadSettingsFile(string fileName)
+        {
+            try
+            {
+                ISettings settings = Factory.InitNewSettings();
+                settings.Log = Log;
+                string[] settingsFileLines = Read(fileName);
+                CheckIfSettingsValid(settingsFileLines, fileName);
+                ReadSettingsVersion(settings, settingsFileLines, fileName);
+
+                if (settings.SettingsVersion != Enums.SettingsVersion.Enigma2Ver5)
+                {
+                    ReadTransponders(settings, settingsFileLines, fileName, out var transponderOpenIndex, out var transponderEndIndex);
+                    ReadServices(settings, settingsFileLines, fileName, transponderOpenIndex, transponderEndIndex);
+                }
+                else
+                    ReadLameDb5(settings, settingsFileLines, fileName);
+
+                if (Log.IsDebugEnabled) Log.Debug($"Settings loaded with {settings.Services.Count} services and {settings.Transponders.Count} transponders");
+                return settings;
+            }
+            catch (SettingsException ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_, Environment.NewLine, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        ///     Checks if settings file appears to be valid Enigma settings file
+        /// </summary>
+        /// <param name="settingsFileLines">Content of settings file in string array of lines</param>
+        /// <param name="fileName">Full path to settings file on disk</param>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException">
+        ///     Throws settings exception if settings file does not appear to be valid enigma
+        ///     settings file
+        /// </exception>
+        protected virtual void CheckIfSettingsValid(string[] settingsFileLines, string fileName)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Checking {fileName} to make sure we have valid settings");
+            var fName = Path.GetFileName(fileName);
+
+            if (settingsFileLines == null || settingsFileLines.Length == 0)
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_File__0__is_empty_, fName));
+
+            if (!settingsFileLines[0].StartsWith(SettingsFirstLine, StringComparison.OrdinalIgnoreCase) || !settingsFileLines[0].Trim().EndsWith('/'))
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_File__0__is_not_valid_settings_file_, fName));
+
+            if (Log.IsDebugEnabled) Log.Debug($"File {fName} looks like a valid settings file, checking for version");
+        }
+
+        /// <summary>
+        ///     Reads settings version and sets SettingsVersion property for specified settings instance
+        /// </summary>
+        /// <param name="settings">Instance of ISettings we're setting settings version to</param>
+        /// <param name="settingsFileLines">Content of settings file in string array of lines</param>
+        /// <param name="fileName">Full path to settings file on disk</param>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException">Throws SettingsException if settings version can't be determined</exception>
+        protected virtual void ReadSettingsVersion(ISettings settings, string[] settingsFileLines, string fileName)
+        {
+            Log.Debug("Looking for settings version");
+            var fName = Path.GetFileName(fileName);
+            var sVersion = settingsFileLines[0].ToLowerInvariant().Trim().Replace(SettingsFirstLine.ToLowerInvariant(), "").TrimEnd('/');
+
+            if (!int.TryParse(sVersion, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_File__0__is_not_valid_settings_file_, fName));
+
+            settings.SettingsVersion = GetSettingsVersion(sVersion);
+
+            if (settings.SettingsVersion == Enums.SettingsVersion.Unknown)
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_Unsuported_settings_version__0_, sVersion));
+            
+            if (Log.IsDebugEnabled) Log.Debug($"Found settings version {settings.SettingsVersion}");
+        }
+
+        /// <summary>
+        ///     Reads transponders from specified lines and adds them to specified instance of ISettings
+        /// </summary>
+        /// <param name="settings">Instance of ISettings we're adding transponders to</param>
+        /// <param name="settingsFileLines">Content of settings file in string array of lines</param>
+        /// <param name="fileName">Full path to settings file on disk</param>
+        /// <param name="transponderOpenIndex">Returns line number of transponder open tag</param>
+        /// <param name="transponderEndIndex">Returns line number of transponder end tag</param>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException">Throws SettingsException if there's no transponder open tag</exception>
+        protected virtual void ReadTransponders(ISettings settings, string[] settingsFileLines, string fileName, out int transponderOpenIndex, out int transponderEndIndex)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Reading transponders from {fileName}");
+
+            //search for the beginning of transponder section
+            transponderOpenIndex = -1;
+            transponderEndIndex = -1;
+            var sCount = settingsFileLines.Length;
+
+            for (var i = 1; i <= sCount - 1; i++)
+            {
+                if (settingsFileLines[i].Trim() != SettingsTransponderOpenTag) continue;
+                transponderOpenIndex = i;
+                break;
+            }
+
+            if (transponderOpenIndex == -1)
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_No__transponder__tag_was_found_in__0_, Path.GetFileName(fileName)));
+
+            if (Log.IsDebugEnabled) Log.Debug($"Transponder section found at line {transponderOpenIndex + 1}");
+
+            //reading transponders, each entry spans 3 lines (id, data, "/")
+            for (var i = transponderOpenIndex + 1; i < sCount; i += 3)
+            {
+                if (settingsFileLines[i].Trim() != SettingsClosingTag)
+                {
+                    if (i + 1 >= sCount || settingsFileLines[i + 1].Trim().Length == 0)
+                    {
+                        Log.Warn($"Incomplete transponder entry at line {i + 1} ignored");
+                        break;
+                    }
+
+                    switch (char.ToLowerInvariant(settingsFileLines[i + 1].Trim()[0]))
+                    {
+                        case 's':
+                        {
+                            // DVBT & DVBC transponders in Enigma1 are saved as satellite transponders
+                            if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
+                            {
+                                if (settingsFileLines[i].ToLowerInvariant().StartsWith("ffff", StringComparison.Ordinal))
+                                    AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+                                else if (settingsFileLines[i].ToLowerInvariant().StartsWith("eeee", StringComparison.Ordinal))
+                                    AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+                                else if (settingsFileLines[i].ToLowerInvariant().StartsWith("0000", StringComparison.Ordinal))
+                                    AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+                                else
+                                    AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+                            }
+                            else
+                            {
+                                if (settingsFileLines[i].ToLowerInvariant().StartsWith("0000", StringComparison.Ordinal))
+                                    AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+                                else
+                                    AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+                            }
+
+                            break;
+                        }
+                        case 't':
+                        {
+                            AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+
+                            break;
+                        }
+                        case 'c':
+                        {
+                            AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+
+                            break;
+                        }
+                        default:
+                        {
+                            Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, settingsFileLines[i], settingsFileLines[i + 1]));
+                            AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    //we have reached the end of transponders part
+                    if (Log.IsDebugEnabled) Log.Debug($"Transponder section ends at line {i + 1}");
+                    transponderEndIndex = i;
+                    return;
+                }
+            }
+
+            Log.Debug("Transponder section has no end tag");
+        }
+
+        /// <summary>
+        ///     Reads services from specified lines and adds them to specified instance of ISettings
+        /// </summary>
+        /// <param name="settings">Instance of ISettings we're adding transponders to</param>
+        /// <param name="settingsFileLines">Content of settings file in string array of lines</param>
+        /// <param name="fileName">Full path to settings file on disk</param>
+        /// <param name="transponderOpenIndex">Line number of transponder open tag</param>
+        /// <param name="transponderEndIndex">Line number of transponder end tag</param>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException">Throws SettingsException if there's no services open tag</exception>
+        protected virtual void ReadServices(ISettings settings, string[] settingsFileLines, string fileName, int transponderOpenIndex, int transponderEndIndex)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Reading services from {fileName}");
+
+            //search for the beginning of services section after transponders section
+            var servicesOpenIndex = -1;
+            var sCount = settingsFileLines.Length;
+
+            for (var i = transponderEndIndex + 1; i <= sCount - 1; i++)
+            {
+                if (settingsFileLines[i].Trim() != SettingsServicesOpenTag)
+                    continue;
+
+                servicesOpenIndex = i;
+                break;
+            }
+
+            if (servicesOpenIndex == -1)
+                throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_No__services__tag_was_found_in_file__0_, Path.GetFileName(fileName)));
+
+            if (Log.IsDebugEnabled) Log.Debug($"Services section found at line {servicesOpenIndex + 1}");
+
+            //reading services, each entry spans 3 lines (id, name, flags)
+            var debug = Log.IsDebugEnabled;
+            for (int i = servicesOpenIndex + 1; i + 2 < sCount; i += 3)
+            {
+                if (settingsFileLines[i].Trim() == SettingsClosingTag)
+                    break;
+
+                var line1 = settingsFileLines[i];
+                var line2 = settingsFileLines[i + 1];
+                var line3 = settingsFileLines[i + 2];
+                if (debug)
+                    Log.Debug($"Initializing new service {line1}    {line2}    {line3}");
+                settings.Services.Add(Factory.InitNewService(line1, line2, line3));
+            }
+
+            Log.Debug("Services read sucessfully");
+        }
+
+        /// <summary>
+        ///     Initializes new DVBT transponder and adds it to specified ISettings instance
+        /// </summary>
+        /// <param name="settings">ISettings instance we're adding transponder to</param>
+        /// <param name="firstLine">First line of transponder data from settings file</param>
+        /// <param name="secondLine">Second line of transponder data from settings file</param>
+        /// <remarks></remarks>
+        protected virtual void AddTransponderDVBT(ISettings settings, string firstLine, string secondLine)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new terrestrial transponder {firstLine} {secondLine}");
+            settings.Transponders.Add(Factory.InitNewTransponderDVBT(firstLine, secondLine));
+        }
+
+        /// <summary>
+        ///     Initializes new DVBC transponder and adds it to specified ISettings instance
+        /// </summary>
+        /// <param name="settings">ISettings instance we're adding transponder to</param>
+        /// <param name="firstLine">First line of transponder data from settings file</param>
+        /// <param name="secondLine">Second line of transponder data from settings file</param>
+        /// <remarks></remarks>
+        protected virtual void AddTransponderDVBC(ISettings settings, string firstLine, string secondLine)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new cable transponder {firstLine} {secondLine}");
+            settings.Transponders.Add(Factory.InitNewTransponderDVBC(firstLine, secondLine));
+        }
+
+        /// <summary>
+        ///     Initializes new DVBS transponder and adds it to specified ISettings instance
+        /// </summary>
+        /// <param name="settings">ISettings instance we're adding transponder to</param>
+        /// <param name="firstLine">First line of transponder data from settings file</param>
+        /// <param name="secondLine">Second line of transponder data from settings file</param>
+        /// <remarks></remarks>
+        protected virtual void AddTransponderDVBS(ISettings settings, string firstLine, string secondLine)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new satellite transponder {firstLine} {secondLine}");
+            settings.Transponders.Add(Factory.InitNewTransponderDVBS(firstLine, secondLine));
+        }
+
+        /// <summary>
+        ///     Initializes new IPTV transponder and adds it to specified ISettings instance
+        /// </summary>
+        /// <param name="settings">ISettings instance we're adding transponder to</param>
+        /// <param name="firstLine">First line of transponder data from settings file</param>
+        /// <param name="secondLine">Second line of transponder data from settings file</param>
+        /// <remarks></remarks>
+        protected virtual void AddTransponderIPTV(ISettings settings, string firstLine, string secondLine)
+        {
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new iptv transponder {firstLine} {secondLine}");
+            settings.Transponders.Add(Factory.InitNewTransponderIPTV(firstLine, secondLine));
+        }
+
+        /// <summary>
+        ///     Reads bouquet from disk and parses content. Goes recursively if bouquet has other bouquets as items.
+        /// </summary>
+        /// <param name="fileName">Full path to file on disk</param>
+        /// <param name="settings"></param>
+        /// <returns>Nothing if bouquet type is unknown. Type is recognized from filename</returns>
+        /// <remarks>Adds bouquet to Bouquets list if not already in it, otherwise updates existing</remarks>
+        protected virtual IFileBouquet ReadFileBouquet(string fileName, ref ISettings settings)
+        {
+            bool ownsContext = _bouquetReadContext == null;
+            if (ownsContext)
+                _bouquetReadContext = new BouquetReadContext();
+
+            string fullPath = Path.GetFullPath(fileName);
+            try
+            {
+                // every bouquet file is read once per load: a second reference gets the same instance
+                // and a reference back to a bouquet that is still being read (a cycle) is not followed
+                if (_bouquetReadContext.Read.TryGetValue(fullPath, out var alreadyRead))
+                {
+                    if (!_bouquetReadContext.InProgress.Contains(fullPath))
+                        return alreadyRead;
+
+                    Log.Warn($"Bouquet {Path.GetFileName(fileName)} references itself (directly or through sub bouquets), reference ignored");
+                    return null;
+                }
+
+                IFileBouquet bqt = Factory.InitNewFileBouquet();
+                string fName = Path.GetFileName(fileName);
+                bqt.FileName = fName;
+
+                //do not read bouquets that have their own methods for reading
+                if (bqt.BouquetType == Enums.BouquetType.E1Bouquets || string.Equals(fName, WhiteListFile, StringComparison.OrdinalIgnoreCase) || string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(fName, ServicesLockedFile, StringComparison.OrdinalIgnoreCase))
+                {
+                    Log.Warn($"File {fName} is not a bouquet file, not reading it as bouquet");
+                    return null;
+                }
+
+                //do not read unknown bouquet types
+                if (bqt.BouquetType == Enums.BouquetType.Unknown)
+                {
+                    Log.Warn(string.Format(Resources.Settings_ReadBouquets_File__0__is_unknown_bouquet_type, fName));
+                    return null;
+                }
+
+                if (!_fileHelper.Exists(fileName))
+                {
+                    Log.Warn(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, fName));
+                    return null;
+                }
+                IFileBouquet existing =
+                    settings.Bouquets.OfType<IFileBouquet>()
+                        .FirstOrDefault(x => String.Equals(x.FileName, fName, StringComparison.Ordinal));
+                if (existing != null)
+                {
+                    bqt = existing;
+                    existing.BouquetItems.Clear();
+                }
+                else
+                {
+                    if (bqt.BouquetType != Enums.BouquetType.Unknown
+                        && !string.Equals(fName, BouquetsTvFile, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(fName, BouquetsRadioFile, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(fName, UserBouquetTvEpl, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(fName, UserBouquetRadioEpl, StringComparison.OrdinalIgnoreCase)
+                        && !fName.ToLowerInvariant().StartsWith("alternatives.", StringComparison.Ordinal))
+                    {
+                        settings.Bouquets.Add(bqt);
+                    }
+                }
+
+                _bouquetReadContext.Read[fullPath] = bqt;
+                _bouquetReadContext.InProgress.Add(fullPath);
+
+                if (Log.IsDebugEnabled) Log.Debug($"Reading bouquet {bqt.FileName}");
+                string[] bouquetLines = Read(fileName, true);
+
+                if (bouquetLines == null || !bouquetLines.Any())
+                {
+                    Log.Warn(string.Format(Resources.Settings_ReadBouquet_Bouquet__0__is_empty, bqt.FileName));
+                }
+                else
+                {
+                    string dir = Path.GetDirectoryName(fileName);
+                    var cnt = bouquetLines.Length;
+                    for (int i = 0; i <= cnt - 1; i++)
+                    {
+                        string line = bouquetLines[i];
+                        if (line.Trim().Length > 0)
+                        {
+                            DetectAndReadReference(dir, ref bqt, bouquetLines, i, settings);
+                        }
+                    }
+                    if (Log.IsDebugEnabled) Log.Debug($"Bouquet {bqt.FileName} successfully parsed with {cnt} items");
+                }
+                return bqt;
+            }
+            catch (SettingsException ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(string.Format(Resources.Settings_ReadBouquet_Failed_to_read_bouquet__0_, Path.GetFileName(fileName)), ex);
+            }
+            finally
+            {
+                _bouquetReadContext?.InProgress.Remove(fullPath);
+                if (ownsContext)
+                    _bouquetReadContext = null;
+            }
+        }
+
+        /// <summary>
+        ///     Bouquet files read during the current load (per thread, so parallel loads don't interfere)
+        /// </summary>
+        private sealed class BouquetReadContext
+        {
+            public readonly Dictionary<string, IFileBouquet> Read = new(StringComparer.OrdinalIgnoreCase);
+            public readonly HashSet<string> InProgress = new(StringComparer.OrdinalIgnoreCase);
+            public readonly HashSet<string> Listed = new(StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        ///     True for the files that list the top level bouquets (bouquets.tv/.radio, userbouquets.*.epl)
+        /// </summary>
+        protected static bool IsBouquetList(string fileName)
+        {
+            string name = Path.GetFileName(fileName);
+            return string.Equals(name, BouquetsTvFile, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, BouquetsRadioFile, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, UserBouquetTvEpl, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(name, UserBouquetRadioEpl, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [ThreadStatic]
+        private static BouquetReadContext _bouquetReadContext;
+
+        /// <summary>
+        ///     Determines type of line and initializes corresponding bouquet item type
+        /// </summary>
+        /// <param name="folder">Directory with all the settings files</param>
+        /// <param name="bouquet">Parent bouquet that this item belongs to</param>
+        /// <param name="bouquetLines">Bouquet file content as string array</param>
+        /// <param name="index">Index of the current bouquet line</param>
+        /// <param name="settings">Reference to existing settings instance</param>
+        /// <remarks></remarks>
+        protected virtual void DetectAndReadReference(string folder, ref IFileBouquet bouquet, string[] bouquetLines, int index, ISettings settings)
+        {
+            string line = bouquetLines[index];
+            string description = string.Empty;
+            int bCount = bouquetLines.Length;
+            string nextLine = index < (bCount - 1) ? bouquetLines[index + 1] : string.Empty;
+            if (nextLine.ToUpperInvariant().StartsWith("#DESCRIPTION", StringComparison.Ordinal))
+                description = bouquetLines[index + 1];
+
+            if (line.StartsWith("#NAME", StringComparison.Ordinal))
+            {
+                bouquet.Name = line.Substring(line.Length >= 6 ? 6 : 5);
+                if (Log.IsDebugEnabled) Log.Debug($"Found bouquet NAME: {line}");
+            }
+            else if (line.StartsWith("#SERVICE", StringComparison.Ordinal))
+            {
+                string serviceData = line.Length > 9 ? line.Substring(9).Trim() : string.Empty;
+                string[] sData = serviceData.Split(':');
+
+                if (sData.Length < 2 || !int.TryParse(sData[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var lineSpecifier))
+                {
+                    Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, Path.Combine(folder, bouquet.Name ?? string.Empty)));
+                    return;
+                }
+
+                string favoritesType = sData[0];
+                var lineType = (Enums.LineSpecifier)lineSpecifier;
+                bool isDirectory = DirectoryLineSpecifiers.Contains(lineSpecifier) || favoritesType == FavoritesTypeFile;
+
+                if (lineType == Enums.LineSpecifier.Unknown || favoritesType == FavoritesTypeUnknown)
+                    Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, Path.Combine(folder, bouquet.Name ?? string.Empty)));
+                else if ((isDirectory || lineType == Enums.LineSpecifier.Alternative) && sData.Length < 11)
+                    Log.Warn(string.Format(Resources.Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_, Path.GetFileName(bouquet.FileName), line));
+                else if (isDirectory)
+                {
+                    if (Log.IsDebugEnabled) Log.Debug($"Found (sub)directory item {sData[10]}");
+                    var tmpName = sData[10];
+
+                    //workaround for FROM BOUQUET "userbouquet.dbe01.radio" ORDER BY bouquet
+                    if (tmpName.IndexOf('"') > -1)
+                    {
+                        Log.Debug("Non standard bouquet name, try to workaround it");
+                        tmpName = tmpName.Substring(tmpName.IndexOf('"') + 1);
+                        tmpName = tmpName.Substring(0, tmpName.IndexOf('"'));
+                        tmpName = tmpName.Trim();
+                        sData[10] = tmpName;
+                        if (Log.IsDebugEnabled) Log.Debug($"Workaround completed with result {tmpName}");
+                    }
+                    string fName = Path.GetFileName(sData[10]);
+
+                    IFileBouquet subBqt = ReadFileBouquet(Path.Combine(folder, fName), ref settings);
+
+                    if (subBqt != null)
+                    {
+                        if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
+                            subBqt.FileName = sData[10];
+
+                        if (lineType == Enums.LineSpecifier.Hidden)
+                            subBqt.Hidden = true;
+
+                        // listed in bouquets.tv / .radio (or E1 userbouquets.*.epl) wins over being referenced
+                        // from another bouquet, whichever is read first
+                        string subPath = Path.GetFullPath(Path.Combine(folder, fName));
+                        if (IsBouquetList(bouquet.FileName))
+                        {
+                            subBqt.IsSubBouquet = false;
+                            _bouquetReadContext?.Listed.Add(subPath);
+                        }
+                        else if (_bouquetReadContext == null || !_bouquetReadContext.Listed.Contains(subPath))
+                        {
+                            subBqt.IsSubBouquet = true;
+                        }
+
+                        IBouquetItemFileBouquet bib = Factory.InitNewBouquetItemFileBouquet(subBqt);
+                        bib.FavoritesTypeFlag = sData[0];
+                        bib.LineSpecifierFlag = sData[1];
+                        bouquet.BouquetItems.Add(bib);
+                        if (Log.IsDebugEnabled) Log.Debug($"Bouquet {Path.GetFileName(sData[10])} added as bouquet item to bouquet {bouquet.Name} ");
+                    }
+                    else
+                    {
+                        Log.Warn(string.Format(Resources.Settings_ReadBouquet_Bouquet__0__in_bouquet__1__is_of_unknown_type, Path.GetFileName(sData[10]),
+                            bouquet.Name));
+                    }
+                }
+                else
+                    switch (lineType)
+                    {
+                        case Enums.LineSpecifier.Marker:
+                            {
+                                IBouquetItemMarker bqim = ReadMarkerReference(line, description);
+
+                                if (bqim != null)
+                                {
+                                    bouquet.BouquetItems.Add(bqim);
+                                    if (Log.IsDebugEnabled) Log.Debug($"Marker {bqim.Description} added to bouquet {bouquet.Name}");
+                                }
+                                else
+                                    Log.Warn($"Invalid marker {line} not added to bouquet {bouquet.Name}");
+                            }
+                            break;
+                        case Enums.LineSpecifier.Space:
+                            {
+                                IBouquetItemMarker bqim = ReadMarkerReference(line, description);
+
+                                if (bqim != null)
+                                {
+                                    bouquet.BouquetItems.Add(bqim);
+                                    if (Log.IsDebugEnabled) Log.Debug($"Spacer entry preserved in bouquet {bouquet.Name}");
+                                }
+                            }
+                            break;
+                        case Enums.LineSpecifier.Alternative:
+                            {
+                                var altTmp = sData[10];
+
+                                if (altTmp.IndexOf('"') > -1)
+                                {
+                                    altTmp = altTmp.Substring(altTmp.IndexOf('"') + 1);
+                                    altTmp = altTmp.Substring(0, altTmp.IndexOf('"')).Trim();
+                                }
+
+                                string altFile = Path.GetFileName(altTmp);
+
+                                IFileBouquet altBqt = ReadFileBouquet(Path.Combine(folder, altFile), ref settings);
+
+                                if (altBqt != null)
+                                {
+                                    IBouquetItemAlternative bia = Factory.InitNewBouquetItemAlternative(altBqt);
+                                    bia.FavoritesTypeFlag = sData[0];
+                                    bia.LineSpecifierFlag = sData[1];
+                                    bouquet.BouquetItems.Add(bia);
+                                    if (Log.IsDebugEnabled) Log.Debug($"Alternative {altFile} added to bouquet {bouquet.Name}");
+                                }
+                                else
+                                    Log.Warn($"Alternative {altFile} in bouquet {bouquet.Name} could not be read");
+                            }
+                            break;
+                        case Enums.LineSpecifier.NormalService:
+                            if (_streamFavoritesTypes.Contains(favoritesType) || (sData.Length > 10 && sData[10].Contains("//", StringComparison.Ordinal)) || sData.Length == 12)
+                            {
+                                //it is a stream
+                                IBouquetItemStream bqis = ReadStreamReference(line, description);
+                                if (bqis != null)
+                                {
+                                    bouquet.BouquetItems.Add(bqis);
+                                    if (description.Length == 0)
+                                       Log.Warn(string.Format(Resources.Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description, bouquet.Name, bqis.Description));
+                                    else
+                                        if (Log.IsDebugEnabled) Log.Debug($"Stream service {bqis.Description} added to bouquet {bouquet.Name}");
+                                }
+                                else
+                                    Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
+                            }
+                            else
+                            {
+                                //it is a regular DVB service
+                                IBouquetItemService bqis = ReadServiceReference(line);
+                                if (bqis != null)
+                                {
+                                    bqis.Description = StripDescriptionTag(description);
+                                    bouquet.BouquetItems.Add(bqis);
+                                    if (Log.IsDebugEnabled) Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
+                                }
+                                else
+                                    Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
+                            }
+                            break;
+                    }
+            }
+            else if (line.StartsWith("#TYPE", StringComparison.Ordinal))
+            {
+            }
+            else if (line.StartsWith("#DESCRIPTION", StringComparison.Ordinal))
+            {
+            }
+            else if (line.StartsWith('/'))
+            {
+            }
+            else
+                Log.Warn(string.Format(Resources.Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_, Path.GetFileName(bouquet.FileName), line));
+        }
+
+        /// <summary>
+        ///     Text of a #DESCRIPTION line without the tag (with or without colon)
+        /// </summary>
+        protected static string StripDescriptionTag(string descriptionLine)
+        {
+            if (string.IsNullOrEmpty(descriptionLine))
+                return string.Empty;
+
+            if (descriptionLine.StartsWith("#DESCRIPTION:", StringComparison.OrdinalIgnoreCase))
+                return descriptionLine.Substring(13).Trim();
+
+            return descriptionLine.StartsWith("#DESCRIPTION", StringComparison.OrdinalIgnoreCase) ? descriptionLine.Substring(12).Trim() : descriptionLine.Trim();
+        }
+
+        /// <summary>
+        ///     Initializes new IBouquetItemService object from bouquet-line
+        /// </summary>
+        /// <param name="bouquetLine">Line from bouquet file including #SERVICE tag</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException"></exception>
+        protected virtual IBouquetItemService ReadServiceReference(string bouquetLine)
+        {
+            try
+            {
+                if (bouquetLine.StartsWith("#SERVICE", StringComparison.Ordinal))
+                    bouquetLine = bouquetLine.Substring(9).Trim();
+
+                return Factory.InitNewBouquetItemService(bouquetLine);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(string.Format(Resources.SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_, bouquetLine), ex);
+            }
+        }
+
+        /// <summary>
+        ///     Initializes new IBouquetItemMarker object from bouquet-line
+        /// </summary>
+        /// <param name="bouquetLine">Line from bouquet file including #SERVICE tag</param>
+        /// <param name="description">Text of the marker visible in settings</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException"></exception>
+        protected virtual IBouquetItemMarker ReadMarkerReference(string bouquetLine, string description)
+        {
+            try
+            {
+                if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
+                    bouquetLine = bouquetLine.Substring(9).Trim();
+                description = StripDescriptionTag(description);
+                string[] sData = bouquetLine.Split(':');
+                IBouquetItemMarker bqim = Factory.InitNewBouquetItemMarker(description, sData[2]);
+                bqim.FavoritesTypeFlag = sData[0];
+                bqim.LineSpecifierFlag = sData[1];
+                return bqim;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(string.Format(Resources.SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_,
+                    bouquetLine), ex);
+            }
+        }
+
+        /// <summary>
+        ///     Initializes new IBouquetItemStream object from bouquet-line
+        /// </summary>
+        /// <param name="bouquetLine">Line from bouquet file including #SERVICE tag</param>
+        /// <param name="description">Text of the stream service visible in settings</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        /// <exception cref="SettingsException"></exception>
+        protected virtual IBouquetItemStream ReadStreamReference(string bouquetLine, string description)
+        {
+            try
+            {
+                if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
+                    bouquetLine = bouquetLine.Substring(9).Trim();
+                description = StripDescriptionTag(description);
+                string[] sData = bouquetLine.Split(':');
+                if (description.Length == 0 && sData.Length > 11)
+                {
+                    description = Uri.UnescapeDataString(sData[11]);
+                }
+                IBouquetItemStream bqis = Factory.InitNewBouquetItemStream(bouquetLine, description);
+                bqis.FavoritesTypeFlag = sData[0];
+                bqis.LineSpecifierFlag = sData[1];
+                return bqis;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(string.Format(
+                    Resources.SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_, bouquetLine), ex);
+            }
+        }
+
+        /// <summary>
+        ///     Reads bouquets file from Enigma1
+        /// </summary>
+        /// <param name="fileName">Full path to file on disk</param>
+        /// <param name="settings"></param>
+        /// <returns>bouquets Bouquet with other bouquets as bouquet items</returns>
+        /// <remarks></remarks>
+        protected virtual IFileBouquet ReadE1Bouquets(string fileName, ref ISettings settings)
+        {
+            Log.Debug("Reading Enigma1 bouquets file");
+
+            try
+            {
+                IFileBouquet bqt = Factory.InitNewFileBouquet();
+                bqt.FileName = BouquetsFile;
+                bqt.Name = BouquetsFile;
+
+                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
+                if (existing != null)
+                {
+                    bqt = existing;
+                    existing.BouquetItems.Clear();
+                }
+                else
+                {
+                    settings.Bouquets.Add(bqt);
+                }
+
+                string[] fileLines = Read(fileName);
+
+                //search for the beginning of bouquets (first line is the header)
+                int openIndex = Array.FindIndex(fileLines, 1, x => x.Trim() == BouquetsOpenTag);
+                if (openIndex == -1)
+                {
+                    Log.Warn(string.Format(Resources.Settings_ReadBouquet_No___0___tag_was_found_in_file__1_, BouquetsOpenTag, bqt.FileName));
+                    return bqt;
+                }
+
+                int endIndex = Array.FindIndex(fileLines, openIndex + 1, x => x.Trim() == SettingsClosingTag);
+                if (endIndex == -1)
+                {
+                    Log.Warn(string.Format(Resources.Settings_ReadBouquet_No___0___tag_was_found_in_file__1_, SettingsClosingTag, bqt.FileName));
+                    endIndex = fileLines.Length;
+                }
+
+                //every bouquet is: order number, name, services..., "/"
+                var block = new List<string>();
+                for (int i = openIndex + 1; i < endIndex; i++)
+                {
+                    string l = fileLines[i].Trim();
+                    if (l != "/")
+                    {
+                        if (l.Length > 0)
+                            block.Add(l);
+                        continue;
+                    }
+
+                    AddE1Bouquet(bqt, block, fileName);
+                    block.Clear();
+                }
+
+                return bqt;
+            }
+            catch (SettingsException ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(Resources.SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_, ex);
+            }
+        }
+
+        /// <summary>
+        ///     Adds one Enigma1 bouquet (order number, name, service lines) to the bouquets bouquet
+        /// </summary>
+        private void AddE1Bouquet(IFileBouquet bouquets, List<string> block, string fileName)
+        {
+            if (block.Count < 2)
+                return;
+
+            string orderNumber = block[0];
+            string name = block[1];
+
+            if (!int.TryParse(orderNumber, NumberStyles.Integer, CultureInfo.InvariantCulture, out var order)
+                && !int.TryParse(orderNumber, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out order))
+            {
+                Log.Warn($"Invalid order number {orderNumber} for Enigma1 bouquet {name} in {fileName}, using 0");
+                order = 0;
+            }
+
+            IBouquetsBouquet bq = Factory.InitNewBouquetsBouquet();
+            bq.Name = name;
+            IBouquetItemBouquetsBouquet bib = Factory.InitNewBouquetItemBouquetsBouquet(bq);
+            bib.BouquetOrderNumberInt = order;
+            bouquets.BouquetItems.Add(bib);
+            if (Log.IsDebugEnabled) Log.Debug($"Found Enigma1 bouquet {name} in {fileName}");
+
+            for (int i = 2; i < block.Count; i++)
+            {
+                if (block[i].Split(':').Length >= 5)
+                {
+                    bq.BouquetItems.Add(Factory.InitNewBouquetItemService(block[i]));
+                    if (Log.IsDebugEnabled)
+                        Log.Debug($"Added service {block[i]} to Enigma1 bouquet {name}");
+                }
+                else
+                {
+                    Log.Warn(string.Format(Resources.Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_like_regular_service, block[i], name));
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Reads Enigma2 whitelist and blacklist file and marks corresponding services as black/white listed
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="settings"></param>
+        /// <remarks>Should be called last when loading settings </remarks>
+        /// <exception cref="ArgumentNullException">Throws ArgumentNullException if file info is null</exception>
+        /// <exception cref="SettingsException">Throws settingsException</exception>
+        protected virtual void ReadBlackWhiteList(string fileName, ref ISettings settings)
+        {
+            var sLocked = new List<IBouquetItemService>();
+
+            if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
+            {
+                return;
+            }
+            if (fileName == null)
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
+            if (!_fileHelper.Exists(fileName))
+            {
+                return;
+            }
+
+            var fName = Path.GetFileName(fileName);
+
+            string[] bouquetFileLines = Read(fileName);
+            sLocked.AddRange(bouquetFileLines.Where(x => x.Trim().Length > 0).Select(ReadServiceReference).Where(bqis => bqis != null));
+
+            if (!sLocked.Any()) return;
+            bool blackListed = (string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase));
+
+            //matching  services
+            try
+            {
+                Log.Debug(!blackListed ? "Matching whitelisted services." : "Matching blacklisted services.");
+
+                var query = settings.Services.Join(sLocked, srv => srv.ServiceId, bi => bi.ServiceId, (srv, x) => new
+                {
+                    Service = srv,
+                    LockedBouquetItem = x
+                }, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var match in query.ToList())
+                {
+                    if (blackListed)
+                    {
+                        match.Service.ServiceSecurity = Enums.ServiceSecurity.BlackListed;
+                        if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as BLACKLISTED");
+                    }
+                    else
+                    {
+                        match.Service.ServiceSecurity = Enums.ServiceSecurity.WhiteListed;
+                        if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as WHITELISTED");
+                    }
+                    sLocked.Remove(match.LockedBouquetItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
+            }
+
+            //logging items that are not matched
+            foreach (IBouquetItemService bi in sLocked)
+            {
+                Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service, bi.ServiceId));
+            }
+        }
+
+        /// <summary>
+        ///     Reads Enigma1 services.locked file and marks bouquets and services as locked
+        /// </summary>
+        /// <param name="fileName">Full path to file on disk</param>
+        /// <param name="settings">Settings with already loaded services and bouquets</param>
+        /// <remarks>Should be last function to call when loading Settings</remarks>
+        protected virtual void ReadServicesLocked(string fileName, ref ISettings settings)
+        {
+            Log.Debug("Reading services.locked file");
+            var sLocked = new List<IBouquetItem>();
+            try
+            {
+                string[] lockedLines = Read(fileName);
+                int lineNumber = 0;
+                foreach (string line in lockedLines)
+                {
+                    lineNumber += 1;
+                    if (lineNumber <= 1) continue;
+                    if (string.IsNullOrEmpty(line) || line.Split(':').Length < 10)
+                    {
+                        Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Invalid_line__0__found_in__1_, line, fileName));
+                    }
+                    else
+                    {
+                        string[] sData = line.Split(':');
+                        IBouquetItemService srv = Factory.InitNewBouquetItemService(line);
+
+                        if (srv.LineSpecifierType == Enums.LineSpecifier.Unknown)
+                        {
+                            Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, fileName));
+                        }
+                        else if (srv.LineSpecifierType.ToString().ToLowerInvariant().StartsWith("isdirectory", StringComparison.Ordinal))
+                        {
+                            if (Log.IsDebugEnabled) Log.Debug($"Found reference to locked bouquet {line} in {fileName}");
+                            try
+                            {
+                                int orderNumber = Int32.Parse(sData[4], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                                sLocked.Add(Factory.InitNewBouquetItemBouquetsBouquet(orderNumber));
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Warn(
+                                    string.Format(
+                                        Resources
+                                            .SettingsIO_ReadServicesLocked_Unable_to_parse_bouquet_order_number__0__to_integer_for_bouquet__1__on_line__2_,
+                                        sData[4], fileName, line));
+                                Log.Warn(ex.ToString());
+                            }
+                        }
+                        else if (srv.LineSpecifierType == Enums.LineSpecifier.NormalService)
+                        {
+                            sLocked.Add(srv);
+                            if (Log.IsDebugEnabled) Log.Debug($"Found reference to locked service {line} in {fileName}");
+                        }
+                        else
+                        {
+                            Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Unsupported_type__0__found_in_line__1__in_file__2_,
+                                srv.LineSpecifierType, line, fileName));
+                        }
+                    }
+                }
+            }
+            catch (SettingsException ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(Resources.SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file, ex);
+            }
+
+            Log.Debug("All items from services.locked loaded.");
+            if (!sLocked.Any())
+                return;
+
+            IFileBouquet bouquets = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => x.BouquetType == Enums.BouquetType.E1Bouquets);
+
+            //matching locked bouquets by order number
+            try
+            {
+                if (bouquets != null)
+                {
+                    Log.Debug("Matching locked bouquets.");
+                    IList<IBouquetItemBouquetsBouquet> bis = bouquets.BouquetItems.OfType<IBouquetItemBouquetsBouquet>().ToList();
+                    var query = bis.Join(sLocked.OfType<IBouquetItemBouquetsBouquet>().ToList(), bs => bs.BouquetOrderNumber,
+                        x => x.BouquetOrderNumber, (bs, x) => new
+                        {
+                            BouquetsBouquetItem = bs,
+                            LockedBouquetItem = x
+                        }, StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var match in query.ToList())
+                    {
+                        if (match.BouquetsBouquetItem.Bouquet != null)
+                        {
+                            match.BouquetsBouquetItem.Bouquet.Locked = true;
+                            if (Log.IsDebugEnabled) Log.Debug($"Bouquet {match.BouquetsBouquetItem.Bouquet.Name} has been marked as LOCKED");
+                        }
+                        else
+                        {
+                            Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_,
+                                match.LockedBouquetItem.BouquetOrderNumber));
+                        }
+                        sLocked.Remove(match.LockedBouquetItem);
+                    }
+                }
+                else
+                {
+                    Log.Debug("Enigma1 bouquets bouquet was not found, no locked bouquets to match.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
+            }
+
+            //matching locked services
+            try
+            {
+                Log.Debug("Matching locked services.");
+                var query = settings.Services.Join(sLocked.OfType<IBouquetItemService>().ToList(), srv => srv.ServiceId,
+                    bi => bi.ServiceId, (srv, x) => new
+                    {
+                        Service = srv,
+                        LockedBouquetItem = x
+                    }, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var match in query.ToList())
+                {
+                    match.Service.ServiceSecurity = Enums.ServiceSecurity.BlackListed;
+                    if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as LOCKED");
+                    sLocked.Remove(match.LockedBouquetItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+                throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
+            }
+
+            //logging items that are not matched
+            foreach (IBouquetItem bi in sLocked)
+            {
+                if (bi is IBouquetItemService service)
+                {
+                    Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service, service.ServiceId));
+                }
+                else
+                {
+                    if (bi is IBouquetItemBouquetsBouquet bouquet)
+                    {
+                        Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_,
+                            bouquet.BouquetOrderNumber));
+                    }
+                }
+            }
+        }
+        #endregion
+    }
+}

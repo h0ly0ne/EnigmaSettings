@@ -48,7 +48,7 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "ICloneable"
-        public new object Clone()
+        public override object Clone()
         {
             var clone = (IBouquetItemAlternative)CloneWithoutSubscribers();
             clone.Bouquet = (IFileBouquet)Bouquet?.Clone();

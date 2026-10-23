@@ -67,7 +67,7 @@ namespace Krkadoni.EnigmaSettings
         /// Performs Memberwise Clone on the object
         /// </summary>
         /// <returns></returns>
-        public object Clone()
+        public virtual object Clone()
         {
             return ShallowCopy();
         }

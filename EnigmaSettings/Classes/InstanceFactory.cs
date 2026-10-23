@@ -101,6 +101,8 @@ namespace Krkadoni.EnigmaSettings
                 Frequency = transponder.Frequency,
                 Modulation = transponder.Modulation,
                 SymbolRate = transponder.SymbolRate,
+                Inversion = transponder.Inversion,
+                System = transponder.System
             };
         }
 
