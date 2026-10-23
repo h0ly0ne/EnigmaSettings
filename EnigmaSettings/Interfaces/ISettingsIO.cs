@@ -3,6 +3,8 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
 {
@@ -155,5 +157,17 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         /// <param name="bLocalEnableBouquetFiles">Indicates whether to enable bouquet file saving</param>
         /// <param name="callback">Async callback to be called after save finishes</param>
         void SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, AsyncCallback callback);
+
+        Task<ISettings> LoadAsync(string settingsFile, CancellationToken cancellationToken = default)
+            => Task.Run(() => Load(settingsFile), cancellationToken);
+
+        Task<ISettings> LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, CancellationToken cancellationToken = default)
+            => Task.Run(() => Load(settingsFile, xmlSatellitesIO, xmlCablesIO), cancellationToken);
+
+        Task SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, CancellationToken cancellationToken = default)
+            => Task.Run(() => Save(folder, settings, strLocalFilenameOverride, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles), cancellationToken);
+
+        Task SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, CancellationToken cancellationToken = default)
+            => Task.Run(() => Save(folder, settings, strLocalFilenameOverride, xmlSatellitesIO, xmlCablesIO, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles), cancellationToken);
     }
 }

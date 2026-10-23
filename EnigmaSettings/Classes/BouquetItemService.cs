@@ -2,6 +2,7 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Krkadoni.EnigmaSettings.Interfaces;
 
@@ -65,9 +66,9 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemService(string bouquetLine)
         {
             if (string.IsNullOrEmpty(bouquetLine))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(bouquetLine));
 
-            if (bouquetLine.ToUpper().StartsWith("#SERVICE"))
+            if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
                 bouquetLine = bouquetLine.Substring(9).Trim();
 
             string[] sData = bouquetLine.Trim().Split(':');
@@ -90,7 +91,7 @@ namespace Krkadoni.EnigmaSettings
             }
             else
             {
-                mType = Convert.ToInt32(sData[4]).ToString("X");
+                mType = Convert.ToInt32(sData[4], CultureInfo.InvariantCulture).ToString("X", CultureInfo.InvariantCulture);
                 mSid = sData[0].TrimStart('0');
                 mTSID = sData[2].TrimStart('0');
                 mNid = sData[3].TrimStart('0');
@@ -108,7 +109,7 @@ namespace Krkadoni.EnigmaSettings
             if (mNameSpc.Length == 0)
                 mNameSpc = "0";
 
-            ServiceId = string.Join(":", mType, mSid, mTSID, mNid, mNameSpc).ToLower();
+            ServiceId = string.Join(":", mType, mSid, mTSID, mNid, mNameSpc).ToLowerInvariant();
         }
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if service is null</exception>
         public BouquetItemService(IService service)
         {
-            Service = service ?? throw new ArgumentNullException();
+            Service = service ?? throw new ArgumentNullException(nameof(service));
         }
 
         /// <summary>

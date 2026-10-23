@@ -6,6 +6,8 @@ namespace Krkadoni.EnigmaSettings
 {
    public class NullLogger : ILog
     {
+       public bool IsDebugEnabled => false;
+
        public void Debug(string message)
        {
            

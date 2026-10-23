@@ -9,6 +9,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Krkadoni.EnigmaSettings.Interfaces;
 using static Krkadoni.EnigmaSettings.Enums;
@@ -74,6 +76,11 @@ namespace Krkadoni.EnigmaSettings
         protected const string DefaultEnigma1Path = "/var/tuxbox/config/enigma/";
 
         private static readonly HashSet<string> _streamFavoritesTypes = ["4097", "5001", "5002", "8193", "8739"];
+        // Enigma reads these files line by line, a BOM would corrupt the first entry
+        private static readonly Encoding Utf8NoBom = new UTF8Encoding(false);
+        private static readonly HashSet<int> DirectoryLineSpecifiers = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 519];
+        private static readonly string FavoritesTypeFile = ((int)Enums.FavoritesType.File).ToString(CultureInfo.InvariantCulture);
+        private static readonly string FavoritesTypeUnknown = ((int)Enums.FavoritesType.Unknown).ToString(CultureInfo.InvariantCulture);
 
         #region "Events"
         /// <summary>
@@ -296,7 +303,7 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="factory"></param>
         public SettingsIO(IInstanceFactory factory)
         {
-            Factory = factory ?? throw new ArgumentNullException(Resources.SettingsIO_New_Invalid_instance_factory_);
+            Factory = factory ?? throw new ArgumentNullException(nameof(factory), Resources.SettingsIO_New_Invalid_instance_factory_);
             _fileHelper = new FileHelper();
         }
 
@@ -354,7 +361,7 @@ namespace Krkadoni.EnigmaSettings
                 settings.MatchServicesWithTransponders();
 
 
-                if (File.Exists(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)))
+                if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)))
                 {
                     IList<IXmlSatellite> sats;
                     try
@@ -363,7 +370,6 @@ namespace Krkadoni.EnigmaSettings
                     }
                     catch (Exception ex)
                     {
-                        OnSettingsLoaded(this, settingsFile, false, null);
                         Log.Warn($"There was an error while reading {SatelliteXmlFileName} file.", ex);
                         sats = new List<IXmlSatellite>();
                     }
@@ -377,7 +383,7 @@ namespace Krkadoni.EnigmaSettings
                     settings.AddMissingXmlSatellites(Factory);
                 }
 
-                if (File.Exists(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)))
+                if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)))
                 {
                     IList<IXmlCable> cabs;
                     try
@@ -386,7 +392,6 @@ namespace Krkadoni.EnigmaSettings
                     }
                     catch (Exception ex)
                     {
-                        OnSettingsLoaded(this, settingsFile, false, null);
                         Log.Warn($"There was an error while reading {CablesXmlFileName} file.", ex);
                         cabs = new List<IXmlCable>();
                     }
@@ -401,10 +406,12 @@ namespace Krkadoni.EnigmaSettings
                 {
                     ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetTvEpl), ref settings);
                     ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetRadioEpl), ref settings);
-                    ReadE1Bouquets(Path.Combine(settings.SettingsDirectory, BouquetsFile), ref settings);
+                    if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, BouquetsFile)))
+                        ReadE1Bouquets(Path.Combine(settings.SettingsDirectory, BouquetsFile), ref settings);
                     settings.MatchBouquetsBouquetsServices();
                     settings.MatchFileBouquetsServices();
-                    ReadServicesLocked(Path.Combine(settings.SettingsDirectory, ServicesLockedFile), ref settings);
+                    if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, ServicesLockedFile)))
+                        ReadServicesLocked(Path.Combine(settings.SettingsDirectory, ServicesLockedFile), ref settings);
                 }
                 else if (settings.SettingsVersion is Enums.SettingsVersion.Enigma2Ver3 or Enums.SettingsVersion.Enigma2Ver4 or Enums.SettingsVersion.Enigma2Ver5)
                 {
@@ -439,9 +446,38 @@ namespace Krkadoni.EnigmaSettings
         /// </summary>
         /// <param name="settingsFile">Full path to lamedb or services file</param>
         /// <param name="callback">Async callback to be called after load finishes</param>
+        /// <remarks>The <see cref="IAsyncResult"/> passed to the callback is a <see cref="Task{ISettings}"/>.</remarks>
         public void LoadAsync(string settingsFile, AsyncCallback callback)
         {
-            new Func<string, ISettings>(Load).BeginInvoke(settingsFile, callback, null);
+            WithCallback(LoadAsync(settingsFile, CancellationToken.None), callback);
+        }
+
+        /// <summary>
+        ///     Loads up and links all the settings data with XmlSatelliteIO, XmlCableIO from Factory on a background thread
+        /// </summary>
+        /// <param name="settingsFile">Full path to lamedb or services file</param>
+        /// <param name="cancellationToken">Cancels the load before it starts</param>
+        public Task<ISettings> LoadAsync(string settingsFile, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => Load(settingsFile), cancellationToken);
+        }
+
+        /// <summary>
+        ///     Loads up and links all the settings data on a background thread
+        /// </summary>
+        /// <param name="settingsFile">Full path to lamedb or services file</param>
+        /// <param name="xmlSatellitesIO">Implementation of reading/writing satellites file</param>
+        /// <param name="xmlCablesIO">Implementation of reading/writing cables file</param>
+        /// <param name="cancellationToken">Cancels the load before it starts</param>
+        public Task<ISettings> LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => Load(settingsFile, xmlSatellitesIO, xmlCablesIO), cancellationToken);
+        }
+
+        private static void WithCallback(Task task, AsyncCallback callback)
+        {
+            if (callback != null)
+                task.ContinueWith(t => callback(t), CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         }
 
         /// <summary>
@@ -451,9 +487,10 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="xmlSatellitesIO"></param>
         /// <param name="xmlCablesIO"></param>
         /// <param name="callback">Async callback to be called after load finishes</param>
+        /// <remarks>The <see cref="IAsyncResult"/> passed to the callback is a <see cref="Task{ISettings}"/>.</remarks>
         public void LoadAsync(string settingsFile, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, AsyncCallback callback)
         {
-            new Func<string, IXmlSatellitesIO, IXmlCablesIO, ISettings>(Load).BeginInvoke(settingsFile, xmlSatellitesIO, xmlCablesIO, callback, null);
+            WithCallback(LoadAsync(settingsFile, xmlSatellitesIO, xmlCablesIO, CancellationToken.None), callback);
         }
 
         /// <summary>
@@ -489,6 +526,11 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public void Save(string folder, ISettings settings, string strLocalFilenameOverride, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellitesFile, bool bLocalEnableCablesFile, bool bLocalEnableBouquetFiles)
         {
+            ArgumentNullException.ThrowIfNull(folder);
+            ArgumentNullException.ThrowIfNull(settings);
+            xmlSatellitesIO ??= Factory.InitNewXmlSatelliteIO(_fileHelper);
+            xmlCablesIO ??= Factory.InitNewXmlCableIO(_fileHelper);
+
             Log.Info($"Saving settings version {settings.SettingsVersion} to {folder}");
             OnSettingsSaving(this, folder, settings);
 
@@ -497,7 +539,7 @@ namespace Krkadoni.EnigmaSettings
                 try
                 {
                     _fileHelper.CreateFolder(folder);
-                    Log.Debug($"Folder {folder} successfully created");
+                    if (Log.IsDebugEnabled) Log.Debug($"Folder {folder} successfully created");
                 }
                 catch (Exception ex)
                 {
@@ -508,7 +550,7 @@ namespace Krkadoni.EnigmaSettings
             }
             else
             {
-                Log.Debug($"Folder {folder} exists");
+                if (Log.IsDebugEnabled) Log.Debug($"Folder {folder} exists");
             }
 
             var st = new Stopwatch();
@@ -517,31 +559,22 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 if (settings.FindBouquetsWithDuplicateFilename().Any())
-                {
-                    OnSettingsSaved(this, folder, false, settings);
                     throw new SettingsException(Resources.SettingsIO_Save_Bouquet_filenames_are_not_unique_);
-                }
 
-                //settings.RenumberMarkers();
-                //settings.RenumberBouquetFileNames();
-                
                 if (bLocalEnableDatabaseFile)
                     WriteSettingsFile(folder, settings, strLocalFilenameOverride);
-                
+
                 if (bLocalEnableBouquetFiles)
                     WriteBouquets(folder, settings);
 
-                IXmlSatellitesIO satellitesIO = Factory.InitNewXmlSatelliteIO(_fileHelper);
                 if (bLocalEnableSatellitesFile)
-                    satellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
+                    xmlSatellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
 
-                IXmlCablesIO cablesIO = Factory.InitNewXmlCableIO(_fileHelper);
                 if (bLocalEnableCablesFile)
-                    cablesIO.SaveCablesToFile(Path.Combine(folder, CablesXmlFileName), settings);
-                
+                    xmlCablesIO.SaveCablesToFile(Path.Combine(folder, CablesXmlFileName), settings);
+
                 st.Stop();
                 Log.Info($"Settings saved successfully in {st.ElapsedMilliseconds} ms.");
-                //Log.Info("Settings saved successfully");
                 OnSettingsSaved(this, folder, true, settings);
             }
             catch (SettingsException ex)
@@ -571,9 +604,44 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="bLocalEnableBouquetFiles">Indicates whether to enable bouquet file saving</param>
         /// <param name="callback">Async callback to be called after save finishes</param>
         /// <remarks></remarks>
+        /// <remarks>The <see cref="IAsyncResult"/> passed to the callback is a <see cref="Task"/>.</remarks>
         public void SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, AsyncCallback callback)
         {
-            new Action<string, ISettings, string, bool, bool, bool, bool>(Save).BeginInvoke(folder, settings, strLocalFilenameOverride, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles, callback, null);
+            WithCallback(SaveAsync(folder, settings, strLocalFilenameOverride, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles, CancellationToken.None), callback);
+        }
+
+        /// <summary>
+        ///     Saves settings to disk on a background thread, initializes default satellites.xml and cables.xml writer
+        /// </summary>
+        /// <param name="folder">Directory where all settings files will be saved</param>
+        /// <param name="settings">Settings instance with all the data</param>
+        /// <param name="strLocalFilenameOverride">Override for the local filename</param>
+        /// <param name="bLocalEnableDatabaseFile">Indicates whether to enable database file</param>
+        /// <param name="bLocalEnableSatellites">Indicates whether to enable satellites</param>
+        /// <param name="bLocalEnableCables">Indicates whether to enable cables</param>
+        /// <param name="bLocalEnableBouquetFiles">Indicates whether to enable bouquet file saving</param>
+        /// <param name="cancellationToken">Cancels the save before it starts</param>
+        public Task SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => Save(folder, settings, strLocalFilenameOverride, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles), cancellationToken);
+        }
+
+        /// <summary>
+        ///     Saves settings to disk on a background thread
+        /// </summary>
+        /// <param name="folder">Directory where all settings files will be saved</param>
+        /// <param name="settings">Settings instance with all the data</param>
+        /// <param name="strLocalFilenameOverride">Override for the local filename</param>
+        /// <param name="xmlSatellitesIO">Instance of satellites.xml writer implementation</param>
+        /// <param name="xmlCablesIO">Instance of cables.xml writer implementation</param>
+        /// <param name="bLocalEnableDatabaseFile">Indicates whether to enable database file</param>
+        /// <param name="bLocalEnableSatellites">Indicates whether to enable satellites</param>
+        /// <param name="bLocalEnableCables">Indicates whether to enable cables</param>
+        /// <param name="bLocalEnableBouquetFiles">Indicates whether to enable bouquet file saving</param>
+        /// <param name="cancellationToken">Cancels the save before it starts</param>
+        public Task SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, CancellationToken cancellationToken = default)
+        {
+            return Task.Run(() => Save(folder, settings, strLocalFilenameOverride, xmlSatellitesIO, xmlCablesIO, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles), cancellationToken);
         }
 
         /// <summary>
@@ -592,7 +660,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public void SaveAsync(string folder, ISettings settings, string strLocalFilenameOverride, IXmlSatellitesIO xmlSatellitesIO, IXmlCablesIO xmlCablesIO, bool bLocalEnableDatabaseFile, bool bLocalEnableSatellites, bool bLocalEnableCables, bool bLocalEnableBouquetFiles, AsyncCallback callback)
         {
-            new Action<string, ISettings, string, IXmlSatellitesIO, IXmlCablesIO, bool, bool, bool, bool>(Save).BeginInvoke(folder, settings, strLocalFilenameOverride, xmlSatellitesIO, xmlCablesIO, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles, callback, null);
+            WithCallback(SaveAsync(folder, settings, strLocalFilenameOverride, xmlSatellitesIO, xmlCablesIO, bLocalEnableDatabaseFile, bLocalEnableSatellites, bLocalEnableCables, bLocalEnableBouquetFiles, CancellationToken.None), callback);
         }
         #endregion
 
@@ -610,13 +678,13 @@ namespace Krkadoni.EnigmaSettings
         protected virtual string[] Read(string fileName, bool warnEmpty = false)
         {
             if (fileName == null)
-                throw new ArgumentNullException(Resources.Settings_Read_Filename_cannot_be_empty_);
+                throw new ArgumentNullException(nameof(fileName), Resources.Settings_Read_Filename_cannot_be_empty_);
     
             if (!_fileHelper.Exists(fileName))
                throw new ArgumentException(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, fileName));
 
             OnFileLoading(this, fileName);
-            Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
+            if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
 
             var st = new Stopwatch();
             string[] fileLines;
@@ -635,7 +703,7 @@ namespace Krkadoni.EnigmaSettings
 
             st.Stop();
 
-            Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
+            if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
            // Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
 
             if (fileLines.Length == 0)
@@ -660,12 +728,12 @@ namespace Krkadoni.EnigmaSettings
         protected virtual string ReadText(string fileName, bool warnEmpty = true)
         {
             if (fileName == null)
-                throw new ArgumentNullException(Resources.Settings_Read_Filename_cannot_be_empty_);
+                throw new ArgumentNullException(nameof(fileName), Resources.Settings_Read_Filename_cannot_be_empty_);
 
             if (!_fileHelper.Exists(fileName))
                 throw new ArgumentException(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, fileName));
             OnFileLoading(this, fileName);
-            Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
+            if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_Reading_file__0_, fileName));
 
             var st = new Stopwatch();
             string fileText;
@@ -684,7 +752,7 @@ namespace Krkadoni.EnigmaSettings
 
             st.Stop();
 
-            Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
+            if (Log.IsDebugEnabled) Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, st.ElapsedMilliseconds));
             //Log.Debug(string.Format(Resources.Settings_Read_File__0__read_in__1__ms, fileName, "?"));
 
             if (fileText.Length == 0)
@@ -709,7 +777,7 @@ namespace Krkadoni.EnigmaSettings
                 try
                 {
                     _fileHelper.Delete(fileName);
-                    Log.Debug($"Existing file {fileName} successfully deleted");
+                    if (Log.IsDebugEnabled) Log.Debug($"Existing file {fileName} successfully deleted");
                 }
                 catch (Exception ex)
                 {
@@ -731,11 +799,11 @@ namespace Krkadoni.EnigmaSettings
         protected virtual void WriteFile(string fileName, string fContent, Encoding encoding)
         {
             OnFileSaving(this, fileName);
-            Log.Debug($"Writing file {fileName} to disk");
+            if (Log.IsDebugEnabled) Log.Debug($"Writing file {fileName} to disk");
             try
             {
                 _fileHelper.WriteAllText(fileName, fContent, encoding);
-                Log.Debug($"File {fileName} successfully written.");
+                if (Log.IsDebugEnabled) Log.Debug($"File {fileName} successfully written.");
                 OnFileSaved(this, fileName, true);
             }
             catch (Exception ex)
@@ -798,7 +866,7 @@ namespace Krkadoni.EnigmaSettings
                 case Enums.SettingsVersion.Enigma2Ver5:
                     return 5;
                 default:
-                    return Convert.ToInt32(version);
+                    return Convert.ToInt32(version, CultureInfo.InvariantCulture);
             }
         }
 
@@ -810,7 +878,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         protected virtual string GetBouquetNameFromFileName(string fileName)
         {
-            switch (fileName.ToLower())
+            switch (fileName.ToLowerInvariant())
             {
                 case BlackListFile:
                     return "blacklist";
@@ -827,10 +895,10 @@ namespace Krkadoni.EnigmaSettings
                 case UserBouquetTvEpl:
                     return "User - bouquets (TV)";
                 default:
-                    if (fileName.ToLower().EndsWith(".tv"))
+                    if (fileName.ToLowerInvariant().EndsWith(".tv", StringComparison.Ordinal))
                         return "TV Bouquet";
                     
-                    return fileName.ToLower().EndsWith(".radio") ? "Radio Bouquet" : string.Empty;
+                    return fileName.ToLowerInvariant().EndsWith(".radio", StringComparison.Ordinal) ? "Radio Bouquet" : string.Empty;
             }
         }
         #endregion
@@ -859,7 +927,7 @@ namespace Krkadoni.EnigmaSettings
                 else
                     ReadLameDb5(settings, settingsFileLines, fileName);
 
-                Log.Debug($"Settings loaded with {settings.Services.Count} services and {settings.Transponders.Count} transponders");
+                if (Log.IsDebugEnabled) Log.Debug($"Settings loaded with {settings.Services.Count} services and {settings.Transponders.Count} transponders");
                 return settings;
             }
             catch (SettingsException ex)
@@ -886,16 +954,16 @@ namespace Krkadoni.EnigmaSettings
         /// </exception>
         protected virtual void CheckIfSettingsValid(string[] settingsFileLines, string fileName)
         {
-            Log.Debug($"Checking {fileName} to make sure we have valid settings");
+            if (Log.IsDebugEnabled) Log.Debug($"Checking {fileName} to make sure we have valid settings");
             var fName = Path.GetFileName(fileName);
 
             if (settingsFileLines == null || settingsFileLines.Length == 0)
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_File__0__is_empty_, fName));
 
-            if (settingsFileLines != null && ((settingsFileLines != null && !settingsFileLines[0].ToLower().StartsWith(SettingsFirstLine.ToLower())) || !settingsFileLines[0].Trim().EndsWith("/")))
+            if (!settingsFileLines[0].StartsWith(SettingsFirstLine, StringComparison.OrdinalIgnoreCase) || !settingsFileLines[0].Trim().EndsWith('/'))
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_File__0__is_not_valid_settings_file_, fName));
 
-            Log.Debug($"File {fName} looks like a valid settings file, checking for version");
+            if (Log.IsDebugEnabled) Log.Debug($"File {fName} looks like a valid settings file, checking for version");
         }
 
         /// <summary>
@@ -910,9 +978,9 @@ namespace Krkadoni.EnigmaSettings
         {
             Log.Debug("Looking for settings version");
             var fName = Path.GetFileName(fileName);
-            var sVersion = settingsFileLines[0].ToLower().Trim().Replace(SettingsFirstLine.ToLower(), "").TrimEnd('/');
+            var sVersion = settingsFileLines[0].ToLowerInvariant().Trim().Replace(SettingsFirstLine.ToLowerInvariant(), "").TrimEnd('/');
 
-            if (!int.TryParse(sVersion, out _))
+            if (!int.TryParse(sVersion, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_File__0__is_not_valid_settings_file_, fName));
 
             settings.SettingsVersion = GetSettingsVersion(sVersion);
@@ -920,7 +988,7 @@ namespace Krkadoni.EnigmaSettings
             if (settings.SettingsVersion == Enums.SettingsVersion.Unknown)
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_Unsuported_settings_version__0_, sVersion));
             
-            Log.Debug($"Found settings version {settings.SettingsVersion}");
+            if (Log.IsDebugEnabled) Log.Debug($"Found settings version {settings.SettingsVersion}");
         }
 
         /// <summary>
@@ -935,7 +1003,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException">Throws SettingsException if there's no transponder open tag</exception>
         protected virtual void ReadTransponders(ISettings settings, string[] settingsFileLines, string fileName, out int transponderOpenIndex, out int transponderEndIndex)
         {
-            Log.Debug($"Reading transponders from {fileName}");
+            if (Log.IsDebugEnabled) Log.Debug($"Reading transponders from {fileName}");
 
             //search for the beginning of transponder section
             transponderOpenIndex = -1;
@@ -952,36 +1020,38 @@ namespace Krkadoni.EnigmaSettings
             if (transponderOpenIndex == -1)
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_No__transponder__tag_was_found_in__0_, Path.GetFileName(fileName)));
 
-            Log.Debug($"Transponder section found at line {transponderOpenIndex + 1}");
+            if (Log.IsDebugEnabled) Log.Debug($"Transponder section found at line {transponderOpenIndex + 1}");
 
-            //reading transponders
-            //make sure that we can progress by 3 lines without exception at the end
-            var secureLastIndex = (sCount - (transponderOpenIndex + 1));
-            secureLastIndex = secureLastIndex - (secureLastIndex % 3);
-
-            for (var i = transponderOpenIndex + 1; i <= secureLastIndex - 1; i += 3)
+            //reading transponders, each entry spans 3 lines (id, data, "/")
+            for (var i = transponderOpenIndex + 1; i < sCount; i += 3)
             {
-                if (settingsFileLines[i] != SettingsClosingTag)
+                if (settingsFileLines[i].Trim() != SettingsClosingTag)
                 {
-                    switch (settingsFileLines[i + 1].Trim().ToLower()[..1])
+                    if (i + 1 >= sCount || settingsFileLines[i + 1].Trim().Length == 0)
                     {
-                        case "s":
+                        Log.Warn($"Incomplete transponder entry at line {i + 1} ignored");
+                        break;
+                    }
+
+                    switch (char.ToLowerInvariant(settingsFileLines[i + 1].Trim()[0]))
+                    {
+                        case 's':
                         {
                             // DVBT & DVBC transponders in Enigma1 are saved as satellite transponders
                             if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
                             {
-                                if (settingsFileLines[i].ToLower().StartsWith("ffff"))
+                                if (settingsFileLines[i].ToLowerInvariant().StartsWith("ffff", StringComparison.Ordinal))
                                     AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else if (settingsFileLines[i].ToLower().StartsWith("eeee"))
+                                else if (settingsFileLines[i].ToLowerInvariant().StartsWith("eeee", StringComparison.Ordinal))
                                     AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else if (settingsFileLines[i].ToLower().StartsWith("0000"))
+                                else if (settingsFileLines[i].ToLowerInvariant().StartsWith("0000", StringComparison.Ordinal))
                                     AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
                                 else
                                     AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
                             }
                             else
                             {
-                                if (settingsFileLines[i].ToLower().StartsWith("0000"))
+                                if (settingsFileLines[i].ToLowerInvariant().StartsWith("0000", StringComparison.Ordinal))
                                     AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
                                 else
                                     AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
@@ -989,13 +1059,13 @@ namespace Krkadoni.EnigmaSettings
 
                             break;
                         }
-                        case "t":
+                        case 't':
                         {
                             AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
 
                             break;
                         }
-                        case "c":
+                        case 'c':
                         {
                             AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
 
@@ -1013,7 +1083,7 @@ namespace Krkadoni.EnigmaSettings
                 else
                 {
                     //we have reached the end of transponders part
-                    Log.Debug($"Transponder section ends at line {transponderOpenIndex + i}");
+                    if (Log.IsDebugEnabled) Log.Debug($"Transponder section ends at line {i + 1}");
                     transponderEndIndex = i;
                     return;
                 }
@@ -1034,7 +1104,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException">Throws SettingsException if there's no services open tag</exception>
         protected virtual void ReadServices(ISettings settings, string[] settingsFileLines, string fileName, int transponderOpenIndex, int transponderEndIndex)
         {
-            Log.Debug($"Reading services from {fileName}");
+            if (Log.IsDebugEnabled) Log.Debug($"Reading services from {fileName}");
 
             //search for the beginning of services section after transponders section
             var servicesOpenIndex = -1;
@@ -1052,25 +1122,20 @@ namespace Krkadoni.EnigmaSettings
             if (servicesOpenIndex == -1)
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_No__services__tag_was_found_in_file__0_, Path.GetFileName(fileName)));
 
-            Log.Debug($"Services section found at line {transponderOpenIndex + servicesOpenIndex}");
+            if (Log.IsDebugEnabled) Log.Debug($"Services section found at line {servicesOpenIndex + 1}");
 
-            //reading services
-            //make sure that we can progress by 3 lines without exception at the end
-            var secureLastIndex = (sCount - (servicesOpenIndex + 1));
-            secureLastIndex = secureLastIndex - (secureLastIndex % 3);
-            secureLastIndex += servicesOpenIndex;
-
-            Log.Debug("Services section should end at line " + (secureLastIndex + transponderOpenIndex + 1));
-
-            for (int i = servicesOpenIndex + 1; i <= secureLastIndex - 1; i += 3)
+            //reading services, each entry spans 3 lines (id, name, flags)
+            var debug = Log.IsDebugEnabled;
+            for (int i = servicesOpenIndex + 1; i + 2 < sCount; i += 3)
             {
-                if (settingsFileLines[i] == SettingsClosingTag)
-                    continue;
+                if (settingsFileLines[i].Trim() == SettingsClosingTag)
+                    break;
 
                 var line1 = settingsFileLines[i];
                 var line2 = settingsFileLines[i + 1];
                 var line3 = settingsFileLines[i + 2];
-                Log.Debug($"Initializing new service {line1}    {line2}    {line3}");
+                if (debug)
+                    Log.Debug($"Initializing new service {line1}    {line2}    {line3}");
                 settings.Services.Add(Factory.InitNewService(line1, line2, line3));
             }
 
@@ -1086,7 +1151,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         protected virtual void AddTransponderDVBT(ISettings settings, string firstLine, string secondLine)
         {
-            Log.Debug($"Initializing new terrestrial transponder {firstLine} {secondLine}");
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new terrestrial transponder {firstLine} {secondLine}");
             settings.Transponders.Add(Factory.InitNewTransponderDVBT(firstLine, secondLine));
         }
 
@@ -1099,7 +1164,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         protected virtual void AddTransponderDVBC(ISettings settings, string firstLine, string secondLine)
         {
-            Log.Debug($"Initializing new cable transponder {firstLine} {secondLine}");
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new cable transponder {firstLine} {secondLine}");
             settings.Transponders.Add(Factory.InitNewTransponderDVBC(firstLine, secondLine));
         }
 
@@ -1112,7 +1177,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         protected virtual void AddTransponderDVBS(ISettings settings, string firstLine, string secondLine)
         {
-            Log.Debug($"Initializing new satellite transponder {firstLine} {secondLine}");
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new satellite transponder {firstLine} {secondLine}");
             settings.Transponders.Add(Factory.InitNewTransponderDVBS(firstLine, secondLine));
         }
 
@@ -1125,7 +1190,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         protected virtual void AddTransponderIPTV(ISettings settings, string firstLine, string secondLine)
         {
-            Log.Debug($"Initializing new iptv transponder {firstLine} {secondLine}");
+            if (Log.IsDebugEnabled) Log.Debug($"Initializing new iptv transponder {firstLine} {secondLine}");
             settings.Transponders.Add(Factory.InitNewTransponderIPTV(firstLine, secondLine));
         }
 
@@ -1145,10 +1210,11 @@ namespace Krkadoni.EnigmaSettings
                 bqt.FileName = fName;
 
                 //do not read bouquets that have their own methods for reading
-                if (bqt.BouquetType == Enums.BouquetType.E1Bouquets || fName.ToLower() == WhiteListFile || fName.ToLower() == BlackListFile ||
-                    fName.ToLower() == ServicesLockedFile)
+                if (bqt.BouquetType == Enums.BouquetType.E1Bouquets || string.Equals(fName, WhiteListFile, StringComparison.OrdinalIgnoreCase) || string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(fName, ServicesLockedFile, StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ArgumentException();
+                    Log.Warn($"File {fName} is not a bouquet file, not reading it as bouquet");
+                    return null;
                 }
 
                 //do not read unknown bouquet types
@@ -1165,7 +1231,7 @@ namespace Krkadoni.EnigmaSettings
                 }
                 IFileBouquet existing =
                     settings.Bouquets.OfType<IFileBouquet>()
-                        .SingleOrDefault(x => String.Equals(x.FileName, fName, StringComparison.CurrentCulture));
+                        .SingleOrDefault(x => String.Equals(x.FileName, fName, StringComparison.Ordinal));
                 if (existing != null)
                 {
                     bqt = existing;
@@ -1174,17 +1240,17 @@ namespace Krkadoni.EnigmaSettings
                 else
                 {
                     if (bqt.BouquetType != Enums.BouquetType.Unknown
-                        && fName.ToLower() != BouquetsTvFile
-                        && fName.ToLower() != BouquetsRadioFile
-                        && fName.ToLower() != UserBouquetTvEpl
-                        && fName.ToLower() != UserBouquetRadioEpl
-                        && !fName.ToLower().StartsWith("alternatives."))
+                        && !string.Equals(fName, BouquetsTvFile, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(fName, BouquetsRadioFile, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(fName, UserBouquetTvEpl, StringComparison.OrdinalIgnoreCase)
+                        && !string.Equals(fName, UserBouquetRadioEpl, StringComparison.OrdinalIgnoreCase)
+                        && !fName.ToLowerInvariant().StartsWith("alternatives.", StringComparison.Ordinal))
                     {
                         settings.Bouquets.Add(bqt);
                     }
                 }
 
-                Log.Debug($"Reading bouquet {bqt.FileName}");
+                if (Log.IsDebugEnabled) Log.Debug($"Reading bouquet {bqt.FileName}");
                 string[] bouquetLines = Read(fileName, true);
 
                 if (bouquetLines == null || !bouquetLines.Any())
@@ -1203,7 +1269,7 @@ namespace Krkadoni.EnigmaSettings
                             DetectAndReadReference(dir, ref bqt, bouquetLines, i, settings);
                         }
                     }
-                    Log.Debug($"Bouquet {bqt.FileName} successfully parsed with {cnt} items");
+                    if (Log.IsDebugEnabled) Log.Debug($"Bouquet {bqt.FileName} successfully parsed with {cnt} items");
                 }
                 return bqt;
             }
@@ -1234,64 +1300,57 @@ namespace Krkadoni.EnigmaSettings
             string description = string.Empty;
             int bCount = bouquetLines.Length;
             string nextLine = index < (bCount - 1) ? bouquetLines[index + 1] : string.Empty;
-            if (nextLine.ToUpper().StartsWith("#DESCRIPTION"))
+            if (nextLine.ToUpperInvariant().StartsWith("#DESCRIPTION", StringComparison.Ordinal))
                 description = bouquetLines[index + 1];
 
-            if (line.StartsWith("#NAME"))
+            if (line.StartsWith("#NAME", StringComparison.Ordinal))
             {
                 bouquet.Name = line.Substring(line.Length >= 6 ? 6 : 5);
-                Log.Debug($"Found bouquet NAME: {line}");
+                if (Log.IsDebugEnabled) Log.Debug($"Found bouquet NAME: {line}");
             }
-            else if (line.StartsWith("#SERVICE"))
+            else if (line.StartsWith("#SERVICE", StringComparison.Ordinal))
             {
-                string serviceData = line.Substring(9).Trim();
+                string serviceData = line.Length > 9 ? line.Substring(9).Trim() : string.Empty;
                 string[] sData = serviceData.Split(':');
-                string favoritesType = sData[0];
-                var lineType = (Enums.LineSpecifier)Enum.Parse(typeof(Enums.LineSpecifier), sData[1], true);
-                int[] directoryTypes =
-                [
-                    1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    6,
-                    7,
-                    9,
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    519
-                ];
-                if (lineType == Enums.LineSpecifier.Unknown || favoritesType == Convert.ToInt32(Enums.FavoritesType.Unknown).ToString(CultureInfo.CurrentCulture))
-                    Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, Path.Combine(folder, bouquet.Name)));
-                else if (directoryTypes.Contains(Convert.ToInt32(sData[1])) || favoritesType == Convert.ToInt32(Enums.FavoritesType.File).ToString(CultureInfo.CurrentCulture))
+
+                if (sData.Length < 2 || !int.TryParse(sData[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var lineSpecifier))
                 {
-                    Log.Debug($"Found (sub)directory item {sData[10]}");
+                    Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, Path.Combine(folder, bouquet.Name ?? string.Empty)));
+                    return;
+                }
+
+                string favoritesType = sData[0];
+                var lineType = (Enums.LineSpecifier)lineSpecifier;
+                bool isDirectory = DirectoryLineSpecifiers.Contains(lineSpecifier) || favoritesType == FavoritesTypeFile;
+
+                if (lineType == Enums.LineSpecifier.Unknown || favoritesType == FavoritesTypeUnknown)
+                    Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, Path.Combine(folder, bouquet.Name ?? string.Empty)));
+                else if ((isDirectory || lineType == Enums.LineSpecifier.Alternative) && sData.Length < 11)
+                    Log.Warn(string.Format(Resources.Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_, Path.GetFileName(bouquet.FileName), line));
+                else if (isDirectory)
+                {
+                    if (Log.IsDebugEnabled) Log.Debug($"Found (sub)directory item {sData[10]}");
                     var tmpName = sData[10];
 
                     //workaround for FROM BOUQUET "userbouquet.dbe01.radio" ORDER BY bouquet
-                    if (tmpName.IndexOf(@"""", StringComparison.CurrentCultureIgnoreCase) > -1)
+                    if (tmpName.IndexOf('"') > -1)
                     {
                         Log.Debug("Non standard bouquet name, try to workaround it");
-                        tmpName = tmpName.Substring(tmpName.IndexOf(@"""", StringComparison.CurrentCultureIgnoreCase) + 1);
-                        tmpName = tmpName.Substring(0, tmpName.IndexOf(@"""", StringComparison.CurrentCultureIgnoreCase));
+                        tmpName = tmpName.Substring(tmpName.IndexOf('"') + 1);
+                        tmpName = tmpName.Substring(0, tmpName.IndexOf('"'));
                         tmpName = tmpName.Trim();
                         sData[10] = tmpName;
-                        Log.Debug($"Workaround completed with result {tmpName}");
+                        if (Log.IsDebugEnabled) Log.Debug($"Workaround completed with result {tmpName}");
                     }
                     string fName = Path.GetFileName(sData[10]);
 
                     IFileBouquet subBqt = ReadFileBouquet(Path.Combine(folder, fName), ref settings);
 
-                    if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
-                        subBqt.FileName = sData[10];
-
                     if (subBqt != null)
                     {
+                        if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
+                            subBqt.FileName = sData[10];
+
                         if (lineType == Enums.LineSpecifier.Hidden)
                             subBqt.Hidden = true;
 
@@ -1299,7 +1358,7 @@ namespace Krkadoni.EnigmaSettings
                         bib.FavoritesTypeFlag = sData[0];
                         bib.LineSpecifierFlag = sData[1];
                         bouquet.BouquetItems.Add(bib);
-                        Log.Debug($"Bouquet {Path.GetFileName(sData[10])} added as bouquet item to bouquet {bouquet.Name} ");
+                        if (Log.IsDebugEnabled) Log.Debug($"Bouquet {Path.GetFileName(sData[10])} added as bouquet item to bouquet {bouquet.Name} ");
                     }
                     else
                     {
@@ -1317,7 +1376,7 @@ namespace Krkadoni.EnigmaSettings
                                 if (bqim != null)
                                 {
                                     bouquet.BouquetItems.Add(bqim);
-                                    Log.Debug($"Marker {bqim.Description} added to bouquet {bouquet.Name}");
+                                    if (Log.IsDebugEnabled) Log.Debug($"Marker {bqim.Description} added to bouquet {bouquet.Name}");
                                 }
                                 else
                                     Log.Warn($"Invalid marker {line} not added to bouquet {bouquet.Name}");
@@ -1330,7 +1389,7 @@ namespace Krkadoni.EnigmaSettings
                                 if (bqim != null)
                                 {
                                     bouquet.BouquetItems.Add(bqim);
-                                    Log.Debug($"Spacer entry preserved in bouquet {bouquet.Name}");
+                                    if (Log.IsDebugEnabled) Log.Debug($"Spacer entry preserved in bouquet {bouquet.Name}");
                                 }
                             }
                             break;
@@ -1338,10 +1397,10 @@ namespace Krkadoni.EnigmaSettings
                             {
                                 var altTmp = sData[10];
 
-                                if (altTmp.IndexOf("\"", StringComparison.CurrentCultureIgnoreCase) > -1)
+                                if (altTmp.IndexOf('"') > -1)
                                 {
-                                    altTmp = altTmp.Substring(altTmp.IndexOf("\"", StringComparison.CurrentCultureIgnoreCase) + 1);
-                                    altTmp = altTmp.Substring(0, altTmp.IndexOf("\"", StringComparison.CurrentCultureIgnoreCase)).Trim();
+                                    altTmp = altTmp.Substring(altTmp.IndexOf('"') + 1);
+                                    altTmp = altTmp.Substring(0, altTmp.IndexOf('"')).Trim();
                                 }
 
                                 string altFile = Path.GetFileName(altTmp);
@@ -1354,14 +1413,14 @@ namespace Krkadoni.EnigmaSettings
                                     bia.FavoritesTypeFlag = sData[0];
                                     bia.LineSpecifierFlag = sData[1];
                                     bouquet.BouquetItems.Add(bia);
-                                    Log.Debug($"Alternative {altFile} added to bouquet {bouquet.Name}");
+                                    if (Log.IsDebugEnabled) Log.Debug($"Alternative {altFile} added to bouquet {bouquet.Name}");
                                 }
                                 else
                                     Log.Warn($"Alternative {altFile} in bouquet {bouquet.Name} could not be read");
                             }
                             break;
                         case Enums.LineSpecifier.NormalService:
-                            if (_streamFavoritesTypes.Contains(favoritesType) || sData[10].IndexOf("//", StringComparison.CurrentCulture) > -1 || sData.Length == 12)
+                            if (_streamFavoritesTypes.Contains(favoritesType) || (sData.Length > 10 && sData[10].Contains("//", StringComparison.Ordinal)) || sData.Length == 12)
                             {
                                 //it is a stream
                                 IBouquetItemStream bqis = ReadStreamReference(line, description);
@@ -1371,7 +1430,7 @@ namespace Krkadoni.EnigmaSettings
                                     if (description.Length == 0)
                                        Log.Warn(string.Format(Resources.Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description, bouquet.Name, bqis.Description));
                                     else
-                                        Log.Debug($"Stream service {bqis.Description} added to bouquet {bouquet.Name}");
+                                        if (Log.IsDebugEnabled) Log.Debug($"Stream service {bqis.Description} added to bouquet {bouquet.Name}");
                                 }
                                 else
                                     Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
@@ -1383,7 +1442,7 @@ namespace Krkadoni.EnigmaSettings
                                 if (bqis != null)
                                 {
                                     bouquet.BouquetItems.Add(bqis);
-                                    Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
+                                    if (Log.IsDebugEnabled) Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
                                 }
                                 else
                                     Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
@@ -1391,13 +1450,13 @@ namespace Krkadoni.EnigmaSettings
                             break;
                     }
             }
-            else if (line.StartsWith("#TYPE"))
+            else if (line.StartsWith("#TYPE", StringComparison.Ordinal))
             {
             }
-            else if (line.StartsWith("#DESCRIPTION"))
+            else if (line.StartsWith("#DESCRIPTION", StringComparison.Ordinal))
             {
             }
-            else if (line.StartsWith("/"))
+            else if (line.StartsWith('/'))
             {
             }
             else
@@ -1415,7 +1474,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (bouquetLine.StartsWith("#SERVICE"))
+                if (bouquetLine.StartsWith("#SERVICE", StringComparison.Ordinal))
                     bouquetLine = bouquetLine.Substring(9).Trim();
 
                 return Factory.InitNewBouquetItemService(bouquetLine);
@@ -1439,17 +1498,17 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (bouquetLine.ToUpper().StartsWith("#SERVICE"))
+                if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
                     bouquetLine = bouquetLine.Substring(9).Trim();
                 if (description == null)
                 {
                     description = string.Empty;
                 }
-                else if (description.ToUpper().StartsWith("#DESCRIPTION:"))
+                else if (description.ToUpperInvariant().StartsWith("#DESCRIPTION:", StringComparison.Ordinal))
                 {
                     description = description.Substring(13);
                 }
-                else if (description.ToUpper().StartsWith("#DESCRIPTION"))
+                else if (description.ToUpperInvariant().StartsWith("#DESCRIPTION", StringComparison.Ordinal))
                 {
                     description = description.Substring(12);
                 }
@@ -1479,17 +1538,17 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (bouquetLine.ToUpper().StartsWith("#SERVICE"))
+                if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
                     bouquetLine = bouquetLine.Substring(9).Trim();
                 if (description == null)
                 {
                     description = string.Empty;
                 }
-                else if (description.ToUpper().StartsWith("#DESCRIPTION:"))
+                else if (description.ToUpperInvariant().StartsWith("#DESCRIPTION:", StringComparison.Ordinal))
                 {
                     description = description.Substring(13);
                 }
-                else if (description.ToUpper().StartsWith("#DESCRIPTION"))
+                else if (description.ToUpperInvariant().StartsWith("#DESCRIPTION", StringComparison.Ordinal))
                 {
                     description = description.Substring(12).Trim();
                 }
@@ -1528,7 +1587,7 @@ namespace Krkadoni.EnigmaSettings
                 bqt.FileName = BouquetsFile;
                 bqt.Name = BouquetsFile;
 
-                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => x.FileName.ToLower() == BouquetsFile);
+                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
                     bqt = existing;
@@ -1539,64 +1598,39 @@ namespace Krkadoni.EnigmaSettings
                     settings.Bouquets.Add(bqt);
                 }
 
-                string bouquetString = ReadText(fileName, false);
+                string[] fileLines = Read(fileName);
 
-                //remove first line
-                bouquetString = bouquetString.Substring(bouquetString.IndexOf("\n", StringComparison.CurrentCulture) + 1);
-
-                //search for the beginning of bouquets
-                int bouquetsOpenIndex = bouquetString.IndexOf(BouquetsOpenTag, StringComparison.CurrentCulture) + BouquetsOpenTag.Length + 1;
-                int bouquetsEndIndex = bouquetString.LastIndexOf(SettingsClosingTag, StringComparison.CurrentCulture);
-
-                if (bouquetsOpenIndex == -1)
+                //search for the beginning of bouquets (first line is the header)
+                int openIndex = Array.FindIndex(fileLines, 1, x => x.Trim() == BouquetsOpenTag);
+                if (openIndex == -1)
                 {
                     Log.Warn(string.Format(Resources.Settings_ReadBouquet_No___0___tag_was_found_in_file__1_, BouquetsOpenTag, bqt.FileName));
                     return bqt;
                 }
-                bouquetString = bouquetString.Substring(bouquetsOpenIndex);
 
-                if (bouquetsEndIndex == -1 || (bouquetsEndIndex < bouquetsOpenIndex))
+                int endIndex = Array.FindIndex(fileLines, openIndex + 1, x => x.Trim() == SettingsClosingTag);
+                if (endIndex == -1)
                 {
                     Log.Warn(string.Format(Resources.Settings_ReadBouquet_No___0___tag_was_found_in_file__1_, SettingsClosingTag, bqt.FileName));
-                    return bqt;
+                    endIndex = fileLines.Length;
                 }
-                bouquetString = bouquetString.Substring(0, bouquetsEndIndex);
 
-                string[] bouquetsE1 = bouquetString.Split('/');
-
-                for (int a = 0; a <= bouquetsE1.Length - 2; a++)
+                //every bouquet is: order number, name, services..., "/"
+                var block = new List<string>();
+                for (int i = openIndex + 1; i < endIndex; i++)
                 {
-                    string bE1 = bouquetsE1[a].Trim();
-                    string[] bouquetLines = bE1.Split('\n');
-                    if (bouquetLines.Length > 1)
+                    string l = fileLines[i].Trim();
+                    if (l != "/")
                     {
-                        IBouquetsBouquet bq = Factory.InitNewBouquetsBouquet();
-                        bq.Name = bouquetLines[1];
-                        IBouquetItemBouquetsBouquet bib = Factory.InitNewBouquetItemBouquetsBouquet(bq);
-                        bib.BouquetOrderNumberInt = Convert.ToInt32(bouquetLines[0]);
-                        bqt.BouquetItems.Add(bib);
-                        Log.Debug($"Found Enigma1 bouquet {bouquetLines[1]} in {fileName}");
-                        for (int i = 2; i <= bouquetLines.Length - 1; i++)
-                        {
-                            if (bouquetLines[i].Trim().Length > 0)
-                            {
-                                if (bouquetLines[i].Split(':').Length >= 5)
-                                {
-                                    IBouquetItemService bis = Factory.InitNewBouquetItemService(bouquetLines[i]);
-                                    bq.BouquetItems.Add(bis);
-                                    Log.Debug($"Added service {bouquetLines[i]} to Enigma1 bouquet {bouquetLines[1]}");
-                                }
-                                else
-                                {
-                                    Log.Warn(
-                                        string.Format(
-                                            Resources.Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_like_regular_service,
-                                            bouquetLines[i], bouquetLines[1]));
-                                }
-                            }
-                        }
+                        if (l.Length > 0)
+                            block.Add(l);
+                        continue;
                     }
+
+                    AddE1Bouquet(bqt, block, fileName);
+                    block.Clear();
                 }
+
                 return bqt;
             }
             catch (SettingsException ex)
@@ -1607,7 +1641,47 @@ namespace Krkadoni.EnigmaSettings
             catch (Exception ex)
             {
                 Log.Error(ex.Message, ex);
-                throw new SettingsException(string.Format(Resources.SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_), ex);
+                throw new SettingsException(Resources.SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_, ex);
+            }
+        }
+
+        /// <summary>
+        ///     Adds one Enigma1 bouquet (order number, name, service lines) to the bouquets bouquet
+        /// </summary>
+        private void AddE1Bouquet(IFileBouquet bouquets, List<string> block, string fileName)
+        {
+            if (block.Count < 2)
+                return;
+
+            string orderNumber = block[0];
+            string name = block[1];
+
+            if (!int.TryParse(orderNumber, NumberStyles.Integer, CultureInfo.InvariantCulture, out var order)
+                && !int.TryParse(orderNumber, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out order))
+            {
+                Log.Warn($"Invalid order number {orderNumber} for Enigma1 bouquet {name} in {fileName}, using 0");
+                order = 0;
+            }
+
+            IBouquetsBouquet bq = Factory.InitNewBouquetsBouquet();
+            bq.Name = name;
+            IBouquetItemBouquetsBouquet bib = Factory.InitNewBouquetItemBouquetsBouquet(bq);
+            bib.BouquetOrderNumberInt = order;
+            bouquets.BouquetItems.Add(bib);
+            if (Log.IsDebugEnabled) Log.Debug($"Found Enigma1 bouquet {name} in {fileName}");
+
+            for (int i = 2; i < block.Count; i++)
+            {
+                if (block[i].Split(':').Length >= 5)
+                {
+                    bq.BouquetItems.Add(Factory.InitNewBouquetItemService(block[i]));
+                    if (Log.IsDebugEnabled)
+                        Log.Debug($"Added service {block[i]} to Enigma1 bouquet {name}");
+                }
+                else
+                {
+                    Log.Warn(string.Format(Resources.Settings_ReadE1Bouquets_Ignoring_line__0__in_Enigma1_bouquet__1___doesn_t_look_like_regular_service, block[i], name));
+                }
             }
         }
 
@@ -1629,7 +1703,7 @@ namespace Krkadoni.EnigmaSettings
             }
             if (fileName == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             if (!_fileHelper.Exists(fileName))
@@ -1640,17 +1714,17 @@ namespace Krkadoni.EnigmaSettings
             var fName = Path.GetFileName(fileName);
 
             string[] bouquetFileLines = Read(fileName);
-            sLocked.AddRange(bouquetFileLines.Select(ReadServiceReference).Where(bqis => bqis != null));
+            sLocked.AddRange(bouquetFileLines.Where(x => x.Trim().Length > 0).Select(ReadServiceReference).Where(bqis => bqis != null));
 
             if (!sLocked.Any()) return;
-            bool blackListed = (fName.ToLower() == BlackListFile);
+            bool blackListed = (string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase));
 
             //matching  services
             try
             {
                 Log.Debug(!blackListed ? "Matching whitelisted services." : "Matching blacklisted services.");
 
-                var query = settings.Services.Join(sLocked, srv => srv.ServiceId.ToLower(), bi => bi.ServiceId.ToLower(), (srv, x) => new
+                var query = settings.Services.Join(sLocked, srv => srv.ServiceId.ToLowerInvariant(), bi => bi.ServiceId.ToLowerInvariant(), (srv, x) => new
                 {
                     Service = srv,
                     LockedBouquetItem = x
@@ -1661,12 +1735,12 @@ namespace Krkadoni.EnigmaSettings
                     if (blackListed)
                     {
                         match.Service.ServiceSecurity = Enums.ServiceSecurity.BlackListed;
-                        Log.Debug($"Service {match.Service} has been marked as BLACKLISTED");
+                        if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as BLACKLISTED");
                     }
                     else
                     {
                         match.Service.ServiceSecurity = Enums.ServiceSecurity.WhiteListed;
-                        Log.Debug($"Service {match.Service} has been marked as WHITELISTED");
+                        if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as WHITELISTED");
                     }
                     sLocked.Remove(match.LockedBouquetItem);
                 }
@@ -1715,12 +1789,12 @@ namespace Krkadoni.EnigmaSettings
                         {
                             Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, fileName));
                         }
-                        else if (srv.LineSpecifierType.ToString().ToLower().StartsWith("isdirectory"))
+                        else if (srv.LineSpecifierType.ToString().ToLowerInvariant().StartsWith("isdirectory", StringComparison.Ordinal))
                         {
-                            Log.Debug($"Found reference to locked bouquet {line} in {fileName}");
+                            if (Log.IsDebugEnabled) Log.Debug($"Found reference to locked bouquet {line} in {fileName}");
                             try
                             {
-                                int orderNumber = Int32.Parse(sData[4], NumberStyles.HexNumber);
+                                int orderNumber = Int32.Parse(sData[4], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                                 sLocked.Add(Factory.InitNewBouquetItemBouquetsBouquet(orderNumber));
                             }
                             catch (Exception ex)
@@ -1736,7 +1810,7 @@ namespace Krkadoni.EnigmaSettings
                         else if (srv.LineSpecifierType == Enums.LineSpecifier.NormalService)
                         {
                             sLocked.Add(srv);
-                            Log.Debug($"Found reference to locked service {line} in {fileName}");
+                            if (Log.IsDebugEnabled) Log.Debug($"Found reference to locked service {line} in {fileName}");
                         }
                         else
                         {
@@ -1770,8 +1844,8 @@ namespace Krkadoni.EnigmaSettings
                 {
                     Log.Debug("Matching locked bouquets.");
                     IList<IBouquetItemBouquetsBouquet> bis = bouquets.BouquetItems.OfType<IBouquetItemBouquetsBouquet>().ToList();
-                    var query = bis.Join(sLocked.OfType<IBouquetItemBouquetsBouquet>().ToList(), bs => bs.BouquetOrderNumber.ToLower(),
-                        x => x.BouquetOrderNumber.ToLower(), (bs, x) => new
+                    var query = bis.Join(sLocked.OfType<IBouquetItemBouquetsBouquet>().ToList(), bs => bs.BouquetOrderNumber.ToLowerInvariant(),
+                        x => x.BouquetOrderNumber.ToLowerInvariant(), (bs, x) => new
                         {
                             BouquetsBouquetItem = bs,
                             LockedBouquetItem = x
@@ -1782,7 +1856,7 @@ namespace Krkadoni.EnigmaSettings
                         if (match.BouquetsBouquetItem.Bouquet != null)
                         {
                             match.BouquetsBouquetItem.Bouquet.Locked = true;
-                            Log.Debug($"Bouquet {match.BouquetsBouquetItem.Bouquet.Name} has been marked as LOCKED");
+                            if (Log.IsDebugEnabled) Log.Debug($"Bouquet {match.BouquetsBouquetItem.Bouquet.Name} has been marked as LOCKED");
                         }
                         else
                         {
@@ -1807,8 +1881,8 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 Log.Debug("Matching locked services.");
-                var query = settings.Services.Join(sLocked.OfType<IBouquetItemService>().ToList(), srv => srv.ServiceId.ToLower(),
-                    bi => bi.ServiceId.ToLower(), (srv, x) => new
+                var query = settings.Services.Join(sLocked.OfType<IBouquetItemService>().ToList(), srv => srv.ServiceId.ToLowerInvariant(),
+                    bi => bi.ServiceId.ToLowerInvariant(), (srv, x) => new
                     {
                         Service = srv,
                         LockedBouquetItem = x
@@ -1817,7 +1891,7 @@ namespace Krkadoni.EnigmaSettings
                 foreach (var match in query.ToList())
                 {
                     match.Service.ServiceSecurity = Enums.ServiceSecurity.BlackListed;
-                    Log.Debug($"Service {match.Service} has been marked as LOCKED");
+                    if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as LOCKED");
                     sLocked.Remove(match.LockedBouquetItem);
                 }
             }
@@ -1873,7 +1947,7 @@ namespace Krkadoni.EnigmaSettings
                 sContent.Append(EditorName + "\n");
 
                 _fileHelper.WriteAllText(Path.Combine(directory, fileName), sContent.ToString());
-                Log.Debug($"Sucessfully written {fileName} to {Path.Combine(directory, fileName)}");
+                if (Log.IsDebugEnabled) Log.Debug($"Sucessfully written {fileName} to {Path.Combine(directory, fileName)}");
                 OnFileSaved(this, fi, true);
             }
             catch (Exception ex)
@@ -1897,6 +1971,7 @@ namespace Krkadoni.EnigmaSettings
                     sContent.Append(DVBSTranspondersToString(settings, 1));
                     sContent.Append(DVBCTranspondersToString(settings));
                     sContent.Append(DVBTTranspondersToString(settings));
+                    sContent.Append(IPTVTranspondersToString(settings));
                     sContent.Append(DVBSTranspondersToString(settings, -1));
                     break;
                 case Enums.SettingsVersion.Enigma2Ver3:
@@ -1905,6 +1980,7 @@ namespace Krkadoni.EnigmaSettings
                     sContent.Append(DVBSTranspondersToString(settings, 0));
                     sContent.Append(DVBCTranspondersToString(settings));
                     sContent.Append(DVBTTranspondersToString(settings));
+                    sContent.Append(IPTVTranspondersToString(settings));
                     break;
             }
 
@@ -1918,7 +1994,7 @@ namespace Krkadoni.EnigmaSettings
             foreach (
                 ITransponderDVBS tran in
                     settings.Transponders.OfType<ITransponderDVBS>()
-                        .Where(x => (positionOrder > 0 & x.OrbitalPositionInt > 0) || (positionOrder < 0 & x.OrbitalPositionInt < 0) || positionOrder == 0)
+                        .Where(x => (positionOrder > 0 && x.OrbitalPositionInt >= 0) || (positionOrder < 0 && x.OrbitalPositionInt < 0) || positionOrder == 0)
                         .OrderByDescending(x => x.OrbitalPositionInt)
                         .ToList())
             {
@@ -1930,11 +2006,11 @@ namespace Krkadoni.EnigmaSettings
                         if (tran.SystemType == Enums.DVBSSystemType.DVBS)
                         {
                             sContent.Append(string.Join(":", tran.NameSpc, tran.TSID, tran.NID) + "\n");
-                            sContent.Append("\t" + "s " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Polarization, tran.FEC, tran.OrbitalPositionInt.ToString(CultureInfo.CurrentCulture), tran.Inversion));
+                            sContent.Append("\t" + "s " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Polarization, tran.FEC, tran.OrbitalPositionInt.ToString(CultureInfo.InvariantCulture), tran.Inversion));
                             sContent.Append("\n" + "/" + "\n");
                         }
                         else
-                            Log.Debug($"Transponder {tran} is not DVBS transponder, not supported in Enigma1, skipping");
+                            if (Log.IsDebugEnabled) Log.Debug($"Transponder {tran} is not DVBS transponder, not supported in Enigma1, skipping");
 
                         break;
                     }
@@ -1943,7 +2019,7 @@ namespace Krkadoni.EnigmaSettings
                     case Enums.SettingsVersion.Enigma2Ver3:
                     {
                         sContent.Append(string.Join(":", tran.NameSpc, tran.TSID, tran.NID) + "\n");
-                        sContent.Append("\t" + "s " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Polarization, tran.FEC, tran.OrbitalPositionInt.ToString(CultureInfo.CurrentCulture), tran.Inversion));
+                        sContent.Append("\t" + "s " + string.Join(":", tran.Frequency, tran.SymbolRate, tran.Polarization, tran.FEC, tran.OrbitalPositionInt.ToString(CultureInfo.InvariantCulture), tran.Inversion));
                         string extraData = string.Empty;
 
                         if (IsVer4OrLater(settings.SettingsVersion))
@@ -2062,72 +2138,53 @@ namespace Krkadoni.EnigmaSettings
             return sContent.ToString();
         }
 
+        protected virtual string IPTVTranspondersToString(ISettings settings)
+        {
+            var sContent = new StringBuilder();
+            foreach (ITransponderIPTV tran in settings.Transponders.OfType<ITransponderIPTV>())
+            {
+                // optional fields are positional, so keep every field up to the last one that is set
+                string[] optional = [tran.Inversion, tran.Modulation, tran.FEC, tran.Flags, tran.System];
+                int last = Array.FindLastIndex(optional, x => x != null);
+                var fields = new List<string> { tran.Frequency ?? "0", tran.SymbolRate ?? "0" };
+                fields.AddRange(optional.Take(last + 1).Select(x => x ?? "0"));
+
+                sContent.Append(string.Join(":", tran.NameSpc, tran.TSID, tran.NID)).Append('\n');
+                sContent.Append("\ts ").Append(string.Join(":", fields)).Append("\n/\n");
+            }
+            return sContent.ToString();
+        }
+
+        /// <summary>
+        ///     Sort order of services in the settings file, matching the order transponders are written in
+        /// </summary>
+        private static int ServiceWriteGroup(IService service, bool enigma1)
+        {
+            switch (service.Transponder)
+            {
+                case null:
+                    return 5;
+                case ITransponderDVBS dvbs:
+                    return enigma1 && dvbs.OrbitalPositionInt < 0 ? 4 : 0;
+                case ITransponderDVBC:
+                    return 1;
+                case ITransponderDVBT:
+                    return 2;
+                default:
+                    return 3;
+            }
+        }
+
         protected virtual string ServicesToString(ISettings settings)
         {
             var sContent = new StringBuilder();
             sContent.Append(SettingsServicesOpenTag + "\n");
 
-            switch (settings.SettingsVersion)
-            {
-                case Enums.SettingsVersion.Enigma1Ver1:
-                case Enums.SettingsVersion.Enigma1Ver2:
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBS))
-                    {
-                        var tran = (ITransponderDVBS)service.Transponder;
-                        if (tran.OrbitalPositionInt > 0)
-                        {
-                            sContent.Append(ServiceToString(service, settings));
-                        }
-                    }
+            bool enigma1 = settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2;
 
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBC))
-                    {
-                        sContent.Append(ServiceToString(service, settings));
-                    }
-
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBT))
-                    {
-                        sContent.Append(ServiceToString(service, settings));
-                    }
-
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBS))
-                    {
-                        var tran = (ITransponderDVBS)service.Transponder;
-                        if (tran.OrbitalPositionInt < 0)
-                        {
-                            sContent.Append(ServiceToString(service, settings));
-                        }
-                    }
-
-                    foreach (IService service in settings.Services.Where(x => x.Transponder == null))
-                    {
-                        sContent.Append(ServiceToString(service, settings, true));
-                    }
-                    break;
-                case Enums.SettingsVersion.Enigma2Ver3:
-                case Enums.SettingsVersion.Enigma2Ver4:
-                case Enums.SettingsVersion.Enigma2Ver5:
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBS))
-                    {
-                        sContent.Append(ServiceToString(service, settings));
-                    }
-
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBC))
-                    {
-                        sContent.Append(ServiceToString(service, settings));
-                    }
-
-                    foreach (IService service in settings.Services.Where(x => x.Transponder != null).Where(x => x.Transponder.TransponderType == Enums.TransponderType.DVBT))
-                    {
-                        sContent.Append(ServiceToString(service, settings));
-                    }
-
-                    foreach (IService service in settings.Services.Where(x => x.Transponder == null))
-                    {
-                        sContent.Append(ServiceToString(service, settings, true));
-                    }
-                    break;
-            }
+            // OrderBy is stable, so the original order is kept inside each group
+            foreach (IService service in settings.Services.OrderBy(x => ServiceWriteGroup(x, enigma1)))
+                sContent.Append(ServiceToString(service, settings, service.Transponder == null));
 
             sContent.Append(SettingsClosingTag + "\n");
             return sContent.ToString();
@@ -2171,7 +2228,14 @@ namespace Krkadoni.EnigmaSettings
 
                 if (serviceSupported)
                 {
-                    var sData = bLocalTransponderIsNull ? string.Join(":", service.SID.PadLeft(4, '0'), service.TransponderId, service.Type, service.ProgNumber, service.SourceID) : string.Join(":", service.SID.PadLeft(4, '0'), service.Transponder.NameSpc.PadRight(8, '0'), service.Transponder.TSID.PadLeft(4, '0'), service.Transponder.NID.PadLeft(4, '0'), service.Type, service.ProgNumber);
+                    var sData = bLocalTransponderIsNull
+                        ? string.Join(":", service.SID.PadLeft(4, '0'), service.TransponderId, service.Type, service.ProgNumber)
+                        : string.Join(":", service.SID.PadLeft(4, '0'), service.Transponder.NameSpc.PadLeft(8, '0'), service.Transponder.TSID.PadLeft(4, '0'), service.Transponder.NID.PadLeft(4, '0'), service.Type, service.ProgNumber);
+
+                    // the optional 7th field (source id) only exists in Enigma2 lamedb
+                    if (!string.IsNullOrEmpty(service.SourceID) && settings.SettingsVersion is not (Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2))
+                        sData += ":" + service.SourceID;
+
                     sContent.Append(sData + "\n");
                     sContent.Append(service.Name + "\n");
 
@@ -2181,7 +2245,7 @@ namespace Krkadoni.EnigmaSettings
                         sContent.Append(service.Flags + "\n");
                 }
                 else
-                    Log.Debug($"Service {service.ToString().Replace("\t", "  ")} is not supported in Enigma1. Not writing it to settings.");
+                    if (Log.IsDebugEnabled) Log.Debug($"Service {service.ToString().Replace("\t", "  ")} is not supported in Enigma1. Not writing it to settings.");
             }
             return sContent.ToString();
         }
@@ -2225,7 +2289,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 OnFileSaving(this, fileName);
                 _fileHelper.WriteAllText(fileName, content);
-                Log.Debug($"Sucessfully written bouquet {bouquetName} to {fileName}");
+                if (Log.IsDebugEnabled) Log.Debug($"Sucessfully written bouquet {bouquetName} to {fileName}");
                 OnFileSaved(this, fileName, true);
             }
             catch (Exception ex)
@@ -2258,22 +2322,20 @@ namespace Krkadoni.EnigmaSettings
                         break;
                     case Enums.BouquetItemType.FileBouquet:
                         var bif = (IBouquetItemFileBouquet)bqItem;
-                        string fName = Path.GetFileName(bif.FileName);
-                        if (fName == null)
-                            throw new ArgumentNullException();
-                        if (fName.ToLower().StartsWith("userbouquet."))
+                        string fName = Path.GetFileName(bif.FileName) ?? throw new SettingsException($"File bouquet reference in bouquet {bouquet.Name} has no file name");
+                        if (fName.ToLowerInvariant().StartsWith("userbouquet.", StringComparison.Ordinal))
                             fName = fName.Substring(12);
                         string reference = "#SERVICE: " + string.Join(":", bif.FavoritesTypeFlag, bif.LineSpecifierFlag, "0", fName.Split('.')[0], "0", "0", "0", "0", "0", "0", bif.FileName) + "\n";
                         reference += "#TYPE 16385" + "\n";
-                        reference += bif.FileName.ToLower() + "\n";
+                        reference += bif.FileName.ToLowerInvariant() + "\n";
                         sContent.Append(reference);
-                        Log.Debug($"File bouquet reference {reference.Replace("\n", "\t")} added to bouquet {bouquet.Name}");
+                        if (Log.IsDebugEnabled) Log.Debug($"File bouquet reference {reference.Replace("\n", "\t")} added to bouquet {bouquet.Name}");
                         break;
                     case Enums.BouquetItemType.Marker:
                         var bim = (IBouquetItemMarker)bqItem;
                         sContent.Append("#SERVICE: " + string.Join(":", bim.FavoritesTypeFlag, bim.LineSpecifierFlag, bim.MarkerNumber, "0", "0", "0", "0", "0", "0", "0", "") + "\n");
                         sContent.Append("#DESCRIPTION: " + bim.Description + "\n");
-                        Log.Debug($"Marker {bim.Description} added to bouquet {bouquet.Name}");
+                        if (Log.IsDebugEnabled) Log.Debug($"Marker {bim.Description} added to bouquet {bouquet.Name}");
                         break;
                     case Enums.BouquetItemType.Service:
                         var bis = (IBouquetItemService)bqItem;
@@ -2307,7 +2369,7 @@ namespace Krkadoni.EnigmaSettings
                             if (serviceSupported)
                             {
                                 sContent.Append("#SERVICE: " + string.Join(":", bis.FavoritesTypeFlag, bis.LineSpecifierFlag, bis.Service.ServiceId, "0", "0", "0", "") + "\n");
-                                Log.Debug($"Service {bis.Service.ServiceId}\t{bis.Service.Name} added to bouquet {bouquet.Name}");
+                                if (Log.IsDebugEnabled) Log.Debug($"Service {bis.Service.ServiceId}\t{bis.Service.Name} added to bouquet {bouquet.Name}");
                             }
                             else
                             {
@@ -2329,7 +2391,7 @@ namespace Krkadoni.EnigmaSettings
                         if (biss != null)
                         {
                             sContent.Append("#DESCRIPTION " + biss.Description + "\n");
-                            Log.Debug($"Stream {biss.Description}\t{biss.URL} added to bouquet {bouquet.Name}");
+                            if (Log.IsDebugEnabled) Log.Debug($"Stream {biss.Description}\t{biss.URL} added to bouquet {bouquet.Name}");
                         }
                         break;
                     case Enums.BouquetItemType.Unknown:
@@ -2357,18 +2419,18 @@ namespace Krkadoni.EnigmaSettings
                     case Enums.BouquetItemType.FileBouquet:
                         var bif = (IBouquetItemFileBouquet)bqItem;
                         sContent.Append("#SERVICE " + string.Join(":", bif.FavoritesTypeFlag, bif.LineSpecifierFlag, "1", "0", "0", "0", "0", "0", "0", "0", "FROM BOUQUET \"" + bif.FileName + "\" ORDER BY bouquet") + "\n");
-                        Log.Debug($"File bouquet reference {bif.FileName} added to bouquet {bouquet.Name}");
+                        if (Log.IsDebugEnabled) Log.Debug($"File bouquet reference {bif.FileName} added to bouquet {bouquet.Name}");
                         break;
                     case Enums.BouquetItemType.Alternative:
                         var bia = (IBouquetItemAlternative)bqItem;
                         sContent.Append("#SERVICE " + string.Join(":", bia.FavoritesTypeFlag, bia.LineSpecifierFlag, "1", "0", "0", "0", "0", "0", "0", "0", "FROM BOUQUET \"" + bia.FileName + "\" ORDER BY bouquet") + "\n");
-                        Log.Debug($"Alternative reference {bia.FileName} added to bouquet {bouquet.Name}");
+                        if (Log.IsDebugEnabled) Log.Debug($"Alternative reference {bia.FileName} added to bouquet {bouquet.Name}");
                         break;
                     case Enums.BouquetItemType.Marker:
                         var bim = (IBouquetItemMarker)bqItem;
                         sContent.Append("#SERVICE " + string.Join(":", bim.FavoritesTypeFlag, bim.LineSpecifierFlag, bim.MarkerNumber, "0", "0", "0", "0", "0", "0", "0", "") + "\n");
                         sContent.Append("#DESCRIPTION " + bim.Description + "\n");
-                        Log.Debug($"Marker {bim.Description} added to bouquet {bouquet.Name}");
+                        if (Log.IsDebugEnabled) Log.Debug($"Marker {bim.Description} added to bouquet {bouquet.Name}");
                         break;
                     case Enums.BouquetItemType.Service:
                         var bis = (IBouquetItemService)bqItem;
@@ -2390,14 +2452,14 @@ namespace Krkadoni.EnigmaSettings
                         else
                         {
                             sContent.Append("#SERVICE " + string.Join(":", bis.FavoritesTypeFlag, bis.LineSpecifierFlag, bis.Service.ServiceId, "0", "0", "0", "") + "\n");
-                            Log.Debug($"Service {bis.Service.ServiceId}\t{bis.Service.Name} added to bouquet {bouquet.Name}");
+                            if (Log.IsDebugEnabled) Log.Debug($"Service {bis.Service.ServiceId}\t{bis.Service.Name} added to bouquet {bouquet.Name}");
                         }
                         break;
                     case Enums.BouquetItemType.Stream:
                         var biss = (IBouquetItemStream)bqItem;
                         sContent.Append("#SERVICE " + string.Join(":", biss.FavoritesTypeFlag, biss.LineSpecifierFlag, biss.StreamFlag, biss.ServiceID, biss.ExtraFlag1, biss.ExtraFlag2, "0", "0", "0", "0", biss.URL, Uri.EscapeDataString(biss.Description).Replace("'", "%27")) + "\n");
                         sContent.Append("#DESCRIPTION " + biss.Description + "\n");
-                        Log.Debug($"Stream {biss.Description}\t{biss.URL} added to bouquet {bouquet.Name}");
+                        if (Log.IsDebugEnabled) Log.Debug($"Stream {biss.Description}\t{biss.URL} added to bouquet {bouquet.Name}");
                         break;
                     case Enums.BouquetItemType.Unknown:
                         Log.Warn(string.Format(Resources.SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_, bouquet.Name));
@@ -2421,11 +2483,11 @@ namespace Krkadoni.EnigmaSettings
             foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList()
                 )
             {
-                string dbeIndex = "dbe" + bouquetIndex.ToString(CultureInfo.CurrentCulture).PadLeft(2, '0');
+                string dbeIndex = "dbe" + bouquetIndex.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0');
                 string enigmaPath = string.Empty;
-                if (bouquet.FileName.IndexOf("/", StringComparison.CurrentCulture) > -1)
+                if (bouquet.FileName.IndexOf('/') > -1)
                 {
-                    enigmaPath = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf("/", StringComparison.CurrentCulture) + 1);
+                    enigmaPath = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf('/') + 1);
                 }
                 if (enigmaPath.Length == 0)
                     enigmaPath = DefaultEnigma1Path;
@@ -2434,7 +2496,7 @@ namespace Krkadoni.EnigmaSettings
                 reference += "#TYPE 16385" + "\n";
                 reference += bouquet.FileName + "\n";
                 sBouquetsTvContent.Append(reference);
-                Log.Debug($"Bouquet {bouquet.FileName} added to userbouquets.epl.tv");
+                if (Log.IsDebugEnabled) Log.Debug($"Bouquet {bouquet.FileName} added to userbouquets.epl.tv");
                 string bContent = E1BouquetToString(bouquet);
                 WriteBouquet(Path.Combine(directory, Path.GetFileName(bouquet.FileName)), bContent, bouquet.Name);
                 bouquetIndex += 1;
@@ -2455,7 +2517,7 @@ namespace Krkadoni.EnigmaSettings
             foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetTv).ToList())
             {
                 sBouquetsTvContent.Append("#SERVICE 1:" + (bouquet.Hidden ? "519" : "7") + ":1:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
-                Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.tv");
+                if (Log.IsDebugEnabled) Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.tv");
                 string bContent = E2BouquetToString(bouquet);
                 string fName = Path.GetFileName(bouquet.FileName);
                 if (fName != null) WriteBouquet(Path.Combine(directory, fName), bContent, bouquet.Name);
@@ -2477,11 +2539,11 @@ namespace Krkadoni.EnigmaSettings
             foreach (
                 IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetRadio).ToList())
             {
-                string dbeIndex = "dbe" + bouquetIndex.ToString(CultureInfo.CurrentCulture).PadLeft(2, '0');
+                string dbeIndex = "dbe" + bouquetIndex.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0');
                 string enigmaPath = string.Empty;
-                if (bouquet.FileName.IndexOf("/", StringComparison.CurrentCulture) > -1)
+                if (bouquet.FileName.IndexOf('/') > -1)
                 {
-                    enigmaPath = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf("/", StringComparison.CurrentCulture) + 1);
+                    enigmaPath = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf('/') + 1);
                 }
                 if (enigmaPath.Length == 0)
                     enigmaPath = DefaultEnigma1Path;
@@ -2490,7 +2552,7 @@ namespace Krkadoni.EnigmaSettings
                 reference += "#TYPE 16385" + "\n";
                 reference += bouquet.FileName + "\n";
                 bouquetsRadioContent.Append(reference);
-                Log.Debug($"Bouquet {bouquet.FileName} added to userbouquets.epl.radio");
+                if (Log.IsDebugEnabled) Log.Debug($"Bouquet {bouquet.FileName} added to userbouquets.epl.radio");
                 string bContent = E1BouquetToString(bouquet);
                 WriteBouquet(Path.Combine(directory, Path.GetFileName(bouquet.FileName)), bContent, bouquet.Name);
                 bouquetIndex += 1;
@@ -2512,7 +2574,7 @@ namespace Krkadoni.EnigmaSettings
                 IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.UserBouquetRadio).ToList())
             {
                 sBouquetsRadioContent.Append("#SERVICE 1:" + (bouquet.Hidden ? "519" : "7") + ":2:0:0:0:0:0:0:0:FROM BOUQUET \"" + Path.GetFileName(bouquet.FileName) + "\" ORDER BY bouquet\n");
-                Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.radio");
+                if (Log.IsDebugEnabled) Log.Debug($"Bouquet {Path.GetFileName(bouquet.FileName)} added to bouquets.radio");
                 string bContent = E2BouquetToString(bouquet);
                 string fName = Path.GetFileName(bouquet.FileName);
                 if (fName != null) WriteBouquet(Path.Combine(directory, fName), bContent, bouquet.Name);
@@ -2543,7 +2605,7 @@ namespace Krkadoni.EnigmaSettings
 
                     string content = E2BouquetToString(alt.Bouquet);
                     WriteBouquet(Path.Combine(directory, fName), content, alt.Bouquet.Name);
-                    Log.Debug($"Alternatives file {fName} written");
+                    if (Log.IsDebugEnabled) Log.Debug($"Alternatives file {fName} written");
                 }
             }
         }
@@ -2569,8 +2631,8 @@ namespace Krkadoni.EnigmaSettings
                     }
                     else
                     {
-                        fContent.Append(string.Join(":", "1:0", srv.ServiceId, "0", "0", "0", "").ToUpper() + "\n");
-                        Log.Debug($"Service {srv} added to blacklist file");
+                        fContent.Append(string.Join(":", "1:0", srv.ServiceId, "0", "0", "0", "").ToUpperInvariant() + "\n");
+                        if (Log.IsDebugEnabled) Log.Debug($"Service {srv} added to blacklist file");
                     }
                 }
             }
@@ -2579,7 +2641,7 @@ namespace Krkadoni.EnigmaSettings
                 Log.Debug("There is no locked services to put inside blacklist file");
             }
 
-            WriteFile(Path.Combine(directory, BlackListFile), fContent.ToString(), Encoding.UTF8);
+            WriteFile(Path.Combine(directory, BlackListFile), fContent.ToString(), Utf8NoBom);
         }
 
         /// <summary>
@@ -2603,8 +2665,8 @@ namespace Krkadoni.EnigmaSettings
                     }
                     else
                     {
-                        fContent.Append(string.Join(":", "1:0", srv.ServiceId, "0", "0", "0", "").ToUpper() + "\n");
-                        Log.Debug($"Service {srv} added to whitelist file");
+                        fContent.Append(string.Join(":", "1:0", srv.ServiceId, "0", "0", "0", "").ToUpperInvariant() + "\n");
+                        if (Log.IsDebugEnabled) Log.Debug($"Service {srv} added to whitelist file");
                     }
                 }
             }
@@ -2612,7 +2674,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 Log.Debug("There is no services to put inside whitelist file");
             }
-            WriteFile(Path.Combine(directory, WhiteListFile), fContent.ToString(), Encoding.UTF8);
+            WriteFile(Path.Combine(directory, WhiteListFile), fContent.ToString(), Utf8NoBom);
         }
 
         /// <summary>
@@ -2638,13 +2700,13 @@ namespace Krkadoni.EnigmaSettings
                 var fContent = new StringBuilder();
                 fContent.Append("Parentallocked Services" + "\n");
 
-                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => x.FileName.ToLower() == BouquetsFile);
+                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
                     if (existing.BouquetItems.Any())
                     {
                         IList<IBouquetItemBouquetsBouquet> lockedBouquets =
-                            existing.BouquetItems.OfType<IBouquetItemBouquetsBouquet>().Where(x => x.Bouquet.Locked).ToList();
+                            existing.BouquetItems.OfType<IBouquetItemBouquetsBouquet>().Where(x => x.Bouquet == null || x.Bouquet.Locked).ToList();
                         if (lockedBouquets.Any())
                         {
                             foreach (IBouquetItemBouquetsBouquet lbq in lockedBouquets)
@@ -2652,7 +2714,7 @@ namespace Krkadoni.EnigmaSettings
                                 if (lbq.Bouquet != null)
                                 {
                                     fContent.Append(string.Join(":", "1:15:fffffffd:12", lbq.BouquetOrderNumber, "ffffffff:0:0:0:0:") + "\n");
-                                    Log.Debug($"Enigma1 bouquet {lbq.Bouquet.Name} added to services.locked");
+                                    if (Log.IsDebugEnabled) Log.Debug($"Enigma1 bouquet {lbq.Bouquet.Name} added to services.locked");
                                 }
                                 else
                                 {
@@ -2693,8 +2755,8 @@ namespace Krkadoni.EnigmaSettings
                         }
                         else
                         {
-                            fContent.Append(string.Join(":", "1:0", srv.ServiceId, "0", "0", "0", "").ToUpper() + "\n");
-                            Log.Debug($"Service {srv} added to services.locked");
+                            fContent.Append(string.Join(":", "1:0", srv.ServiceId, "0", "0", "0", "").ToUpperInvariant() + "\n");
+                            if (Log.IsDebugEnabled) Log.Debug($"Service {srv} added to services.locked");
                         }
                     }
                 }
@@ -2703,7 +2765,7 @@ namespace Krkadoni.EnigmaSettings
                     Log.Debug("There is no locked services to put inside services.locked file");
                 }
 
-                WriteFile(fName, fContent.ToString(), Encoding.UTF8);
+                WriteFile(fName, fContent.ToString(), Utf8NoBom);
             }
             catch (SettingsException ex)
             {
@@ -2741,7 +2803,7 @@ namespace Krkadoni.EnigmaSettings
                 var fContent = new StringBuilder();
                 fContent.Append("eDVB bouquets /2/" + "\n" + "bouquets" + "\n");
 
-                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => x.FileName.ToLower() == BouquetsFile);
+                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
                     if (existing.BouquetItems.Any())
@@ -2754,15 +2816,15 @@ namespace Krkadoni.EnigmaSettings
                                 //making sure all bouquets have correct order numbers 
                                 bbq.BouquetOrderNumberInt = bqOrderNumber;
 
-                                fContent.Append(string.Join("\n", bbq.BouquetOrderNumberInt.ToString(CultureInfo.CurrentCulture), bbq.Bouquet.Name, ""));
+                                fContent.Append(string.Join("\n", bbq.BouquetOrderNumberInt.ToString(CultureInfo.InvariantCulture), bbq.Bouquet.Name, ""));
                                 foreach (IBouquetItemService srv in bbq.Bouquet.BouquetItems.OfType<IBouquetItemService>())
                                 {
                                     if (srv.Service != null)
                                     {
                                         if (srv.Service.Transponder != null)
                                         {
-                                            fContent.Append(string.Join(":", srv.Service.SID.PadLeft(4, '0'), srv.Service.Transponder.TransponderId.ToLower(), Convert.ToInt32(srv.Service.ServiceType).ToString(CultureInfo.CurrentCulture)) + "\n");
-                                            Log.Debug($"Service {srv} in bouquet {bbq.Bouquet.Name} added to Enigma1 bouquets file");
+                                            fContent.Append(string.Join(":", srv.Service.SID.PadLeft(4, '0'), srv.Service.Transponder.TransponderId.ToLowerInvariant(), Convert.ToInt32(srv.Service.ServiceType, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture)) + "\n");
+                                            if (Log.IsDebugEnabled) Log.Debug($"Service {srv} in bouquet {bbq.Bouquet.Name} added to Enigma1 bouquets file");
                                         }
                                         else
                                         {
@@ -2784,7 +2846,7 @@ namespace Krkadoni.EnigmaSettings
                                 }
                                 fContent.Append("/" + "\n");
                                 bqOrderNumber += 1;
-                                Log.Debug($"Enigma1 bouquet {bbq.Bouquet.Name} added to Enigma1 bouquets file");
+                                if (Log.IsDebugEnabled) Log.Debug($"Enigma1 bouquet {bbq.Bouquet.Name} added to Enigma1 bouquets file");
                             }
                             else
                             {
@@ -2808,7 +2870,7 @@ namespace Krkadoni.EnigmaSettings
 
                 fContent.Append("end" + "\n" + EditorName + "\n");
 
-                WriteFile(fName, fContent.ToString(), Encoding.UTF8);
+                WriteFile(fName, fContent.ToString(), Utf8NoBom);
             }
             catch (SettingsException ex)
             {
@@ -2819,7 +2881,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 Log.Error(ex.Message, ex);
                 throw new SettingsException(
-                    string.Format(Resources.SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_, directory), ex);
+                    $"Failed to write Enigma1 bouquets file to {directory}", ex);
             }
         }
         #endregion

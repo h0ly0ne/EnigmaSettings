@@ -66,11 +66,11 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemFileBouquet(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(fileName));
 
             FileName = fileName;
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.CurrentCulture);
+            _favoritesTypeFlag = ((int)Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _lineSpecifierFlag = ((int)Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if bouquet is null</exception>
         public BouquetItemFileBouquet(IFileBouquet bouquet)
         {
-            Bouquet = bouquet ?? throw new ArgumentNullException();
+            Bouquet = bouquet ?? throw new ArgumentNullException(nameof(bouquet));
         }
 
         /// <summary>

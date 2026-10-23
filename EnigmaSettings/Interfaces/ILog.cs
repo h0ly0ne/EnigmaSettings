@@ -7,6 +7,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
 {
     public interface ILog
     {
+        /// <summary>
+        ///     False when debug messages are discarded, so callers can skip building them
+        /// </summary>
+        bool IsDebugEnabled => true;
+
         void Debug(string message);
         void Warn(string message);
         void Warn(string message, Exception ex);

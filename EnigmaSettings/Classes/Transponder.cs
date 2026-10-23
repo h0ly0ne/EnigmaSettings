@@ -181,7 +181,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns>Returns 1st line of transponder info for services file</returns>
         /// <remarks>Used to match transponder to service</remarks>
         [DataMember]
-        public string TransponderId => string.Join(":", NameSpc, TSID, NID).ToLower();
+        public string TransponderId => string.Join(":", NameSpc, TSID, NID).ToLowerInvariant();
 
         /// <summary>
         /// Performs MemberwiseClone on current object

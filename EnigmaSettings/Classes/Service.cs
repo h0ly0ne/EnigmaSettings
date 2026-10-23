@@ -2,6 +2,7 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -137,7 +138,7 @@ namespace Krkadoni.EnigmaSettings
         public Service(string serviceData, string name, string flags)
         {
             if (string.IsNullOrEmpty(serviceData))
-                throw new ArgumentNullException(Resources.Service_ServiceData_Service_data_cannot_be_empty_);
+                throw new ArgumentNullException(nameof(serviceData), Resources.Service_ServiceData_Service_data_cannot_be_empty_);
 
             if (string.IsNullOrEmpty(name))
                 name = string.Empty;
@@ -468,7 +469,7 @@ namespace Krkadoni.EnigmaSettings
                     if (mSid.Length == 0)
                         mSid = "0";
 
-                    return string.Join(":", Convert.ToInt32(Type).ToString("X"), mSid.TrimStart('0'), !string.IsNullOrEmpty(TSID) ? TSID.TrimStart('0') : "0", !string.IsNullOrEmpty(ONID) ? ONID.TrimStart('0') : "0", !string.IsNullOrEmpty(NameSpace) ? NameSpace.TrimStart('0') : "0").ToLower();
+                    return string.Join(":", Convert.ToInt32(Type, CultureInfo.InvariantCulture).ToString("X", CultureInfo.InvariantCulture), mSid.TrimStart('0'), !string.IsNullOrEmpty(TSID) ? TSID.TrimStart('0') : "0", !string.IsNullOrEmpty(ONID) ? ONID.TrimStart('0') : "0", !string.IsNullOrEmpty(NameSpace) ? NameSpace.TrimStart('0') : "0").ToLowerInvariant();
                 }
                 else
                 {
@@ -492,7 +493,7 @@ namespace Krkadoni.EnigmaSettings
                     if (mNameSpc.Length == 0)
                         mNameSpc = "0";
 
-                    return string.Join(":", Convert.ToInt32(Type).ToString("X"), mSid, mTSID, mNid, mNameSpc).ToLower();
+                    return string.Join(":", Convert.ToInt32(Type, CultureInfo.InvariantCulture).ToString("X", CultureInfo.InvariantCulture), mSid, mTSID, mNid, mNameSpc).ToLowerInvariant();
                 }
             }
         }
@@ -507,7 +508,7 @@ namespace Krkadoni.EnigmaSettings
         /// </returns>
         /// <remarks></remarks>
         [DataMember]
-        public string TransponderId => Transponder == null ? field.ToLower() : Transponder.TransponderId;
+        public string TransponderId => Transponder == null ? field.ToLowerInvariant() : Transponder.TransponderId;
 
         [DataMember]
         public ITransponder Transponder
@@ -562,7 +563,7 @@ namespace Krkadoni.EnigmaSettings
                 // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (string fString  in fStrings)
                 {
-                    if (fString.IndexOf(":", StringComparison.CurrentCulture) > -1 && fString.Split(':').Length >= 2)
+                    if (fString.IndexOf(':') > -1 && fString.Split(':').Length >= 2)
                     {
                         IFlag f = Activator.CreateInstance(typeof (TFlag), fString) as TFlag;
 

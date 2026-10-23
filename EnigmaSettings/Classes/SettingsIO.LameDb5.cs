@@ -108,7 +108,7 @@ namespace Krkadoni.EnigmaSettings
 
             string LameDb5FileName = "lamedb5";
             string header = SettingsFirstLine + GetSettingsVersion(settings.SettingsVersion) + "/" + "\n";
-            string transponderBlocks = DVBSTranspondersToString(settings, 0) + DVBCTranspondersToString(settings) + DVBTTranspondersToString(settings);
+            string transponderBlocks = DVBSTranspondersToString(settings, 0) + DVBCTranspondersToString(settings) + DVBTTranspondersToString(settings) + IPTVTranspondersToString(settings);
 
             if(!string.IsNullOrEmpty(strLocalFilenameOverride))
                 LameDb5FileName = strLocalFilenameOverride;
@@ -124,7 +124,7 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 _fileHelper.WriteAllText(fi, sb.ToString());
-                Log.Debug($"Sucessfully written {LameDb5FileName} to {fi}");
+                if (Log.IsDebugEnabled) Log.Debug($"Sucessfully written {LameDb5FileName} to {fi}");
                 OnFileSaved(this, fi, true);
             }
             catch (Exception ex)
@@ -145,7 +145,7 @@ namespace Krkadoni.EnigmaSettings
             firstLine = null;
             secondLine = null;
 
-            if (string.IsNullOrEmpty(line) || !line.StartsWith("t:")) 
+            if (string.IsNullOrEmpty(line) || !line.StartsWith("t:", StringComparison.Ordinal)) 
                 return false;
 
             int comma = line.IndexOf(',');
@@ -167,15 +167,15 @@ namespace Krkadoni.EnigmaSettings
         /// </summary>
         protected virtual void ReadLameDb5(ISettings settings, string[] settingsFileLines, string fileName)
         {
-            Log.Debug($"Reading lamedb v5 from {fileName}");
+            if (Log.IsDebugEnabled) Log.Debug($"Reading lamedb v5 from {fileName}");
             foreach (string raw in settingsFileLines)
             {
                 string line = raw == null ? string.Empty : raw.Trim();
 
-                if (line.Length == 0 || line.StartsWith("#") || line.StartsWith("eDVB services"))
+                if (line.Length == 0 || line.StartsWith('#') || line.StartsWith("eDVB services", StringComparison.Ordinal))
                     continue;
 
-                if (line.StartsWith("t:"))
+                if (line.StartsWith("t:", StringComparison.Ordinal))
                 {
                     if (!TryParseLameDb5Transponder(line, out var first, out var second))
                     {
@@ -184,18 +184,19 @@ namespace Krkadoni.EnigmaSettings
                     }
 
                     // second is non-empty and starts with the type letter per TryParseLameDb5Transponder's contract
-                    switch (second.Substring(0, 1).ToLower())
+                    switch (char.ToLowerInvariant(second[0]))
                     {
-                        case "s": AddTransponderDVBS(settings, first, second); break;
-                        case "t": AddTransponderDVBT(settings, first, second); break;
-                        case "c": AddTransponderDVBC(settings, first, second); break;
+                        case 's' when first.StartsWith("0000", StringComparison.Ordinal): AddTransponderIPTV(settings, first, second); break;
+                        case 's': AddTransponderDVBS(settings, first, second); break;
+                        case 't': AddTransponderDVBT(settings, first, second); break;
+                        case 'c': AddTransponderDVBC(settings, first, second); break;
                         default:
                             Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, first, second));
                             AddTransponderDVBS(settings, first, second);
                             break;
                     }
                 }
-                else if (line.StartsWith("s:"))
+                else if (line.StartsWith("s:", StringComparison.Ordinal))
                 {
                     if (!TryParseLameDb5Service(line, out var dataId, out var name, out var flags))
                     {
@@ -207,7 +208,7 @@ namespace Krkadoni.EnigmaSettings
                 }
             }
 
-            Log.Debug($"lamedb v5 loaded with {settings.Services.Count} services and {settings.Transponders.Count} transponders");
+            if (Log.IsDebugEnabled) Log.Debug($"lamedb v5 loaded with {settings.Services.Count} services and {settings.Transponders.Count} transponders");
         }
 
         /// <summary>
@@ -220,7 +221,7 @@ namespace Krkadoni.EnigmaSettings
             name = null;
             flags = "p:";
 
-            if (string.IsNullOrEmpty(line) || !line.StartsWith("s:")) 
+            if (string.IsNullOrEmpty(line) || !line.StartsWith("s:", StringComparison.Ordinal)) 
                 return false;
 
             string rest = line.Substring(2);
@@ -232,7 +233,7 @@ namespace Krkadoni.EnigmaSettings
             dataId = rest.Substring(0, comma).Trim();
             string after = rest.Substring(comma + 1).Trim();
 
-            if (after.StartsWith("\""))
+            if (after.StartsWith('"'))
             {
                 int endQuote = after.IndexOf('"', 1);
                 if (endQuote > 0)
@@ -240,7 +241,7 @@ namespace Krkadoni.EnigmaSettings
                     name = after.Substring(1, endQuote - 1);
                     string remainder = after.Length > endQuote + 1 ? after.Substring(endQuote + 1).Trim() : string.Empty;
 
-                    if (remainder.StartsWith(",")) 
+                    if (remainder.StartsWith(',')) 
                         remainder = remainder.Substring(1).Trim();
 
                     if (remainder.Length > 0) 

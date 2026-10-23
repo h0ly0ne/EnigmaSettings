@@ -92,7 +92,7 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemStream(string description, string url, string streamFlag)
         {
             if (description == null || string.IsNullOrEmpty(url) || string.IsNullOrEmpty(streamFlag))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(url));
 
             _description = description.Trim();
             _url = url;
@@ -113,9 +113,9 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemStream(string bouquetLine, string description)
         {
             if (string.IsNullOrEmpty(bouquetLine) || description == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(bouquetLine));
 
-            if (bouquetLine.ToUpper().StartsWith("#SERVICE"))
+            if (bouquetLine.ToUpperInvariant().StartsWith("#SERVICE", StringComparison.Ordinal))
                 bouquetLine = bouquetLine.Substring(9).Trim();
 
             string[] sData = bouquetLine.Trim().Split(':');
@@ -219,7 +219,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 try
                 {
-                    return int.Parse(StreamFlag, NumberStyles.HexNumber);
+                    return int.Parse(StreamFlag, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 }
                 catch (Exception)
                 {
@@ -231,7 +231,7 @@ namespace Krkadoni.EnigmaSettings
                 if (value == StreamFlagInt)
                     return;
 
-                _streamFlag = value.ToString("X");
+                _streamFlag = value.ToString("X", CultureInfo.InvariantCulture);
                 OnPropertyChanged(nameof(StreamFlag));
                 OnPropertyChanged(nameof(StreamFlagInt));
             }
@@ -274,7 +274,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 try
                 {
-                    return int.Parse(_extraFlag1, NumberStyles.HexNumber);
+                    return int.Parse(_extraFlag1, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 }
                 catch (Exception)
                 {
@@ -286,7 +286,7 @@ namespace Krkadoni.EnigmaSettings
                 if (value == ExtraFlag1Int)
                     return;
 
-                _extraFlag1 = value.ToString("X");
+                _extraFlag1 = value.ToString("X", CultureInfo.InvariantCulture);
                 OnPropertyChanged(nameof(ExtraFlag1));
                 OnPropertyChanged(nameof(ExtraFlag1Int));
             }
@@ -329,7 +329,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 try
                 {
-                    return Int32.Parse(_extraFlag2, NumberStyles.HexNumber);
+                    return Int32.Parse(_extraFlag2, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 }
                 catch (Exception)
                 {
@@ -341,7 +341,7 @@ namespace Krkadoni.EnigmaSettings
                 if (value == ExtraFlag2Int)
                     return;
 
-                _extraFlag2 = value.ToString("X");
+                _extraFlag2 = value.ToString("X", CultureInfo.InvariantCulture);
                 OnPropertyChanged(nameof(ExtraFlag2));
                 OnPropertyChanged(nameof(ExtraFlag2Int));
             }
@@ -384,7 +384,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 try
                 {
-                    return int.Parse(_serviceId, NumberStyles.HexNumber);
+                    return int.Parse(_serviceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 }
                 catch (Exception)
                 {
@@ -396,7 +396,7 @@ namespace Krkadoni.EnigmaSettings
                 if (value == ExtraFlag2Int)
                     return;
 
-                _serviceId = value.ToString("X");
+                _serviceId = value.ToString("X", CultureInfo.InvariantCulture);
                 OnPropertyChanged(nameof(ServiceID));
                 OnPropertyChanged(nameof(ServiceIDInt));
             }

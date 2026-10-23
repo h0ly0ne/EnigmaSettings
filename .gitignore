@@ -19,3 +19,8 @@
 **/bin/Release/
 **/obj/
 /.vs/ProjectEvaluation
+
+# User-specific files
+*.user
+.vs/
+**/bin/

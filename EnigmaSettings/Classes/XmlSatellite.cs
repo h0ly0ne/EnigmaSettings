@@ -162,22 +162,22 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (Position == null || !int.TryParse(Position, out _))
+                if (Position == null || !int.TryParse(Position, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
                     return string.Empty;
 
-                string pos = Math.Abs(Convert.ToInt32(Position)).ToString(CultureInfo.CurrentCulture);
+                string pos = Math.Abs(Convert.ToInt32(Position, CultureInfo.InvariantCulture)).ToString(CultureInfo.InvariantCulture);
                 
-                if (pos.EndsWith("0"))
+                if (pos.EndsWith('0'))
                     pos = pos.Substring(0, pos.Length - 1);
                 else
                 {
                     pos = pos.Substring(0, pos.Length - 1) + "." + pos.Substring(pos.Length - 1);
                 
-                    if (pos.StartsWith("."))
+                    if (pos.StartsWith('.'))
                         pos = "0" + pos;
                 }
 
-                if (Convert.ToInt32(Position) < 0)
+                if (Convert.ToInt32(Position, CultureInfo.InvariantCulture) < 0)
                     return pos + "° W";
                 
                 return pos + "° E";

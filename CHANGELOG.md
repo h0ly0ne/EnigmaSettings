@@ -1,5 +1,67 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **Enigma1 `bouquets` file could never be read.** The parser cut the content with an end
+  offset computed before an earlier `Substring`, so every E1 list with a `bouquets` file failed
+  with `ArgumentOutOfRangeException`. It is now parsed line by line (LF and CRLF).
+- **Enigma1 load no longer fails when `bouquets` or `services.locked` is missing.**
+- **`IService.SourceID` was dropped on save** for every service that has a transponder. It is now
+  written for Enigma2 (v3/v4/v5) and never for Enigma1.
+- **IPTV transponders and their services were lost on save.** `ITransponderIPTV` entries are now
+  written (v3/v4/v5 and Enigma1) and lamedb5 reads them back as IPTV instead of DVB-S.
+- **Culture-dependent file output.** Numbers were formatted/parsed with the current culture, so on
+  e.g. sv-SE / nb-NO a western orbital position was written as `−300` (U+2212) and the file could
+  not be loaded again. All file parsing/formatting now uses the invariant culture and string
+  comparisons are ordinal.
+- **`LoadAsync` / `SaveAsync` always threw `PlatformNotSupportedException`** (`Delegate.BeginInvoke`
+  does not exist on .NET Core/.NET 5+). They now run on the thread pool; the `IAsyncResult` passed
+  to a legacy callback is the `Task` / `Task<ISettings>`.
+- **Blank lines in `whitelist` / `blacklist`** aborted the whole load; they are skipped now.
+- **`whitelist`, `blacklist`, `services.locked` and the E1 `bouquets` file were written with a
+  UTF-8 BOM**, which corrupts the first entry on the receiver. They are written without BOM.
+- **`satellites.xml` / `cables.xml` encoding.** Files were always read as ISO-8859-1 (ignoring the
+  declaration, so UTF-8 names became e.g. `TÃ¼rksat`) and written as UTF-8 bytes under an
+  `iso-8859-1` declaration. The reader now honours BOM/declaration; the writer emits real
+  ISO-8859-1 (characters outside Latin-1 as character references).
+- `Save(..., xmlSatellitesIO, xmlCablesIO, ...)` ignored the passed writers and always used the
+  factory defaults.
+- `#SERVICE` lines with fewer than 11 fields or a non-numeric line specifier no longer abort the load.
+- `SettingsLoaded` / `SettingsSaved` were raised twice (failure and then success/failure).
+- Null reference when a sub bouquet of an Enigma1 list could not be read, and when writing
+  `services.locked` with a bouquet reference that has no bouquet.
+- Service lists: entries after the `end` tag are no longer read; a transponder without data line no
+  longer throws.
+- Enigma1 save dropped DVB-S transponders/services at orbital position 0.
+- Namespaces shorter than 8 digits were right-padded (changing the value); they are left-padded.
+- `RemoveTransponder(s)` threw for services without a transponder.
+- `ArgumentNullException`s now carry the parameter name instead of the message as parameter name.
+
+### Changed
+
+- New `Task` based overloads `LoadAsync(..., CancellationToken)` and `SaveAsync(..., CancellationToken)`
+  on `SettingsIO` and (as default interface members) on `ISettingsIO`.
+- `ILog.IsDebugEnabled` (default `true`, `NullLogger` returns `false`); debug messages are only
+  built when it is enabled, which saves most string allocations while loading/saving large lists.
+- `RemoveServices` / `RemoveTransponders` / `RemoveService` / `RemoveTransponder` run in linear
+  time (hash sets, single pass per list) instead of O(n·m).
+- `IFileHelper.OpenRead` (default interface member); the XML readers go through `IFileHelper`
+  and the file helper is no longer a static field shared by all `XmlSatellitesIO`/`XmlCablesIO`
+  instances. `SerializerSatellites`/`SerializerCables` got `LoadFromFile`/`SaveToFile` overloads
+  taking an `IFileHelper`.
+- `FileHelper` writes atomically (temporary file, then replace) and plain `WriteAllText` uses UTF-8
+  without BOM explicitly.
+- Library is no longer tied to `win-x64` (no `RuntimeIdentifier`), publish profiles are not
+  self-contained, Debug builds emit portable PDBs again.
+- `*.user` files are no longer tracked.
+
+### Removed (breaking)
+
+- `ObjectCopier` — it relied on `BinaryFormatter` (removed in .NET 9) and no library type is
+  `[Serializable]`, so it threw for every input. Use `ICloneable.Clone()` on the model types.
+
 ## 1.1.0.1
 
 ### Fixed
@@ -17,8 +79,7 @@
 
 Brings the Enigma2 support up to date: lamedb version 5, more IPTV/stream service
 types, service alternatives, SPACE/HIDDEN bouquet entries, and a completed DVB
-service-type / DVB-T modulation enum set. A new xUnit test project
-(`EnigmaSettings.Tests`) covers the format with round-trip fixtures.
+service-type / DVB-T modulation enum set.
 
 ### Added (non-breaking)
 

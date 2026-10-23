@@ -124,7 +124,7 @@ namespace Krkadoni.EnigmaSettings
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentException();
+                    throw new ArgumentException("Bouquet name cannot be empty", nameof(value));
 
                 if (value == _name)
                     return;

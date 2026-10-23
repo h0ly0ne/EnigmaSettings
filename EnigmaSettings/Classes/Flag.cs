@@ -80,7 +80,7 @@ namespace Krkadoni.EnigmaSettings
         public Flag(string flagString)
         {
             if (string.IsNullOrEmpty(flagString))
-                throw new ArgumentNullException(Resources.Flag_New_Flag_string_cannot_be_empty_);
+                throw new ArgumentNullException(nameof(flagString), Resources.Flag_New_Flag_string_cannot_be_empty_);
 
             _flagString = flagString;
         }
@@ -96,7 +96,7 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (!FlagString.ToLower().StartsWith("f:"))
+                if (!FlagString.ToLowerInvariant().StartsWith("f:", StringComparison.Ordinal))
                     return Enums.FFlagType.None;
 
                 if (FlagValue.TrimStart('0').Length == 0)
@@ -183,7 +183,7 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (!FlagString.ToLower().StartsWith("c:"))
+                if (!FlagString.ToLowerInvariant().StartsWith("c:", StringComparison.Ordinal))
                     return Enums.CFlagType.None;
 
                 if (FlagValue.Trim('0').Length == 0)
@@ -234,7 +234,7 @@ namespace Krkadoni.EnigmaSettings
                 if (FlagString.Length == 0)
                     return Enums.FlagType.Unknown;
 
-                switch (FlagString.Split(':')[0].ToLower())
+                switch (FlagString.Split(':')[0].ToLowerInvariant())
                 {
                     case "c":
                         return Enums.FlagType.C;
@@ -288,7 +288,7 @@ namespace Krkadoni.EnigmaSettings
 
                 try
                 {
-                    return int.Parse(FlagValue, NumberStyles.HexNumber);
+                    return int.Parse(FlagValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 }
                 catch (Exception)
                 {
@@ -303,10 +303,10 @@ namespace Krkadoni.EnigmaSettings
                 switch (FlagType)
                 {
                     case Enums.FlagType.C:
-                        value = Convert.ToInt32(value.ToString("X").PadLeft(6, '0'));
+                        value = Convert.ToInt32(value.ToString("X", CultureInfo.InvariantCulture).PadLeft(6, '0'), CultureInfo.InvariantCulture);
                         break;
                     case Enums.FlagType.F:
-                        value = Convert.ToInt32(value.ToString("X"));
+                        value = Convert.ToInt32(value.ToString("X", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
                         break;
                 }
                 FlagString = FlagString.Split(':')[0] + ":" + value;
@@ -328,9 +328,9 @@ namespace Krkadoni.EnigmaSettings
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException(Resources.Flag_New_Flag_string_cannot_be_empty_);
+                    throw new ArgumentNullException(nameof(value), Resources.Flag_New_Flag_string_cannot_be_empty_);
 
-                if (value.IndexOf(":", StringComparison.CurrentCulture) == -1)
+                if (!value.Contains(':'))
                     throw new ArgumentException(Resources.Flag_New_Invalid_flag);
 
                 if (value == _flagString)

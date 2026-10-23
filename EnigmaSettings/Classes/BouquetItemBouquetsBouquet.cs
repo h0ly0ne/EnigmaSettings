@@ -69,9 +69,9 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if bouquet is null</exception>
         public BouquetItemBouquetsBouquet(IBouquetsBouquet bouquet)
         {
-            Bouquet = bouquet ?? throw new ArgumentNullException();
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.CurrentCulture);
+            Bouquet = bouquet ?? throw new ArgumentNullException(nameof(bouquet));
+            _favoritesTypeFlag = ((int)Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _lineSpecifierFlag = ((int)Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -82,8 +82,8 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemBouquetsBouquet(int bouquetOrderNumber)
         {
             _bouquetOrderNumberInt = bouquetOrderNumber;
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.CurrentCulture);
+            _favoritesTypeFlag = ((int)Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _lineSpecifierFlag = ((int)Enums.LineSpecifier.IsDirectoryMustChangeDirectoryMayChangeDirectoryAutomaticallySorted).ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks>Used to match locked bouquets</remarks>
         [DataMember]
-        public string BouquetOrderNumber => BouquetOrderNumberInt.ToString("X").ToLower();
+        public string BouquetOrderNumber => BouquetOrderNumberInt.ToString("X", CultureInfo.InvariantCulture).ToLowerInvariant();
 
         /// <summary>
         ///     Negative number as integer as found in bouquets file

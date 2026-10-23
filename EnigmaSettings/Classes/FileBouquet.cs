@@ -1,6 +1,7 @@
 // Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -184,13 +185,13 @@ namespace Krkadoni.EnigmaSettings
             if (string.IsNullOrEmpty(fName))
                 return Enums.BouquetType.Unknown;
 
-            if (fName.ToLower() == "bouquets")
+            if (string.Equals(fName, "bouquets", StringComparison.OrdinalIgnoreCase))
                 return Enums.BouquetType.E1Bouquets;
             
-            if (fName.ToLower().EndsWith(".tv") || fName.ToLower().EndsWith(".tv.epl"))
+            if (fName.ToLowerInvariant().EndsWith(".tv", StringComparison.Ordinal) || fName.ToLowerInvariant().EndsWith(".tv.epl", StringComparison.Ordinal))
                 return Enums.BouquetType.UserBouquetTv;
             
-            if (fName.ToLower().EndsWith(".radio") || fName.ToLower().EndsWith(".radio.epl"))
+            if (fName.ToLowerInvariant().EndsWith(".radio", StringComparison.Ordinal) || fName.ToLowerInvariant().EndsWith(".radio.epl", StringComparison.Ordinal))
                 return Enums.BouquetType.UserBouquetRadio;
             
             return Enums.BouquetType.Unknown;

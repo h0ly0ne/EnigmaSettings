@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
  
+using System.IO;
 using System.Text;
 
 namespace Krkadoni.EnigmaSettings.Interfaces
@@ -22,5 +23,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
        bool FolderExists(string path);
 
        void CreateFolder(string path);
+
+       Stream OpenRead(string path) => File.OpenRead(path);
     }
 }

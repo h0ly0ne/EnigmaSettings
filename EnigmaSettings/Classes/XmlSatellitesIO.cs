@@ -21,7 +21,7 @@ namespace Krkadoni.EnigmaSettings
     /// <remarks></remarks>
     public class XmlSatellitesIO : IXmlSatellitesIO
     {
-        private static IFileHelper _fileProvider;
+        private readonly IFileHelper _fileProvider;
 
         /// <summary>
         ///     Initializes new instance with custom factory implementation
@@ -32,8 +32,8 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if factory is null</exception>
         public XmlSatellitesIO(IInstanceFactory factory, IFileHelper fileProvider)
         {
-            Factory = factory ?? throw new ArgumentNullException(Resources.SettingsIO_New_Invalid_instance_factory_);
-            _fileProvider = fileProvider ?? throw new ArgumentNullException(Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
+            Factory = factory ?? throw new ArgumentNullException(nameof(factory), Resources.SettingsIO_New_Invalid_instance_factory_);
+            _fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider), Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Krkadoni.EnigmaSettings
         public IList<IXmlSatellite> LoadSatellitesFromFile(string fileName)
         {
             var sats = new List<IXmlSatellite>();
-            SerializerSatellites ss = SerializerSatellites.LoadFromFile(fileName);
+            SerializerSatellites ss = SerializerSatellites.LoadFromFile(fileName, _fileProvider);
             foreach (SerializerSatellites.SerializerSatellite sSat in ss.sat)
             {
                 var sat = new XmlSatellite
@@ -161,7 +161,7 @@ namespace Krkadoni.EnigmaSettings
                 }
                 ss.sat.Add(sSat);
             }
-            ss.SaveToFile(fileName);
+            ss.SaveToFile(fileName, _fileProvider);
         }
 
         #region "Serialization"
@@ -193,37 +193,33 @@ namespace Krkadoni.EnigmaSettings
             /// <returns>string XML value</returns>
             public virtual string Serialize()
             {
-                var memoryStream = new MemoryStream();
-                var xmlSettings = new XmlWriterSettings {Indent = true, Encoding = Encoding.GetEncoding("ISO-8859-1")};
-                var xmlTextWriter = XmlWriter.Create(memoryStream, xmlSettings); //  (memoryStream, Encoding.GetEncoding("ISO-8859-1")) { Formatting = Formatting.Indented };
-                // XmlTextWriter xmlTextWriter = New XmlTextWriter(memoryStream, New UTF8Encoding(True))
-                var ns = new XmlSerializerNamespaces();
-                ns.Add("", "");
-                Serializer.Serialize(xmlTextWriter, this, ns);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                using var streamReader = new StreamReader(memoryStream);
-
-                return streamReader.ReadToEnd();
+                return XmlFileSerializer.Serialize(Serializer, this);
             }
 
             public static SerializerSatellites Deserialize(string xml)
             {
-                return (SerializerSatellites)Serializer.Deserialize(XmlReader.Create(new StringReader(xml)));
+                using var reader = XmlReader.Create(new StringReader(xml));
+                return (SerializerSatellites)Serializer.Deserialize(reader);
             }
 
             public virtual void SaveToFile(string fileName)
             {
-                _fileProvider.WriteAllText(fileName, Serialize());
+                SaveToFile(fileName, new FileHelper());
+            }
+
+            public virtual void SaveToFile(string fileName, IFileHelper fileHelper)
+            {
+                XmlFileSerializer.Save(fileHelper, fileName, Serialize());
             }
 
             public static SerializerSatellites LoadFromFile(string fileName)
             {
-                string strXMLSerialized;
-                using (var srCurrentStreamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read), Encoding.GetEncoding("ISO-8859-1")))
-                {
-                    strXMLSerialized = srCurrentStreamReader.ReadToEnd();
-                }
-                return Deserialize(strXMLSerialized);
+                return LoadFromFile(fileName, new FileHelper());
+            }
+
+            public static SerializerSatellites LoadFromFile(string fileName, IFileHelper fileHelper)
+            {
+                return XmlFileSerializer.Load<SerializerSatellites>(fileHelper, Serializer, fileName);
             }
             #endregion
 

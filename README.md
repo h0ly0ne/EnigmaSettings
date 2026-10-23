@@ -8,7 +8,7 @@ It does all heavy work with settings loading, manipulation and saving so you don
 
 If you’ve ever thought about writing your own settings editor (like DreamboxEdit, Dreamset…)
 but didn’t know anything about Enigma settings – this library is for you.
-It’s written in C# and compatible with Mono 2.8 and higher.
+It’s written in C# and targets .NET 10.
 
 Contributions and bugfixes are welcomed.
 
@@ -21,10 +21,10 @@ Main Features
 - It’s FREE
 - It’s open source library licensed under permissive MIT license. Anyone can use it.
 - It’s easy to use, has excellent logging support, and commented code.
-- It works on Windows XP SP2 and newer (.NET framework 3.5), Linux and MacOS X (Mono 2.8 and higher). I suppose it will work on iOS and Android too when compiled as Portable Library, but I didn’t have time to test it.
+- It runs everywhere .NET 10 runs (Windows, Linux, macOS). Files are read and written culture-independently, so the regional settings of the machine don’t affect the output.
 - It’s fast. It will load up huge motor settings in under 500 ms.
-- It supports Enigma1, Enigma2 ver3 and Enigma2 ver4 settings and automatic conversion between them.
-- Implemented background threading for settings loading and saving  (Async methods)
+- It supports Enigma1, Enigma2 ver3, ver4 and ver5 (lamedb5) settings and automatic conversion between them.
+- Task based `LoadAsync` / `SaveAsync` methods for loading and saving on a background thread
 - Full interface based objective model
 - Every part of library can be replaced by custom code via custom instance factory (Inversion of Concerns)
 - Fully prepared for GUI data binding (IEditable and IPropertyChanged interfaces implemented)
@@ -44,7 +44,10 @@ string fileName = "C:\\Settings\\lamedb";
 Krkadoni.EnigmaSettings.SettingsIO settingsIO = new Krkadoni.EnigmaSettings.SettingsIO();
 
 //load list
-Krkadoni.EnigmaSettings.Settings settings = settingsIO.Load(fileName);
+ISettings settings = settingsIO.Load(fileName);
+
+//or without blocking the caller
+//ISettings settings = await settingsIO.LoadAsync(fileName);
 
 //change satellite position for Thor satellite from 1.0 W to 0.8 W
 //Changes satellite position to new position for satellite and belonging transponders
@@ -68,8 +71,8 @@ service.ServiceSecurity = Enums.ServiceSecurity.BlackListed;
 service.SID = "24";
 //etc...
 
-//save settings to current folder
-settingsIO.Save(new DirectoryInfo(AppSettings.CurrentDir), settings );
+//save settings, satellites.xml, cables.xml and bouquets to a folder
+settingsIO.Save("C:\\Settings\\out", settings, null, true, true, true, true);
 ```
 
 ```VB.NET
@@ -82,7 +85,7 @@ Dim fileName As String = "C:\Settings\lamedb"
 Dim settingsIO As New Krkadoni.EnigmaSettings.SettingsIO()
 
 'load list
-Dim settings As Krkadoni.EnigmaSettings.Settings = settingsIO.Load(fileName)
+Dim settings As ISettings = settingsIO.Load(fileName)
 
 'change satellite position for Thor satellite from 1.0 W to 0.8 W
 'Changes satellite position to new position for satellite and belonging transponders
@@ -107,6 +110,6 @@ service.ServiceSecurity = Enums.ServiceSecurity.BlackListed
 service.SID = "24"
 'etc...
 
-'save settings to current folder
-settingsIO.Save(New DirectoryInfo(AppSettings.CurrentDir), settings)
+'save settings, satellites.xml, cables.xml and bouquets to a folder
+settingsIO.Save("C:\Settings\out", settings, Nothing, True, True, True, True)
 ```

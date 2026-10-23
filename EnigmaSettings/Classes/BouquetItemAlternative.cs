@@ -61,20 +61,20 @@ namespace Krkadoni.EnigmaSettings
         public BouquetItemAlternative(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(fileName));
 
             FileName = fileName;
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.Alternative).ToString(CultureInfo.CurrentCulture);
+            _favoritesTypeFlag = ((int)Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _lineSpecifierFlag = ((int)Enums.LineSpecifier.Alternative).ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>Initializes a new instance and sets the alternatives bouquet.</summary>
         /// <exception cref="ArgumentNullException">Thrown if bouquet is null.</exception>
         public BouquetItemAlternative(IFileBouquet bouquet)
         {
-            Bouquet = bouquet ?? throw new ArgumentNullException();
-            _favoritesTypeFlag = Convert.ToInt16(Enums.FavoritesType.DVBService).ToString(CultureInfo.CurrentCulture);
-            _lineSpecifierFlag = Convert.ToInt16(Enums.LineSpecifier.Alternative).ToString(CultureInfo.CurrentCulture);
+            Bouquet = bouquet ?? throw new ArgumentNullException(nameof(bouquet));
+            _favoritesTypeFlag = ((int)Enums.FavoritesType.DVBService).ToString(CultureInfo.InvariantCulture);
+            _lineSpecifierFlag = ((int)Enums.LineSpecifier.Alternative).ToString(CultureInfo.InvariantCulture);
         }
 
         [DataMember]

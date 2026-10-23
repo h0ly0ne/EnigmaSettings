@@ -138,16 +138,16 @@ namespace Krkadoni.EnigmaSettings
         public TransponderDVBS(string transponderData, string transponderFrequency)
         {
             if (string.IsNullOrEmpty(transponderData))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(transponderData));
 
             if (string.IsNullOrEmpty(transponderFrequency))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(transponderFrequency));
 
             _TransponderType = Enums.TransponderType.DVBS;
             string[] tData = transponderData.Split(':');
             string[] tFreq = transponderFrequency.Split(':');
 
-            if (!tFreq[0].Split(' ')[0].Trim().ToLower().StartsWith("s"))
+            if (!tFreq[0].Split(' ')[0].Trim().ToLowerInvariant().StartsWith('s'))
                 throw new ArgumentException(Resources.Transponder_New_Invalid_transponder_type_);
 
             NameSpc = tData[0];
@@ -157,7 +157,7 @@ namespace Krkadoni.EnigmaSettings
             SymbolRate = tFreq[1];
             Polarization = tFreq[2];
             FEC = tFreq[3];
-            OrbitalPositionInt = Convert.ToInt32(tFreq[4]);
+            OrbitalPositionInt = Convert.ToInt32(tFreq[4], CultureInfo.InvariantCulture);
             Inversion = tFreq[5];
 
             if (tFreq.Length > 6)
@@ -312,7 +312,7 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string OrbitalPositionHex
         {
-            get => _orbitalPositionInt.ToString("X");
+            get => _orbitalPositionInt.ToString("X", CultureInfo.InvariantCulture);
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -320,7 +320,7 @@ namespace Krkadoni.EnigmaSettings
 
                 try
                 {
-                    OrbitalPositionInt = int.Parse(value, NumberStyles.HexNumber);
+                    OrbitalPositionInt = int.Parse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                 }
                 catch (Exception)
                 {
@@ -748,12 +748,12 @@ namespace Krkadoni.EnigmaSettings
                 int dvbNamespace = orbPosition << 16;
 
                 if (IsValidOnidTsid()) 
-                    return dvbNamespace.ToString("X").PadLeft(8, '0').ToLower();
+                    return dvbNamespace.ToString("X", CultureInfo.InvariantCulture).PadLeft(8, '0').ToLowerInvariant();
 
                 if (Frequency != null)
-                    dvbNamespace = dvbNamespace | ((Convert.ToInt32(Frequency)/1000) & 0xffff) | ((Convert.ToInt32(Polarization) & 1) << 15);
+                    dvbNamespace = dvbNamespace | ((Convert.ToInt32(Frequency, CultureInfo.InvariantCulture)/1000) & 0xffff) | ((Convert.ToInt32(Polarization, CultureInfo.InvariantCulture) & 1) << 15);
 
-                return dvbNamespace.ToString("X").PadLeft(8, '0').ToLower();
+                return dvbNamespace.ToString("X", CultureInfo.InvariantCulture).PadLeft(8, '0').ToLowerInvariant();
             }
         }
 
@@ -764,8 +764,8 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         protected bool IsValidOnidTsid()
         {
-            int mOnid = Int32.Parse(NID, NumberStyles.HexNumber);
-            int mTSID = Int32.Parse(TSID, NumberStyles.HexNumber);
+            int mOnid = Int32.Parse(NID, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            int mTSID = Int32.Parse(TSID, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             int orbPosition = (OrbitalPositionInt > 0 ? OrbitalPositionInt : 3600 + OrbitalPositionInt);
 
             switch (mOnid)
@@ -816,12 +816,12 @@ namespace Krkadoni.EnigmaSettings
             string tType = string.Join("", "\t", "s", " ", Frequency);
 
             if (SystemType == Enums.DVBSSystemType.DVBS & ModulationType == Enums.DVBSModulationType.Auto)
-                return string.Join("\t", string.Join(":", NameSpc.PadRight(8, '0'), TSID.PadLeft(4, '0'), NID.PadLeft(4, '0')), string.Join(":", tType, SymbolRate.PadRight(8, '0'), Polarization, FEC, OrbitalPositionInt.ToString(CultureInfo.CurrentCulture), Inversion, Flags), "/" ).TrimEnd(':');
+                return string.Join("\t", string.Join(":", NameSpc.PadRight(8, '0'), TSID.PadLeft(4, '0'), NID.PadLeft(4, '0')), string.Join(":", tType, SymbolRate.PadRight(8, '0'), Polarization, FEC, OrbitalPositionInt.ToString(CultureInfo.InvariantCulture), Inversion, Flags), "/" ).TrimEnd(':');
             
             if (SystemType == Enums.DVBSSystemType.DVBS)
-                return string.Join("\t", string.Join(":", NameSpc.PadRight(8, '0'), TSID.PadLeft(4, '0'), NID.PadLeft(4, '0')), string.Join(":", tType, SymbolRate.PadRight(8, '0'), Polarization, FEC, OrbitalPositionInt.ToString(CultureInfo.CurrentCulture), Inversion, Flags, System, Modulation), "/").TrimEnd(':');
+                return string.Join("\t", string.Join(":", NameSpc.PadRight(8, '0'), TSID.PadLeft(4, '0'), NID.PadLeft(4, '0')), string.Join(":", tType, SymbolRate.PadRight(8, '0'), Polarization, FEC, OrbitalPositionInt.ToString(CultureInfo.InvariantCulture), Inversion, Flags, System, Modulation), "/").TrimEnd(':');
 
-            return string.Join("\t", string.Join(":", NameSpc.PadRight(8, '0'), TSID.PadLeft(4, '0'), NID.PadLeft(4, '0')), string.Join(":", tType, SymbolRate.PadRight(8, '0'), Polarization, FEC, OrbitalPositionInt.ToString(CultureInfo.CurrentCulture), Inversion, Flags, System, Modulation, RollOff, Pilot, IsId, PlsCode, PlsMode, T2miPlpId, T2miPid), "/").TrimEnd(':');
+            return string.Join("\t", string.Join(":", NameSpc.PadRight(8, '0'), TSID.PadLeft(4, '0'), NID.PadLeft(4, '0')), string.Join(":", tType, SymbolRate.PadRight(8, '0'), Polarization, FEC, OrbitalPositionInt.ToString(CultureInfo.InvariantCulture), Inversion, Flags, System, Modulation, RollOff, Pilot, IsId, PlsCode, PlsMode, T2miPlpId, T2miPid), "/").TrimEnd(':');
         }
     }
 }

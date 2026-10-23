@@ -84,10 +84,10 @@ namespace Krkadoni.EnigmaSettings
         public TransponderIPTV(string transponderData, string transponderFrequency)
         {
             if (string.IsNullOrEmpty(transponderData))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(transponderData));
 
             if (string.IsNullOrEmpty(transponderFrequency))
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(transponderFrequency));
 
             _TransponderType = Enums.TransponderType.IPTV;
             string[] tData = transponderData.Split(':');
@@ -97,7 +97,7 @@ namespace Krkadoni.EnigmaSettings
             TSID = tData[1];
             NID = tData[2];
 
-            if (transponderFrequency.Trim().ToLower().StartsWith('s'))
+            if (transponderFrequency.Trim().ToLowerInvariant().StartsWith('s'))
             {
                 Frequency = tFreq[0].Split(' ')[1].Trim();
                 SymbolRate = tFreq[1];

@@ -20,7 +20,7 @@ namespace Krkadoni.EnigmaSettings
     /// <remarks></remarks>
     public class XmlCablesIO : IXmlCablesIO
     {
-        private static IFileHelper _fileProvider;
+        private readonly IFileHelper _fileProvider;
 
         /// <summary>
         ///     Initializes new instance with custom factory implementation
@@ -31,8 +31,8 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if factory is null</exception>
         public XmlCablesIO(IInstanceFactory factory, IFileHelper fileProvider)
         {
-            Factory = factory ?? throw new ArgumentNullException(Resources.SettingsIO_New_Invalid_instance_factory_);
-            _fileProvider = fileProvider ?? throw new ArgumentNullException(Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
+            Factory = factory ?? throw new ArgumentNullException(nameof(factory), Resources.SettingsIO_New_Invalid_instance_factory_);
+            _fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider), Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Krkadoni.EnigmaSettings
         public IList<IXmlCable> LoadCablesFromFile(string fileName)
         {
             var cables = new List<IXmlCable>();
-            var sc = SerializerCables.LoadFromFile(fileName);
+            var sc = SerializerCables.LoadFromFile(fileName, _fileProvider);
 
             foreach (var sCab in sc.cab)
             {
@@ -139,7 +139,7 @@ namespace Krkadoni.EnigmaSettings
                 }
                 sc.cab.Add(sCab);
             }
-            sc.SaveToFile(fileName);
+            sc.SaveToFile(fileName, _fileProvider);
         }
         #region "Serialization"
 
@@ -166,37 +166,33 @@ namespace Krkadoni.EnigmaSettings
             /// <returns>string XML value</returns>
             public virtual string Serialize()
             {
-                var memoryStream = new MemoryStream();
-                var xmlSettings = new XmlWriterSettings { Indent = true, Encoding = Encoding.GetEncoding("ISO-8859-1") };
-                var xmlTextWriter = XmlWriter.Create(memoryStream, xmlSettings);
-                var ns = new XmlSerializerNamespaces();
-
-                ns.Add("", "");
-                Serializer.Serialize(xmlTextWriter, this, ns);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                using var streamReader = new StreamReader(memoryStream);
-
-                return streamReader.ReadToEnd();
+                return XmlFileSerializer.Serialize(Serializer, this);
             }
 
             public static SerializerCables Deserialize(string xml)
             {
-                return (SerializerCables)Serializer.Deserialize(XmlReader.Create(new StringReader(xml)));
+                using var reader = XmlReader.Create(new StringReader(xml));
+                return (SerializerCables)Serializer.Deserialize(reader);
             }
 
             public virtual void SaveToFile(string fileName)
             {
-                _fileProvider.WriteAllText(fileName, Serialize());
+                SaveToFile(fileName, new FileHelper());
+            }
+
+            public virtual void SaveToFile(string fileName, IFileHelper fileHelper)
+            {
+                XmlFileSerializer.Save(fileHelper, fileName, Serialize());
             }
 
             public static SerializerCables LoadFromFile(string fileName)
             {
-                string strXMLSerialized;
-                using (var srCurrentStreamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read), Encoding.GetEncoding("ISO-8859-1")))
-                {
-                    strXMLSerialized = srCurrentStreamReader.ReadToEnd();
-                }
-                return Deserialize(strXMLSerialized);
+                return LoadFromFile(fileName, new FileHelper());
+            }
+
+            public static SerializerCables LoadFromFile(string fileName, IFileHelper fileHelper)
+            {
+                return XmlFileSerializer.Load<SerializerCables>(fileHelper, Serializer, fileName);
             }
             #endregion
 
