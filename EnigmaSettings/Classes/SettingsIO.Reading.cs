@@ -133,74 +133,90 @@ namespace Krkadoni.EnigmaSettings
 
             if (Log.IsDebugEnabled) Log.Debug($"Transponder section found at line {transponderOpenIndex + 1}");
 
-            //reading transponders, each entry spans 3 lines (id, data, "/")
-            for (var i = transponderOpenIndex + 1; i < sCount; i += 3)
+            // the section must be closed by "end" before the services section starts (structural error otherwise)
+            int endTag = Array.FindIndex(settingsFileLines, transponderOpenIndex + 1, x => x.Trim() == SettingsClosingTag);
+            int servicesTag = Array.FindIndex(settingsFileLines, transponderOpenIndex + 1, x => x.Trim() == SettingsServicesOpenTag);
+            if (endTag == -1 || (servicesTag != -1 && servicesTag < endTag))
+                throw new SettingsException($"Transponder section in {Path.GetFileName(fileName)} has no end tag");
+
+            //reading transponders, each entry spans 3 lines (id, data, "/"); a broken entry is skipped like Enigma2 does
+            for (var i = transponderOpenIndex + 1; i < endTag; i += 3)
             {
-                if (settingsFileLines[i].Trim() != SettingsClosingTag)
+                string firstLine = settingsFileLines[i];
+                string secondLine = i + 1 < endTag ? settingsFileLines[i + 1] : string.Empty;
+
+                if (secondLine.Trim().Length == 0)
                 {
-                    if (i + 1 >= sCount || settingsFileLines[i + 1].Trim().Length == 0)
-                    {
-                        Log.Warn($"Incomplete transponder entry at line {i + 1} ignored");
-                        break;
-                    }
-
-                    switch (char.ToLowerInvariant(settingsFileLines[i + 1].Trim()[0]))
-                    {
-                        case 's':
-                        {
-                            // DVBT & DVBC transponders in Enigma1 are saved as satellite transponders
-                            if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
-                            {
-                                if (settingsFileLines[i].StartsWith("ffff", StringComparison.OrdinalIgnoreCase))
-                                    AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else if (settingsFileLines[i].StartsWith("eeee", StringComparison.OrdinalIgnoreCase))
-                                    AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else if (settingsFileLines[i].StartsWith("0000", StringComparison.OrdinalIgnoreCase))
-                                    AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else
-                                    AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                            }
-                            else
-                            {
-                                if (settingsFileLines[i].StartsWith("0000", StringComparison.OrdinalIgnoreCase))
-                                    AddTransponderIPTV(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                                else
-                                    AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-                            }
-
-                            break;
-                        }
-                        case 't':
-                        {
-                            AddTransponderDVBT(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-
-                            break;
-                        }
-                        case 'c':
-                        {
-                            AddTransponderDVBC(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-
-                            break;
-                        }
-                        default:
-                        {
-                            Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, settingsFileLines[i], settingsFileLines[i + 1]));
-                            AddTransponderDVBS(settings, settingsFileLines[i], settingsFileLines[i + 1]);
-
-                            break;
-                        }
-                    }
+                    Log.Warn($"Incomplete transponder entry at line {i + 1} skipped: {firstLine}");
+                    continue;
                 }
-                else
+
+                try
                 {
-                    //we have reached the end of transponders part
-                    if (Log.IsDebugEnabled) Log.Debug($"Transponder section ends at line {i + 1}");
-                    transponderEndIndex = i;
-                    return;
+                    AddTransponder(settings, firstLine, secondLine);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Invalid transponder entry at line {i + 1} skipped: {firstLine} {secondLine.Trim()}", ex);
                 }
             }
 
-            Log.Debug("Transponder section has no end tag");
+            if (Log.IsDebugEnabled) Log.Debug($"Transponder section ends at line {endTag + 1}");
+            transponderEndIndex = endTag;
+        }
+
+        /// <summary>
+        ///     Initializes the transponder of one lamedb entry (type from the data line, Enigma1 cable / terrestrial
+        ///     from the namespace) and adds it to the settings
+        /// </summary>
+        protected virtual void AddTransponder(ISettings settings, string firstLine, string secondLine)
+        {
+            switch (char.ToLowerInvariant(secondLine.Trim()[0]))
+            {
+                case 's':
+                {
+                    // DVBT & DVBC transponders in Enigma1 are saved as satellite transponders
+                    if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
+                    {
+                        if (firstLine.StartsWith("ffff", StringComparison.OrdinalIgnoreCase))
+                            AddTransponderDVBC(settings, firstLine, secondLine);
+                        else if (firstLine.StartsWith("eeee", StringComparison.OrdinalIgnoreCase))
+                            AddTransponderDVBT(settings, firstLine, secondLine);
+                        else if (firstLine.StartsWith("0000", StringComparison.OrdinalIgnoreCase))
+                            AddTransponderIPTV(settings, firstLine, secondLine);
+                        else
+                            AddTransponderDVBS(settings, firstLine, secondLine);
+                    }
+                    else
+                    {
+                        if (firstLine.StartsWith("0000", StringComparison.OrdinalIgnoreCase))
+                            AddTransponderIPTV(settings, firstLine, secondLine);
+                        else
+                            AddTransponderDVBS(settings, firstLine, secondLine);
+                    }
+
+                    break;
+                }
+                case 't':
+                {
+                    AddTransponderDVBT(settings, firstLine, secondLine);
+
+                    break;
+                }
+                case 'c':
+                {
+                    AddTransponderDVBC(settings, firstLine, secondLine);
+
+                    break;
+                }
+                default:
+                {
+                    Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, firstLine, secondLine));
+                    AddTransponderDVBS(settings, firstLine, secondLine);
+
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -247,7 +263,16 @@ namespace Krkadoni.EnigmaSettings
                 var line3 = settingsFileLines[i + 2];
                 if (debug)
                     Log.Debug($"Initializing new service {line1}    {line2}    {line3}");
-                settings.Services.Add(Factory.InitNewService(line1, line2, line3));
+
+                // a broken entry is skipped like Enigma2 does, the 3 line grid stays intact
+                try
+                {
+                    settings.Services.Add(Factory.InitNewService(line1, line2, line3));
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Invalid service entry at line {i + 1} skipped: {line1} / {line2}", ex);
+                }
             }
 
             Log.Debug("Services read sucessfully");
@@ -489,14 +514,14 @@ namespace Krkadoni.EnigmaSettings
                 else if (isMarker)
                 {
                     // plain, numbered (320), invisible (576) markers and spacers (832); the flag is written back as read
-                    IBouquetItemMarker bqim = ReadMarkerReference(line, description);
+                    IBouquetItemMarker bqim = TryReadEntry(() => ReadMarkerReference(line, description), out var markerError);
                     if (bqim != null)
                     {
                         bouquet.BouquetItems.Add(bqim);
                         if (Log.IsDebugEnabled) Log.Debug($"Marker {bqim.Description} ({sData[1]}) added to bouquet {bouquet.Name}");
                     }
                     else
-                        Log.Warn($"Invalid marker {line} not added to bouquet {bouquet.Name}");
+                        Log.Warn($"Invalid marker {line} not added to bouquet {bouquet.Name}", markerError);
                 }
                 else if (isDirectory)
                 {
@@ -578,10 +603,10 @@ namespace Krkadoni.EnigmaSettings
                 else if (_streamFavoritesTypes.Contains(favoritesType) || (sData.Length > 10 && sData[10].Contains("//", StringComparison.Ordinal)) || sData.Length == 12)
                 {
                     //it is a stream (any remaining flags, e.g. invisible, are kept)
-                    IBouquetItemStream bqis = ReadStreamReference(line, description);
+                    IBouquetItemStream bqis = TryReadEntry(() => ReadStreamReference(line, description), out var streamError);
                     if (bqis == null)
                     {
-                        Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
+                        Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_, line, bouquet.Name), streamError);
                     }
                     else
                     {
@@ -595,7 +620,7 @@ namespace Krkadoni.EnigmaSettings
                 else
                 {
                     //it is a regular DVB service (any remaining flags, e.g. invisible, are kept)
-                    IBouquetItemService bqis = ReadServiceReference(line);
+                    IBouquetItemService bqis = TryReadEntry(() => ReadServiceReference(line), out var serviceError);
                     if (bqis != null)
                     {
                         bqis.Description = StripDescriptionTag(description);
@@ -603,7 +628,7 @@ namespace Krkadoni.EnigmaSettings
                         if (Log.IsDebugEnabled) Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
                     }
                     else
-                        Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
+                        Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_, line, bouquet.Name), serviceError);
                 }
             }
             else if (line.StartsWith("#TYPE", StringComparison.Ordinal))
@@ -617,6 +642,24 @@ namespace Krkadoni.EnigmaSettings
             }
             else
                 Log.Warn(string.Format(Resources.Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_, Path.GetFileName(bouquet.FileName), line));
+        }
+
+        /// <summary>
+        ///     Reads one entry of a list file; a broken entry returns null (with the error) instead of failing the
+        ///     whole load, like Enigma2 skips entries it cannot parse
+        /// </summary>
+        private static T TryReadEntry<T>(Func<T> read, out Exception error) where T : class
+        {
+            try
+            {
+                error = null;
+                return read();
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                return null;
+            }
         }
 
         /// <summary>
@@ -813,7 +856,14 @@ namespace Krkadoni.EnigmaSettings
             {
                 if (block[i].Split(':').Length >= 5)
                 {
-                    bq.BouquetItems.Add(Factory.InitNewBouquetItemService(block[i]));
+                    var item = TryReadEntry(() => Factory.InitNewBouquetItemService(block[i]), out var error);
+                    if (item == null)
+                    {
+                        Log.Warn($"Invalid service line {block[i]} in Enigma1 bouquet {name} skipped", error);
+                        continue;
+                    }
+
+                    bq.BouquetItems.Add(item);
                     if (Log.IsDebugEnabled)
                         Log.Debug($"Added service {block[i]} to Enigma1 bouquet {name}");
                 }
@@ -870,7 +920,14 @@ namespace Krkadoni.EnigmaSettings
                 bouquet.ServiceSecurity = blackListed ? Enums.ServiceSecurity.BlackListed : Enums.ServiceSecurity.WhiteListed;
             }
 
-            sLocked.AddRange(bouquetFileLines.Where(x => !x.Contains("FROM BOUQUET", StringComparison.OrdinalIgnoreCase)).Select(ReadServiceReference).Where(bqis => bqis != null));
+            sLocked.AddRange(bouquetFileLines.Where(x => !x.Contains("FROM BOUQUET", StringComparison.OrdinalIgnoreCase)).Select(x =>
+                {
+                    var item = TryReadEntry(() => ReadServiceReference(x), out var error);
+                    if (item == null)
+                        Log.Warn($"Invalid line in {fName} skipped: {x}", error);
+                    return item;
+                })
+                .Where(bqis => bqis != null));
 
             if (sLocked.Count == 0) return;
 
@@ -937,7 +994,13 @@ namespace Krkadoni.EnigmaSettings
                     else
                     {
                         string[] sData = line.Split(':');
-                        IBouquetItemService srv = Factory.InitNewBouquetItemService(line);
+                        IBouquetItemService srv = TryReadEntry(() => Factory.InitNewBouquetItemService(line), out var error);
+
+                        if (srv == null)
+                        {
+                            Log.Warn($"Invalid line {line} in {fileName} skipped", error);
+                            continue;
+                        }
 
                         if (srv.LineSpecifierType == Enums.LineSpecifier.Unknown)
                         {

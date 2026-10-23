@@ -16,6 +16,13 @@
   `isInvisible` 512) instead of a fixed list of values, the flag is written back as read, and lines
   that still cannot be used are logged as warnings instead of disappearing.
 - Markers without description (e.g. spacers `1:832`) no longer get an empty `#DESCRIPTION` line.
+- **A single broken entry no longer fails the whole load.** Broken transponder and service entries in
+  lamedb (v3/v4/v5), bouquet lines with too few fields (`#SERVICE 1:64`, `#SERVICE 1:0`,
+  `#SERVICE 4097:0`), and broken lines in `whitelist` / `blacklist`, `services.locked` and the
+  Enigma1 `bouquets` file are skipped with a warning (including the cause), like Enigma2 skips entries
+  it cannot parse; the 3 line layout of lamedb is kept. Structural errors (header, `transponders`,
+  `services`, a transponder section without `end`) still fail the load. Checked by corrupting every
+  line of a sample list in 483 ways: only the structural lines fail now (16 of 32 lines failed before).
 - `FileHelper` removes its temporary file when writing fails (e.g. read-only target); the original
   file stays untouched.
 - **Enigma1 `bouquets` file could never be read.** The parser cut the content with an end

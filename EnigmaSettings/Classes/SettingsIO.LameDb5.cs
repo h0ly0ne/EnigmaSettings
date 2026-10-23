@@ -183,16 +183,23 @@ namespace Krkadoni.EnigmaSettings
                     }
 
                     // second is non-empty and starts with the type letter per TryParseLameDb5Transponder's contract
-                    switch (char.ToLowerInvariant(second[0]))
+                    try
                     {
-                        case 's' when first.StartsWith("0000", StringComparison.Ordinal): AddTransponderIPTV(settings, first, second); break;
-                        case 's': AddTransponderDVBS(settings, first, second); break;
-                        case 't': AddTransponderDVBT(settings, first, second); break;
-                        case 'c': AddTransponderDVBC(settings, first, second); break;
-                        default:
-                            Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, first, second));
-                            AddTransponderDVBS(settings, first, second);
-                            break;
+                        switch (char.ToLowerInvariant(second[0]))
+                        {
+                            case 's' when first.StartsWith("0000", StringComparison.Ordinal): AddTransponderIPTV(settings, first, second); break;
+                            case 's': AddTransponderDVBS(settings, first, second); break;
+                            case 't': AddTransponderDVBT(settings, first, second); break;
+                            case 'c': AddTransponderDVBC(settings, first, second); break;
+                            default:
+                                Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, first, second));
+                                AddTransponderDVBS(settings, first, second);
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warn($"Invalid v5 transponder line skipped: {line}", ex);
                     }
                 }
                 else if (line.StartsWith("s:", StringComparison.Ordinal))
@@ -203,7 +210,14 @@ namespace Krkadoni.EnigmaSettings
                         continue;
                     }
 
-                    settings.Services.Add(Factory.InitNewService(dataId, name, flags));
+                    try
+                    {
+                        settings.Services.Add(Factory.InitNewService(dataId, name, flags));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warn($"Invalid v5 service line skipped: {line}", ex);
+                    }
                 }
             }
 
