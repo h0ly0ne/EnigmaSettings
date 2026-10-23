@@ -257,7 +257,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10
+        ///     0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8, 6=8/9, 7=3/5, 8=4/5, 9=9/10, 10=6/7, 15=None
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -330,7 +330,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -396,7 +396,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=8PSK
+        ///     0=Auto, 1=QPSK, 2=8PSK, 3=QAM16, 4=16APSK, 5=32APSK
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -418,7 +418,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 3=0.20
+        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 2=0.20, 3=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -442,7 +442,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Only used in DVB-S2. 0=Auto, 2=Off, 1=On
+        ///     Only used in DVB-S2. 0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -520,7 +520,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -567,7 +567,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=8PSK
+        ///     0=Auto, 1=QPSK, 2=8PSK, 3=QAM16, 4=16APSK, 5=32APSK
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -593,12 +593,9 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=0.35, 1=0.25, 3=0.20
+        ///     Enigma2 coding: 0=0.35, 1=0.25, 2=0.20, 3=Auto (0.35 when not set, as for DVB-S)
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">RollOff types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         [DataMember]
         public Enums.DVBSRollOffType RollOffType
         {
@@ -607,13 +604,14 @@ namespace Krkadoni.EnigmaSettings
                 switch (RollOff)
                 {
                     case null:
-                        return Enums.DVBSRollOffType.X35;
                     case "0":
                         return Enums.DVBSRollOffType.X35;
                     case "1":
                         return Enums.DVBSRollOffType.X25;
-                    case "3":
+                    case "2":
                         return Enums.DVBSRollOffType.X20;
+                    case "3":
+                        return Enums.DVBSRollOffType.Auto;
                     default:
                         return Enums.DVBSRollOffType.Unknown;
                 }
@@ -621,12 +619,9 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 2=Off, 1=On
+        ///     Enigma2 coding: 0=Off, 1=On, 2=Auto (Pilot_Unknown); Auto when not set
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Pilot types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersSatellite</see>
         [DataMember]
         public Enums.DVBSPilotType PilotType
         {
@@ -634,14 +629,13 @@ namespace Krkadoni.EnigmaSettings
             {
                 switch (Pilot)
                 {
-                    case null:
-                        return Enums.DVBSPilotType.Auto;
                     case "0":
-                        return Enums.DVBSPilotType.Auto;
+                        return Enums.DVBSPilotType.Off;
                     case "1":
                         return Enums.DVBSPilotType.On;
+                    case null:
                     case "2":
-                        return Enums.DVBSPilotType.Off;
+                        return Enums.DVBSPilotType.Auto;
                     default:
                         return Enums.DVBSPilotType.Unknown;
                 }
@@ -744,7 +738,7 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                int orbPosition = (OrbitalPositionInt > 0 ? OrbitalPositionInt : 3600 + OrbitalPositionInt);
+                int orbPosition = OrbitalPositionInt < 0 ? 3600 + OrbitalPositionInt : OrbitalPositionInt;
                 int dvbNamespace = orbPosition << 16;
 
                 if (IsValidOnidTsid()) 
@@ -766,7 +760,7 @@ namespace Krkadoni.EnigmaSettings
         {
             int mOnid = Int32.Parse(NID, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             int mTSID = Int32.Parse(TSID, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            int orbPosition = (OrbitalPositionInt > 0 ? OrbitalPositionInt : 3600 + OrbitalPositionInt);
+            int orbPosition = OrbitalPositionInt < 0 ? 3600 + OrbitalPositionInt : OrbitalPositionInt;
 
             switch (mOnid)
             {

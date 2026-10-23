@@ -38,6 +38,34 @@
 - Namespaces shorter than 8 digits were right-padded (changing the value); they are left-padded.
 - `RemoveTransponder(s)` threw for services without a transponder.
 - `ArgumentNullException`s now carry the parameter name instead of the message as parameter name.
+- **DVB-T convenience enums did not match the Enigma2 coding** (`lib/dvb/frontendparms.h`).
+  `BandwidthType`, `FECHighType`, `FECLowType`, `ModulationType`, `TransmissionType`,
+  `GuardIntervalType`, `HierarchyType` and `InversionType` returned wrong members (e.g. modulation
+  `2` = QAM64 was reported as `Qam16`, bandwidth `0` = 8 MHz as `Auto`). The enums now use the
+  Enigma2 values and gained the missing members (`Qam256`, 5/10/1.712 MHz, 1k/4k/16k/32k,
+  1/128, 19/128, 19/256, FEC 6/7, 8/9, 3/5, 4/5). `DVBTModulationType` no longer has the
+  `Auto`/`QPSK` value collision. The corrections announced in the format modernization entry
+  below are only now actually in the code.
+- **DVB-S `RollOffType` / `PilotType`** now follow the Enigma2 coding (roll-off `2` = 0.20,
+  `3` = auto; pilot `0` = off, `1` = on, `2` = auto). Previously roll-off `2` was `Unknown` and
+  pilot `0`/`2` were swapped.
+- **`AddMissingXmlSatellites` never added a missing satellite** (inverted condition) and logged a
+  misleading "position 0 degrees" warning instead. Missing satellites are created again and linked
+  to their transponders.
+- `AddMissingXmlTranspondersSatellites` threw for transponders without satellite (position 0) and
+  for non-numeric frequencies.
+- **Sub bouquets were promoted to the main list on save.** Bouquets referenced from another
+  bouquet are written as files but no longer listed in `bouquets.tv` / `bouquets.radio`.
+- **Stream URLs set through the API broke the bouquet line.** `IBouquetItemStream.URL` is now
+  always the decoded URL and is encoded like Enigma2 does when written (`:` / `%` / control
+  characters as `%xx`). Previously `URL` returned the encoded form after loading, and a plain URL
+  set by the caller was written with raw `:`. Stream lines with fewer than 11 fields no longer
+  throw.
+- `RemoveEmptyBouquets` left references to the removed sub bouquets in their parents; they are
+  removed too (repeated until no empty bouquet remains).
+- `CalculatedNameSpace` / ONID-TSID validation treated orbital position 0 as 360.0°.
+- `RenumberBouquetFileNames` numbered by file name text (`dbe10` before `dbe2`) instead of the
+  bouquet order.
 
 ### Changed
 
@@ -56,6 +84,20 @@
 - Library is no longer tied to `win-x64` (no `RuntimeIdentifier`), publish profiles are not
   self-contained, Debug builds emit portable PDBs again.
 - `*.user` files are no longer tracked.
+- `SettingsIO(IInstanceFactory, IFileHelper)` constructor and `SettingsIO.FileProvider` property;
+  all settings, bouquet and xml files go through the given `IFileHelper`.
+- Service / bouquet matching joins use `StringComparer.OrdinalIgnoreCase` instead of lower-casing
+  every key.
+- `IFileBouquet.BouquetType` is cached per file name instead of being recomputed on every access.
+- `RemoveStreams`, `RemoveInvalidBouquetItems` and `RemoveEmptyBouquets` remove in one pass per list.
+- Settings files are no longer deleted before writing (the atomic write replaces them).
+
+### Breaking
+
+- `SettingsIO._fileHelper` is `protected` (was a public field); use `SettingsIO.FileProvider`.
+- Values of the DVB-T enums, `DVBSRollOffType.X20` and `DVBSPilotType` changed to the Enigma2
+  coding (see Fixed). Code that persisted or compared the numeric enum values must be adjusted.
+- `IBouquetItemStream.URL` returns the decoded URL (see Fixed).
 
 ### Removed (breaking)
 

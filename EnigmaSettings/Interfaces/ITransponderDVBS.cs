@@ -47,7 +47,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Polarization { get; set; }
 
         /// <summary>
-        ///     0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10
+        ///     0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8, 6=8/9, 7=3/5, 8=4/5, 9=9/10, 10=6/7, 15=None
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -56,7 +56,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string FEC { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -82,7 +82,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string System { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=8PSK
+        ///     0=Auto, 1=QPSK, 2=8PSK, 3=QAM16, 4=16APSK, 5=32APSK
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -91,7 +91,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Modulation { get; set; }
 
         /// <summary>
-        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 3=0.20
+        ///     Only used in DVB-S2. 0=0.35, 1=0.25, 2=0.20, 3=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -99,7 +99,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string RollOff { get; set; }
 
         /// <summary>
-        ///     Only used in DVB-S2. 0=Auto, 2=Off, 1=On
+        ///     Only used in DVB-S2. 0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -141,7 +141,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSPolarizationType PolarizationType { get; }
 
         /// <summary>
-        ///     0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10
+        ///     0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8, 6=8/9, 7=3/5, 8=4/5, 9=9/10, 10=6/7, 15=None
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -150,7 +150,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSCFECType FECType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -168,7 +168,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSSystemType SystemType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=8PSK
+        ///     0=Auto, 1=QPSK, 2=8PSK, 3=QAM16, 4=16APSK, 5=32APSK
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -177,7 +177,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSModulationType ModulationType { get; }
 
         /// <summary>
-        ///     0=0.35, 1=0.25, 3=0.20
+        ///     0=0.35, 1=0.25, 2=0.20, 3=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -186,7 +186,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBSRollOffType RollOffType { get; }
 
         /// <summary>
-        ///     0=Auto, 2=Off, 1=On
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>

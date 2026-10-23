@@ -4,6 +4,7 @@
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
+using System.Text;
 
 using Krkadoni.EnigmaSettings.Interfaces;
 
@@ -125,7 +126,7 @@ namespace Krkadoni.EnigmaSettings
             ServiceID = sData[3];
             ExtraFlag1 = sData[4];
             ExtraFlag2 = sData[5];
-            URL = sData[10];
+            _url = sData.Length > 10 ? DecodeUrl(sData[10]) : string.Empty;
             Description = description;
         }
 
@@ -134,20 +135,50 @@ namespace Krkadoni.EnigmaSettings
         /// </summary>
         /// <value></value>
         /// <returns>URL decoded string</returns>
-        /// <remarks>Will automatically encode string</remarks>
+        /// <remarks>Encoded with <see cref="EncodeUrl" /> when written to a bouquet file</remarks>
         [DataMember]
         public string URL
         {
-            get => Uri.UnescapeDataString(_url);
+            get => _url;
             set
             {
+                value ??= string.Empty;
+
                 if (value == _url)
                     return;
 
-                value ??= string.Empty;
-                _url = Uri.EscapeDataString(value);
+                _url = value;
                 OnPropertyChanged(nameof(URL));
             }
+        }
+
+        /// <summary>
+        ///     Encodes a stream URL for a #SERVICE line the way Enigma2 does (eServiceReference::toString):
+        ///     ':' , '%' and control characters become %xx, everything else is kept
+        /// </summary>
+        public static string EncodeUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return string.Empty;
+
+            var sb = new StringBuilder(url.Length + 16);
+            foreach (char c in url)
+            {
+                if (c == ':' || c == '%' || c < ' ')
+                    sb.Append('%').Append(((int)c).ToString("x2", CultureInfo.InvariantCulture));
+                else
+                    sb.Append(c);
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        ///     Decodes the %xx sequences of a stream URL read from a #SERVICE line
+        /// </summary>
+        public static string DecodeUrl(string url)
+        {
+            return string.IsNullOrEmpty(url) ? string.Empty : Uri.UnescapeDataString(url);
         }
 
         /// <summary>
@@ -409,7 +440,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks></remarks>
         public override string ToString()
         {
-            return string.Join("\t", string.Join(":", FavoritesType.ToString(), LineSpecifierFlag, StreamFlag, "0", ExtraFlag1, ExtraFlag2, "0", "0", "0", "0", _url), string.Join(" ", "#DESCRIPTION", Description));
+            return string.Join("\t", string.Join(":", FavoritesType.ToString(), LineSpecifierFlag, StreamFlag, "0", ExtraFlag1, ExtraFlag2, "0", "0", "0", "0", EncodeUrl(_url)), string.Join(" ", "#DESCRIPTION", Description));
         }
     }
 }

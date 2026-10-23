@@ -6,7 +6,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
     public interface ITransponderDVBT : ITransponder
     {
         /// <summary>
-        ///     0=Auto, 1=8Mhz, 2=7Mhz, 3=6Mhz
+        ///     0=8MHz, 1=7MHz, 2=6MHz, 3=Auto, 4=5MHz, 5=1.712MHz, 6=10MHz
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -15,7 +15,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Bandwidth { get; set; }
 
         /// <summary>
-        ///     Code rate High Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8.
+        ///     Code rate High Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -24,7 +24,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string FECHigh { get; set; }
 
         /// <summary>
-        ///     Code rate Low Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8
+        ///     Code rate Low Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -33,7 +33,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string FECLow { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
+        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -42,7 +42,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Modulation { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=2k, 3=8k
+        ///     0=2k, 1=8k, 2=Auto, 3=4k, 4=1k, 5=16k, 6=32k
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -51,7 +51,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Transmission { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=1/32, 2=1/16, 3=1/8, 4=1/4
+        ///     0=1/32, 1=1/16, 2=1/8, 3=1/4, 4=Auto, 5=1/128, 6=19/128, 7=19/256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -60,7 +60,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string GuardInterval { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=None, 2=1, 3=2, 4=4
+        ///     0=None, 1=1, 2=2, 3=4, 4=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -69,7 +69,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string Hierarchy { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -96,7 +96,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         string PlpId { get; set; }
 
         /// <summary>
-        ///     0=Auto, 1=8Mhz, 2=7Mhz, 3=6Mhz
+        ///     0=8MHz, 1=7MHz, 2=6MHz, 3=Auto, 4=5MHz, 5=1.712MHz, 6=10MHz
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -105,7 +105,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTBandwidthType BandwidthType { get; }
 
         /// <summary>
-        ///     Code rate High Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8.
+        ///     Code rate High Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -114,7 +114,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTFECHighType FECHighType { get; }
 
         /// <summary>
-        ///     Code rate Low Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8
+        ///     Code rate Low Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -123,7 +123,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTFECLowType FECLowType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
+        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -132,7 +132,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTModulationType ModulationType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=2k, 3=8k
+        ///     0=2k, 1=8k, 2=Auto, 3=4k, 4=1k, 5=16k, 6=32k
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -141,7 +141,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTTransmissionType TransmissionType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=1/32, 2=1/16, 3=1/8, 4=1/4
+        ///     0=1/32, 1=1/16, 2=1/8, 3=1/4, 4=Auto, 5=1/128, 6=19/128, 7=19/256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -150,7 +150,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTGuardIntervalType GuardIntervalType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=None, 2=1, 3=2, 4=4
+        ///     0=None, 1=1, 2=2, 3=4, 4=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -159,7 +159,7 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         Enums.DVBTHierarchyType HierarchyType { get; }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>

@@ -2,6 +2,7 @@
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 using Krkadoni.EnigmaSettings.Interfaces;
@@ -156,7 +157,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=8Mhz, 2=7Mhz, 3=6Mhz
+        ///     0=8MHz, 1=7MHz, 2=6MHz, 3=Auto, 4=5MHz, 5=1.712MHz, 6=10MHz
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -180,7 +181,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Code rate High Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8.
+        ///     Code rate High Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -204,7 +205,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     Code rate Low Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8
+        ///     Code rate Low Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -228,7 +229,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
+        ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -252,7 +253,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=2k, 3=8k
+        ///     0=2k, 1=8k, 2=Auto, 3=4k, 4=1k, 5=16k, 6=32k
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -276,7 +277,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=1/32, 2=1/16, 3=1/8, 4=1/4
+        ///     0=1/32, 1=1/16, 2=1/8, 3=1/4, 4=Auto, 5=1/128, 6=19/128, 7=19/256
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -300,7 +301,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=None, 2=1, 3=2, 4=4
+        ///     0=None, 1=1, 2=2, 3=4, 4=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -324,7 +325,7 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     0=Off, 1=On, 2=Auto
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -404,235 +405,71 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
-        ///     0=Auto, 1=8Mhz, 2=7Mhz, 3=6Mhz
+        ///     Enigma2 coding: 0=8MHz, 1=7MHz, 2=6MHz, 3=Auto, 4=5MHz, 5=1.712MHz, 6=10MHz
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Bandwidth types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTBandwidthType BandwidthType
-        {
-            get
-            {
-                switch (Bandwidth)
-                {
-                    case "0":
-                        return Enums.DVBTBandwidthType.Auto;
-                    case "1":
-                        return Enums.DVBTBandwidthType.B8Mhz;
-                    case "2":
-                        return Enums.DVBTBandwidthType.B7Mhz;
-                    case "3":
-                        return Enums.DVBTBandwidthType.B6Mhz;
-                    default:
-                        return Enums.DVBTBandwidthType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTBandwidthType BandwidthType => ParseCode(Bandwidth, Enums.DVBTBandwidthType.Unknown);
 
         /// <summary>
-        ///     Code rate High Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8.
+        ///     Code rate High Pass FEC, Enigma2 coding: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTFECHighType FECHighType
-        {
-            get
-            {
-                switch (FECHigh)
-                {
-                    case "0":
-                        return Enums.DVBTFECHighType.Auto;
-                    case "1":
-                        return Enums.DVBTFECHighType.F12;
-                    case "2":
-                        return Enums.DVBTFECHighType.F23;
-                    case "3":
-                        return Enums.DVBTFECHighType.F34;
-                    case "4":
-                        return Enums.DVBTFECHighType.F56;
-                    case "5":
-                        return Enums.DVBTFECHighType.F78;
-                    default:
-                        return Enums.DVBTFECHighType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTFECHighType FECHighType => ParseCode(FECHigh, Enums.DVBTFECHighType.Unknown);
 
         /// <summary>
-        ///     Code rate Low Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8
+        ///     Code rate Low Pass FEC, Enigma2 coding: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">FEC types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTFECLowType FECLowType
-        {
-            get
-            {
-                switch (FECLow)
-                {
-                    case "0":
-                        return Enums.DVBTFECLowType.Auto;
-                    case "1":
-                        return Enums.DVBTFECLowType.F12;
-                    case "2":
-                        return Enums.DVBTFECLowType.F23;
-                    case "3":
-                        return Enums.DVBTFECLowType.F34;
-                    case "4":
-                        return Enums.DVBTFECLowType.F56;
-                    case "5":
-                        return Enums.DVBTFECLowType.F78;
-                    default:
-                        return Enums.DVBTFECLowType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTFECLowType FECLowType => ParseCode(FECLow, Enums.DVBTFECLowType.Unknown);
 
         /// <summary>
-        ///     0=Auto, 1=QPSK, 2=QAM16, 3=QAM64
+        ///     Enigma2 coding: 0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Modulation types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTModulationType ModulationType
-        {
-            get
-            {
-                switch (Modulation)
-                {
-                    case "0":
-                        return Enums.DVBTModulationType.Auto;
-                    case "1":
-                        return Enums.DVBTModulationType.QPSK;
-                    case "2":
-                        return Enums.DVBTModulationType.Qam16;
-                    case "3":
-                        return Enums.DVBTModulationType.Qam64;
-                    default:
-                        return Enums.DVBTModulationType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTModulationType ModulationType => ParseCode(Modulation, Enums.DVBTModulationType.Unknown);
 
         /// <summary>
-        ///     0=Auto, 1=2k, 3=8k
+        ///     Enigma2 coding: 0=2k, 1=8k, 2=Auto, 3=4k, 4=1k, 5=16k, 6=32k
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Transmission types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTTransmissionType TransmissionType
-        {
-            get
-            {
-                switch (Transmission)
-                {
-                    case "0":
-                        return Enums.DVBTTransmissionType.Auto;
-                    case "1":
-                        return Enums.DVBTTransmissionType.T2K;
-                    case "3":
-                        return Enums.DVBTTransmissionType.T8K;
-                    default:
-                        return Enums.DVBTTransmissionType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTTransmissionType TransmissionType => ParseCode(Transmission, Enums.DVBTTransmissionType.Unknown);
 
         /// <summary>
-        ///     0=Auto, 1=1/32, 2=1/16, 3=1/8, 4=1/4
+        ///     Enigma2 coding: 0=1/32, 1=1/16, 2=1/8, 3=1/4, 4=Auto, 5=1/128, 6=19/128, 7=19/256
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Guard interval types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTGuardIntervalType GuardIntervalType
-        {
-            get
-            {
-                switch (GuardInterval)
-                {
-                    case "0":
-                        return Enums.DVBTGuardIntervalType.Auto;
-                    case "1":
-                        return Enums.DVBTGuardIntervalType.G132;
-                    case "2":
-                        return Enums.DVBTGuardIntervalType.G116;
-                    case "3":
-                        return Enums.DVBTGuardIntervalType.G18;
-                    case "4":
-                        return Enums.DVBTGuardIntervalType.G14;
-                    default:
-                        return Enums.DVBTGuardIntervalType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTGuardIntervalType GuardIntervalType => ParseCode(GuardInterval, Enums.DVBTGuardIntervalType.Unknown);
 
         /// <summary>
-        ///     0=Auto, 1=None, 2=1, 3=2, 4=4
+        ///     Enigma2 coding: 0=None, 1=1, 2=2, 3=4, 4=Auto
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Hierarchy types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTHierarchyType HierarchyType
-        {
-            get
-            {
-                switch (Hierarchy)
-                {
-                    case "0":
-                        return Enums.DVBTHierarchyType.Auto;
-                    case "1":
-                        return Enums.DVBTHierarchyType.None;
-                    case "2":
-                        return Enums.DVBTHierarchyType.H1;
-                    case "3":
-                        return Enums.DVBTHierarchyType.H2;
-                    case "4":
-                        return Enums.DVBTHierarchyType.H4;
-                    default:
-                        return Enums.DVBTHierarchyType.Unknown;
-                }
-            }
-        }
+        public Enums.DVBTHierarchyType HierarchyType => ParseCode(Hierarchy, Enums.DVBTHierarchyType.Unknown);
 
         /// <summary>
-        ///     0=Auto, 1=On, 2=Off
+        ///     Enigma2 coding: 0=Off, 1=On, 2=Auto
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        /// <see href="http://www.satsupreme.com/showthread.php/194074-Lamedb-format-explained">Inversion types</see>
+        /// <see href="https://github.com/OpenPLi/enigma2/blob/develop/lib/dvb/frontendparms.h">eDVBFrontendParametersTerrestrial</see>
         [DataMember]
-        public Enums.DVBTInversionType InversionType
+        public Enums.DVBTInversionType InversionType => ParseCode(Inversion, Enums.DVBTInversionType.Unknown);
+
+        /// <summary>
+        ///     Maps a numeric lamedb value to the enum member with the same value
+        /// </summary>
+        private static T ParseCode<T>(string value, T unknown) where T : struct, Enum
         {
-            get
-            {
-                switch (Inversion)
-                {
-                    case "0":
-                        return Enums.DVBTInversionType.Auto;
-                    case "1":
-                        return Enums.DVBTInversionType.On;
-                    case "2":
-                        return Enums.DVBTInversionType.Off;
-                    default:
-                        return Enums.DVBTInversionType.Unknown;
-                }
-            }
+            if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var code))
+                return unknown;
+
+            var result = (T)Enum.ToObject(typeof(T), code);
+            return Enum.IsDefined(result) ? result : unknown;
         }
 
         public override string ToString()

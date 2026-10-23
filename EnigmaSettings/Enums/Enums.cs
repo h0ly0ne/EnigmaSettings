@@ -123,12 +123,13 @@ namespace Krkadoni.EnigmaSettings
             APSK32 = 5
         }
 
+        // Enigma2 coding (lib/dvb/frontendparms.h): Pilot_Off=0, Pilot_On=1, Pilot_Unknown=2 (auto)
         public enum DVBSPilotType
         {
             Unknown = -2,
-            Auto = 0,
+            Off = 0,
             On = 1,
-            Off = 2
+            Auto = 2
         }
 
         public enum DVBSPolarizationType
@@ -140,12 +141,14 @@ namespace Krkadoni.EnigmaSettings
             CircularRight = 3
         }
 
+        // Enigma2 coding: RollOff_alpha_0_35=0, RollOff_alpha_0_25=1, RollOff_alpha_0_20=2, RollOff_auto=3
         public enum DVBSRollOffType
         {
             Unknown = -2,
             X35 = 0,
             X25 = 1,
-            X20 = 3
+            X20 = 2,
+            Auto = 3
         }
 
         public enum DVBSSystemType
@@ -155,80 +158,100 @@ namespace Krkadoni.EnigmaSettings
             DVBS2 = 1
         }
 
+        // DVB-T values follow the Enigma2 coding of eDVBFrontendParametersTerrestrial (lib/dvb/frontendparms.h)
         public enum DVBTBandwidthType
         {
             Unknown = -2,
-            Auto = 0,
-            B8Mhz = 1,
-            B7Mhz = 2,
-            B6Mhz = 3
+            B8Mhz = 0,
+            B7Mhz = 1,
+            B6Mhz = 2,
+            Auto = 3,
+            B5Mhz = 4,
+            B1712Khz = 5,
+            B10Mhz = 6
         }
 
         public enum DVBTFECHighType
         {
             Unknown = -2,
-            Auto = 0,
-            F12 = 1,
-            F23 = 2,
-            F34 = 3,
-            F56 = 4,
-            F78 = 5
+            F12 = 0,
+            F23 = 1,
+            F34 = 2,
+            F56 = 3,
+            F78 = 4,
+            Auto = 5,
+            F67 = 6,
+            F89 = 7,
+            F35 = 8,
+            F45 = 9
         }
 
         public enum DVBTFECLowType
         {
             Unknown = -2,
-            Auto = 0,
-            F12 = 1,
-            F23 = 2,
-            F34 = 3,
-            F56 = 4,
-            F78 = 5
+            F12 = 0,
+            F23 = 1,
+            F34 = 2,
+            F56 = 3,
+            F78 = 4,
+            Auto = 5,
+            F67 = 6,
+            F89 = 7,
+            F35 = 8,
+            F45 = 9
         }
 
         public enum DVBTGuardIntervalType
         {
             Unknown = -2,
-            Auto = 0,
-            G132 = 1,
-            G116 = 2,
-            G18 = 3,
-            G14 = 4
+            G132 = 0,
+            G116 = 1,
+            G18 = 2,
+            G14 = 3,
+            Auto = 4,
+            G1128 = 5,
+            G19128 = 6,
+            G19256 = 7
         }
 
         public enum DVBTHierarchyType
         {
             Unknown = -2,
-            Auto = 0,
-            None = 1,
-            H1 = 2,
-            H2 = 3,
-            H4 = 4
+            None = 0,
+            H1 = 1,
+            H2 = 2,
+            H4 = 3,
+            Auto = 4
         }
 
         public enum DVBTInversionType
         {
             Unknown = -2,
-            Auto = 0,
+            Off = 0,
             On = 1,
-            Off = 2
+            Auto = 2
         }
 
         public enum DVBTModulationType
         {
             Unknown = -2,
-            Auto = 1,
-            QPSK = 1,
-            Qam16 = 2,
-            Qam64 = 3
+            QPSK = 0,
+            Qam16 = 1,
+            Qam64 = 2,
+            Auto = 3,
+            Qam256 = 4
         }
 
         public enum DVBTTransmissionType
         {
             Unknown = -2,
-            Auto = 0,
-            T2K = 1,
-            T8K = 3
+            T2K = 0,
+            T8K = 1,
+            Auto = 2,
+            T4K = 3,
+            T1K = 4,
+            T16K = 5,
+            T32K = 6
         }
 
         /// <summary>

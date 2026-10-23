@@ -107,7 +107,9 @@ namespace Krkadoni.EnigmaSettings
 
                 value ??= string.Empty;
                 _fileName = value;
+                _bouquetType = null;
                 OnPropertyChanged(nameof(FileName));
+                OnPropertyChanged(nameof(BouquetType));
             }
         }
 
@@ -133,7 +135,10 @@ namespace Krkadoni.EnigmaSettings
         /// <returns></returns>
         /// <remarks></remarks>
         [DataMember]
-        public Enums.BouquetType BouquetType => GetTypeFromFileName(_fileName);
+        public Enums.BouquetType BouquetType => _bouquetType ??= GetTypeFromFileName(_fileName);
+
+        // cached, BouquetType is read in nearly every bouquet filter
+        private Enums.BouquetType? _bouquetType;
 
         /// <summary>
         ///     List of bouquet items
@@ -188,10 +193,10 @@ namespace Krkadoni.EnigmaSettings
             if (string.Equals(fName, "bouquets", StringComparison.OrdinalIgnoreCase))
                 return Enums.BouquetType.E1Bouquets;
             
-            if (fName.ToLowerInvariant().EndsWith(".tv", StringComparison.Ordinal) || fName.ToLowerInvariant().EndsWith(".tv.epl", StringComparison.Ordinal))
+            if (fName.EndsWith(".tv", StringComparison.OrdinalIgnoreCase) || fName.EndsWith(".tv.epl", StringComparison.OrdinalIgnoreCase))
                 return Enums.BouquetType.UserBouquetTv;
-            
-            if (fName.ToLowerInvariant().EndsWith(".radio", StringComparison.Ordinal) || fName.ToLowerInvariant().EndsWith(".radio.epl", StringComparison.Ordinal))
+
+            if (fName.EndsWith(".radio", StringComparison.OrdinalIgnoreCase) || fName.EndsWith(".radio.epl", StringComparison.OrdinalIgnoreCase))
                 return Enums.BouquetType.UserBouquetRadio;
             
             return Enums.BouquetType.Unknown;

@@ -495,29 +495,30 @@ namespace Krkadoni.EnigmaSettings
                 //adding non-existing satellites
                 foreach (var position in missingPositions)
                 {
-                    if (position == 0) 
-                        continue;
-
-                    var mPosition = position;
-                    if (Satellites.Any(x => x.Position == mPosition.ToString(CultureInfo.InvariantCulture)))
+                    if (position == 0)
                     {
-                        var xmlSat = factory.InitNewXmlSatellite();
-                        xmlSat.Position = position.ToString(CultureInfo.InvariantCulture);
+                        Log.Warn(Resources.Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_);
+                        continue;
+                    }
+
+                    var positionString = position.ToString(CultureInfo.InvariantCulture);
+                    var xmlSat = Satellites.FirstOrDefault(x => x.Position == positionString);
+
+                    if (xmlSat == null)
+                    {
+                        xmlSat = factory.InitNewXmlSatellite();
+                        xmlSat.Position = positionString;
                         xmlSat.Flags = "0";
                         xmlSat.Name = "Sat " + xmlSat.PositionString;
                         Satellites.Add(xmlSat);
                         newSatellites.Add(xmlSat);
-                        IList<ITransponderDVBS> found = FindTranspondersWithoutSatellite().Where(x => x.OrbitalPositionInt == Convert.ToInt32(xmlSat.Position, CultureInfo.InvariantCulture)).ToList();
-
-                        foreach (var transponder in found)
-                        {
-                            transponder.Satellite = xmlSat;
-                        }
-
                         Log.Warn(string.Format(Resources.Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites, position));
                     }
-                    else
-                        Log.Warn(string.Format(Resources.Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_));
+
+                    foreach (var transponder in trans.Where(x => x.OrbitalPositionInt == position))
+                    {
+                        transponder.Satellite = xmlSat;
+                    }
                 }
 
                 foreach (var newsat in newSatellites)
@@ -527,7 +528,7 @@ namespace Krkadoni.EnigmaSettings
                     foreach (var tran in transList)
                     {
                         var mTran = tran;
-                        IList<IXmlTransponder> query = newsat.Transponders.Where(t => ((Convert.ToInt32(t.Frequency, CultureInfo.InvariantCulture) < Convert.ToInt32(mTran.Frequency, CultureInfo.InvariantCulture) + frequencyToleration) && (Convert.ToInt32(t.Frequency, CultureInfo.InvariantCulture) > Convert.ToInt32(mTran.Frequency, CultureInfo.InvariantCulture) - frequencyToleration)) && t.Polarization == mTran.Polarization && t.SymbolRate == mTran.SymbolRate).ToList();
+                        IList<IXmlTransponder> query = newsat.Transponders.Where(t => IsSameTransponder(t, mTran, frequencyToleration)).ToList();
 
                         if (query.Count != 0)
                             continue;
@@ -543,6 +544,21 @@ namespace Krkadoni.EnigmaSettings
                 Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites, ex);
             }
+        }
+
+        /// <summary>
+        ///     True when the xml transponder has the same polarization and symbol rate and a frequency within the toleration
+        /// </summary>
+        private static bool IsSameTransponder(IXmlTransponder xmlTransponder, ITransponderDVBS transponder, int frequencyToleration)
+        {
+            if (xmlTransponder.Polarization != transponder.Polarization || xmlTransponder.SymbolRate != transponder.SymbolRate)
+                return false;
+
+            if (!int.TryParse(xmlTransponder.Frequency, NumberStyles.Integer, CultureInfo.InvariantCulture, out var xmlFrequency)
+                || !int.TryParse(transponder.Frequency, NumberStyles.Integer, CultureInfo.InvariantCulture, out var frequency))
+                return false;
+
+            return Math.Abs(xmlFrequency - frequency) < frequencyToleration;
         }
 
         /// <summary>
@@ -563,13 +579,13 @@ namespace Krkadoni.EnigmaSettings
 
                 foreach (var tran in tranS)
                 {
+                    // transponders on position 0 get no satellite
+                    if (tran.Satellite == null)
+                        continue;
+
                     var mTran = tran;
                     IList<IXmlTransponder> query =
-                        tran.Satellite.Transponders.Where(
-                            t =>
-                                ((Convert.ToInt32(t.Frequency, CultureInfo.InvariantCulture) < Convert.ToInt32(mTran.Frequency, CultureInfo.InvariantCulture) + frequencyToleration) &&
-                                 (Convert.ToInt32(t.Frequency, CultureInfo.InvariantCulture) > Convert.ToInt32(mTran.Frequency, CultureInfo.InvariantCulture) - frequencyToleration)) &&
-                                t.Polarization == mTran.Polarization && t.SymbolRate == mTran.SymbolRate).ToList();
+                        tran.Satellite.Transponders.Where(t => IsSameTransponder(t, mTran, frequencyToleration)).ToList();
 
                     if (query.Any())
                         continue;
@@ -687,11 +703,11 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 IList<IBouquetItemService> bis = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemService>().Concat(Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemAlternative>().Where(a => a.Bouquet != null).SelectMany(a => a.Bouquet.BouquetItems).OfType<IBouquetItemService>()).ToList();
-                var query = bis.Join(Services, bs => bs.ServiceId.ToLowerInvariant(), srv => srv.ServiceId.ToLowerInvariant(), (bs, srv) => new
+                var query = bis.Join(Services, bs => bs.ServiceId, srv => srv.ServiceId, (bs, srv) => new
                 {
                     BouquetItem = bs,
                     Service = srv
-                });
+                }, StringComparer.OrdinalIgnoreCase);
 
                 foreach (var match in query.ToList())
                 {
@@ -754,11 +770,11 @@ namespace Krkadoni.EnigmaSettings
                     return;
                 }
 
-                var query = bis.Join(Services, bs => bs.ServiceId.ToLowerInvariant(), srv => srv.ServiceId.ToLowerInvariant(), (bs, srv) => new
+                var query = bis.Join(Services, bs => bs.ServiceId, srv => srv.ServiceId, (bs, srv) => new
                 {
                     BouquetItem = bs,
                     Service = srv
-                });
+                }, StringComparer.OrdinalIgnoreCase);
 
                 foreach (var match in query.ToList())
                 {
@@ -834,7 +850,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     var s = Path.GetFileName(x.FileName);
                     return s != null && (x.BouquetType == Enums.BouquetType.UserBouquetTv && s.StartsWith("userbouquet.dbe", StringComparison.Ordinal));
-                }).OrderBy(x => x.FileName).ToList();
+                }).ToList();
                 var index = 0;
 
                 foreach (var bouquet in bqsTv)
@@ -865,7 +881,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     var name = Path.GetFileName(x.FileName);
                     return name != null && (x.BouquetType == Enums.BouquetType.UserBouquetRadio && name.StartsWith("userbouquet.dbe", StringComparison.Ordinal));
-                }).OrderBy(x => x.FileName).ToList();
+                }).ToList();
 
                 foreach (var bouquet in bqsRadio)
                 {
@@ -986,12 +1002,19 @@ namespace Krkadoni.EnigmaSettings
             try
             {
                 Log.Debug("Removing empty bouquets");
-                IList<IBouquet> bqs = Bouquets.Where(x => x.BouquetItems.Count == 0).ToList();
 
-                foreach (var bouquet in bqs)
+                // removing references can leave the parent bouquet empty, so repeat until nothing changes
+                HashSet<IBouquet> empty;
+                while ((empty = new HashSet<IBouquet>(Bouquets.Where(x => x.BouquetItems.Count == 0))).Count > 0)
                 {
-                    Bouquets.Remove(bouquet);
-                    if (Log.IsDebugEnabled) Log.Debug($"Removed empty bouquet {bouquet.Name} from the list of bouquets");
+                    RemoveWhere(Bouquets, empty.Contains, x => $"Removed empty bouquet {x.Name} from the list of bouquets");
+
+                    foreach (var bouquet in AllServiceContainers())
+                    {
+                        RemoveWhere(bouquet.BouquetItems,
+                            x => x is IBouquetItemFileBouquet { Bouquet: not null } fileBouquet && empty.Contains(fileBouquet.Bouquet),
+                            x => $"Removed reference to empty bouquet {((IBouquetItemFileBouquet)x).FileName} from bouquet {bouquet.Name}");
+                    }
                 }
 
                 Log.Debug("Finished removing empty bouquets");
@@ -1034,13 +1057,8 @@ namespace Krkadoni.EnigmaSettings
 
                 foreach (var bouquet in AllServiceContainers())
                 {
-                    IList<IBouquetItemStream> streams = bouquet.BouquetItems.OfType<IBouquetItemStream>().ToList();
-
-                    foreach (var stream in streams)
-                    {
-                        bouquet.BouquetItems.Remove(stream);
-                        if (Log.IsDebugEnabled) Log.Debug($"Stream {stream.Description} removed from bouquet {bouquet.Name}");
-                    }
+                    RemoveWhere(bouquet.BouquetItems, x => x is IBouquetItemStream,
+                        x => $"Stream {((IBouquetItemStream)x).Description} removed from bouquet {bouquet.Name}");
                 }
 
                 Log.Debug("Finished removing streams from bouquets");
@@ -1387,37 +1405,16 @@ namespace Krkadoni.EnigmaSettings
 
                 foreach (var bouquet in AllServiceContainers())
                 {
-                    IList<IBouquetItemService> biServices = bouquet.BouquetItems.OfType<IBouquetItemService>().Where(x => x.Service == null).ToList();
-
-                    foreach (var bis in biServices)
-                    {
-                        bouquet.BouquetItems.Remove(bis);
-                        if (Log.IsDebugEnabled) Log.Debug($"Removed invalid service reference {bis.ServiceId} from bouquet {bouquet}");
-                    }
-
-                    IList<IBouquetItemFileBouquet> biFileBouquets = bouquet.BouquetItems.OfType<IBouquetItemFileBouquet>().Where(x => x.Bouquet == null).ToList();
-
-                    foreach (var bifb in biFileBouquets)
-                    {
-                        bouquet.BouquetItems.Remove(bifb);
-                        if (Log.IsDebugEnabled) Log.Debug($"Removed invalid reference to file bouquet {bifb.FileName} from bouquet {bouquet}");
-                    }
-
-                    IList<IBouquetItemBouquetsBouquet> biBouquetsBouquets = bouquet.BouquetItems.OfType<IBouquetItemBouquetsBouquet>().Where(x => x.Bouquet == null).ToList();
-
-                    foreach (var bibb in biBouquetsBouquets)
-                    {
-                        bouquet.BouquetItems.Remove(bibb);
-                        if (Log.IsDebugEnabled) Log.Debug($"Removed invalid reference to bouquets bouquet number {bibb.BouquetOrderNumberInt} from bouquet {bouquet}");
-                    }
-
-                    IList<IBouquetItemAlternative> biAlternatives = bouquet.BouquetItems.OfType<IBouquetItemAlternative>().Where(x => x.Bouquet == null).ToList();
-
-                    foreach (var bia in biAlternatives)
-                    {
-                        bouquet.BouquetItems.Remove(bia);
-                        if (Log.IsDebugEnabled) Log.Debug($"Removed invalid reference to alternatives file {bia.FileName} from bouquet {bouquet}");
-                    }
+                    RemoveWhere(bouquet.BouquetItems,
+                        x => x switch
+                        {
+                            IBouquetItemService bis => bis.Service == null,
+                            IBouquetItemFileBouquet bifb => bifb.Bouquet == null,
+                            IBouquetItemBouquetsBouquet bibb => bibb.Bouquet == null,
+                            IBouquetItemAlternative bia => bia.Bouquet == null,
+                            _ => false
+                        },
+                        x => $"Removed invalid bouquet item {x} from bouquet {bouquet.Name}");
                 }
 
                 Log.Debug("Finished removing invalid bouquet items");
