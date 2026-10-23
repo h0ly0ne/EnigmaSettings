@@ -127,9 +127,8 @@ namespace Krkadoni.EnigmaSettings
                 if (Log.IsDebugEnabled) Log.Debug($"Sucessfully written {LameDb5FileName} to {fi}");
                 OnFileSaved(this, fi, true);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fi, false);
                 throw new SettingsException(string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, fi), ex);
             }

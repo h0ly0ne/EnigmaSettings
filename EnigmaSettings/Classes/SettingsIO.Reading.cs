@@ -47,14 +47,8 @@ namespace Krkadoni.EnigmaSettings
                 if (Log.IsDebugEnabled) Log.Debug($"Settings loaded with {settings.Services.Count} services and {settings.Transponders.Count} transponders");
                 return settings;
             }
-            catch (SettingsException ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.Settings_ReadServicesFile_There_was_an_error_while_reading_services_0__1_, Environment.NewLine, ex.Message), ex);
             }
         }
@@ -409,14 +403,8 @@ namespace Krkadoni.EnigmaSettings
                 }
                 return bqt;
             }
-            catch (SettingsException ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.Settings_ReadBouquet_Failed_to_read_bouquet__0_, Path.GetFileName(fileName)), ex);
             }
             finally
@@ -661,9 +649,8 @@ namespace Krkadoni.EnigmaSettings
 
                 return Factory.InitNewBouquetItemService(bouquetLine);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.SettingsIO_ReadServiceReference_Failed_to_initialize_new_service_from_line__0_, bouquetLine), ex);
             }
         }
@@ -689,9 +676,8 @@ namespace Krkadoni.EnigmaSettings
                 bqim.LineSpecifierFlag = sData[1];
                 return bqim;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(Resources.SettingsIO_ReadMarkerReference_Failed_to_initialize_new_marker_from_line__0_,
                     bouquetLine), ex);
             }
@@ -722,9 +708,8 @@ namespace Krkadoni.EnigmaSettings
                 bqis.LineSpecifierFlag = sData[1];
                 return bqis;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(string.Format(
                     Resources.SettingsIO_ReadStreamReference_Failed_to_initialize_new_stream_reference_from_line__0_, bouquetLine), ex);
             }
@@ -793,14 +778,8 @@ namespace Krkadoni.EnigmaSettings
 
                 return bqt;
             }
-            catch (SettingsException ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.SettingsIO_ReadE1Bouquets_Failed_to_read_Enigma1_bouquets_file_, ex);
             }
         }
@@ -921,9 +900,8 @@ namespace Krkadoni.EnigmaSettings
                     sLocked.Remove(match.LockedBouquetItem);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
 
@@ -996,14 +974,8 @@ namespace Krkadoni.EnigmaSettings
                     }
                 }
             }
-            catch (SettingsException ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.SettingsIO_ReadServicesLocked_Failed_to_read_services_locked_file, ex);
             }
 
@@ -1047,9 +1019,8 @@ namespace Krkadoni.EnigmaSettings
                     Log.Debug("Enigma1 bouquets bouquet was not found, no locked bouquets to match.");
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
 
@@ -1071,9 +1042,8 @@ namespace Krkadoni.EnigmaSettings
                     sLocked.Remove(match.LockedBouquetItem);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, ex);
             }
 

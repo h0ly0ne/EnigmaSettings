@@ -186,8 +186,19 @@
   `CancelEdit` overrides of the derived bouquet item and transponder classes are gone.
 - `ArgumentNullException.ThrowIfNull`, `Count` / `Length` instead of `Any()`, `FileHelper` sealed,
   `FileBouquet.GetTypeFromFileName` static.
+- **Error handling unified.** Every error is logged exactly once, by the public entry point that was
+  called (`SettingsIO.Load` / `Save` and the public `ISettings` methods, via the new internal
+  `ErrorBoundary`); a broken lamedb was logged twice before, errors in nested bouquets more often.
+  Inner methods only wrap a foreign exception once into a `SettingsException` with their specific
+  message and no longer log. Public methods calling each other (and `Load` calling the match
+  methods) log once. The repeated try / catch / log / rethrow blocks of 48 methods are gone.
 
 ### Breaking
+
+- Invalid arguments of public methods (e.g. `Load(null)`, `RemoveService(null)`,
+  `RemoveServices(null)`) throw the `ArgumentNullException` directly instead of a `SettingsException`
+  and are not logged. Errors in the settings data and file access still arrive as `SettingsException`.
+- Error log entries: one entry per failed public call instead of one per involved method.
 
 - `SettingsIO._fileHelper` is `protected` (was a public field); use `SettingsIO.FileProvider`.
 - Values of the DVB-T enums, `DVBSRollOffType.X20` and `DVBSPilotType` changed to the Enigma2

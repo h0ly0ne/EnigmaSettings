@@ -49,9 +49,8 @@ namespace Krkadoni.EnigmaSettings
                 if (Log.IsDebugEnabled) Log.Debug($"Sucessfully written {fileName} to {Path.Combine(directory, fileName)}");
                 OnFileSaved(this, fi, true);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fi, false);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, Path.Combine(directory, fileName)), ex);
@@ -394,9 +393,8 @@ namespace Krkadoni.EnigmaSettings
                 if (Log.IsDebugEnabled) Log.Debug($"Sucessfully written bouquet {bouquetName} to {fileName}");
                 OnFileSaved(this, fileName, true);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fileName, false);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_, bouquetName, fileName), ex);
@@ -821,14 +819,8 @@ namespace Krkadoni.EnigmaSettings
 
                 WriteFile(fName, fContent.ToString(), Utf8NoBom);
             }
-            catch (SettingsException ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     string.Format(Resources.SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_, directory), ex);
             }
@@ -924,14 +916,8 @@ namespace Krkadoni.EnigmaSettings
 
                 WriteFile(fName, fContent.ToString(), Utf8NoBom);
             }
-            catch (SettingsException ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message, ex);
                 throw new SettingsException(
                     $"Failed to write Enigma1 bouquets file to {directory}", ex);
             }

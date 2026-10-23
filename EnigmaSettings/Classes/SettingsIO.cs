@@ -348,111 +348,101 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="cablesIO">Implementation of reading/writing cables file</param>
         public ISettings Load(string settingsFile, IXmlSatellitesIO satellitesIO, IXmlCablesIO cablesIO)
         {
+            ArgumentNullException.ThrowIfNull(settingsFile);
+            ArgumentNullException.ThrowIfNull(satellitesIO);
+            ArgumentNullException.ThrowIfNull(cablesIO);
+
             try
             {
-                if (settingsFile == null)
+                return ErrorBoundary.Run(Log, string.Format(Resources.Settings_Load_Failed_to_load_settings_from__0_, settingsFile), () =>
                 {
-                    Log.Error(Resources.Settings_LoadSettings_Invalid_filename_);
-                    throw new SettingsException(Resources.Settings_LoadSettings_Invalid_filename_);
-                }
+                    if (!_fileHelper.Exists(settingsFile))
+                        throw new SettingsException(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, settingsFile));
 
-                if (!_fileHelper.Exists(settingsFile))
-                {
-                    Log.Info(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, settingsFile));
-                    throw new SettingsException(string.Format(Resources.Settings_LoadSettings_File__0__does_not_exist_, settingsFile));
-                }
+                    OnSettingsLoading(this, settingsFile);
 
-                OnSettingsLoading(this, settingsFile);
+                    Log.Info(string.Format(Resources.Settings_Load_Loading_settings_from__0_, settingsFile));
 
-                Log.Info(string.Format(Resources.Settings_Load_Loading_settings_from__0_, settingsFile));
+                    var st = new Stopwatch();
+                    st.Start();
 
-                var st = new Stopwatch();
-                st.Start();
+                    ISettings settings = ReadSettingsFile(settingsFile);
+                    settings.SettingsFileName = settingsFile;
+                    settings.MatchServicesWithTransponders();
 
-                ISettings settings = ReadSettingsFile(settingsFile);
-                settings.SettingsFileName = settingsFile;
-                settings.MatchServicesWithTransponders();
-
-
-                if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)))
-                {
-                    IList<IXmlSatellite> sats;
-                    try
+                    if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)))
                     {
-                        sats = satellitesIO.LoadSatellitesFromFile(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)).ToList();
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Warn($"There was an error while reading {SatelliteXmlFileName} file.", ex);
-                        sats = new List<IXmlSatellite>();
-                    }
+                        IList<IXmlSatellite> sats;
+                        try
+                        {
+                            sats = satellitesIO.LoadSatellitesFromFile(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)).ToList();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warn($"There was an error while reading {SatelliteXmlFileName} file.", ex);
+                            sats = new List<IXmlSatellite>();
+                        }
 
-                    foreach (var sat in sats)
-                    {
-                        settings.Satellites.Add(sat);
+                        foreach (var sat in sats)
+                        {
+                            settings.Satellites.Add(sat);
+                        }
+
+                        settings.MatchSatellitesWithTransponders();
+                        settings.AddMissingXmlSatellites(Factory);
                     }
 
-                    settings.MatchSatellitesWithTransponders();
-                    settings.AddMissingXmlSatellites(Factory);
-                }
-
-                if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)))
-                {
-                    IList<IXmlCable> cabs;
-                    try
+                    if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)))
                     {
-                        cabs = cablesIO.LoadCablesFromFile(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)).ToList();
+                        IList<IXmlCable> cabs;
+                        try
+                        {
+                            cabs = cablesIO.LoadCablesFromFile(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)).ToList();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warn($"There was an error while reading {CablesXmlFileName} file.", ex);
+                            cabs = new List<IXmlCable>();
+                        }
+
+                        foreach (var cab in cabs)
+                        {
+                            settings.Cables.Add(cab);
+                        }
                     }
-                    catch (Exception ex)
+
+                    _bouquetReadContext = new BouquetReadContext();
+
+                    if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
                     {
-                        Log.Warn($"There was an error while reading {CablesXmlFileName} file.", ex);
-                        cabs = new List<IXmlCable>();
+                        ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetTvEpl), ref settings);
+                        ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetRadioEpl), ref settings);
+                        if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, BouquetsFile)))
+                            ReadE1Bouquets(Path.Combine(settings.SettingsDirectory, BouquetsFile), ref settings);
+                        settings.MatchBouquetsBouquetsServices();
+                        settings.MatchFileBouquetsServices();
+                        if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, ServicesLockedFile)))
+                            ReadServicesLocked(Path.Combine(settings.SettingsDirectory, ServicesLockedFile), ref settings);
                     }
-
-                    foreach (var cab in cabs)
+                    else if (settings.SettingsVersion is Enums.SettingsVersion.Enigma2Ver3 or Enums.SettingsVersion.Enigma2Ver4 or Enums.SettingsVersion.Enigma2Ver5)
                     {
-                        settings.Cables.Add(cab);
+                        ReadFileBouquet(Path.Combine(settings.SettingsDirectory, BouquetsTvFile), ref settings);
+                        ReadFileBouquet(Path.Combine(settings.SettingsDirectory, BouquetsRadioFile), ref settings);
+                        settings.MatchFileBouquetsServices();
+                        ReadBlackWhiteList(Path.Combine(settings.SettingsDirectory, WhiteListFile), ref settings);
+                        ReadBlackWhiteList(Path.Combine(settings.SettingsDirectory, BlackListFile), ref settings);
                     }
-                }
 
-                _bouquetReadContext = new BouquetReadContext();
-
-                if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
-                {
-                    ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetTvEpl), ref settings);
-                    ReadFileBouquet(Path.Combine(settings.SettingsDirectory, UserBouquetRadioEpl), ref settings);
-                    if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, BouquetsFile)))
-                        ReadE1Bouquets(Path.Combine(settings.SettingsDirectory, BouquetsFile), ref settings);
-                    settings.MatchBouquetsBouquetsServices();
-                    settings.MatchFileBouquetsServices();
-                    if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, ServicesLockedFile)))
-                        ReadServicesLocked(Path.Combine(settings.SettingsDirectory, ServicesLockedFile), ref settings);
-                }
-                else if (settings.SettingsVersion is Enums.SettingsVersion.Enigma2Ver3 or Enums.SettingsVersion.Enigma2Ver4 or Enums.SettingsVersion.Enigma2Ver5)
-                {
-                    ReadFileBouquet(Path.Combine(settings.SettingsDirectory, BouquetsTvFile), ref settings);
-                    ReadFileBouquet(Path.Combine(settings.SettingsDirectory, BouquetsRadioFile), ref settings);
-                    settings.MatchFileBouquetsServices();
-                    ReadBlackWhiteList(Path.Combine(settings.SettingsDirectory, WhiteListFile), ref settings);
-                    ReadBlackWhiteList(Path.Combine(settings.SettingsDirectory, BlackListFile), ref settings);
-                }
-
-                st.Stop();
-                Log.Info($"Settings loaded in {st.ElapsedMilliseconds} ms");
-                OnSettingsLoaded(this, settingsFile, true, settings);
-                return settings;
+                    st.Stop();
+                    Log.Info($"Settings loaded in {st.ElapsedMilliseconds} ms");
+                    OnSettingsLoaded(this, settingsFile, true, settings);
+                    return settings;
+                });
             }
-            catch (SettingsException ex)
+            catch
             {
                 OnSettingsLoaded(this, settingsFile, false, null);
-                Log.Error(ex.Message, ex);
                 throw;
-            }
-            catch (Exception ex)
-            {
-                OnSettingsLoaded(this, settingsFile, false, null);
-                Log.Error(string.Format(Resources.Settings_Load_Failed_to_load_settings_from__0_, settingsFile), ex);
-                throw new SettingsException(string.Format(Resources.Settings_Load_Failed_to_load_settings_from__0_, settingsFile), ex);
             }
             finally
             {
@@ -550,63 +540,56 @@ namespace Krkadoni.EnigmaSettings
             xmlSatellitesIO ??= Factory.InitNewXmlSatelliteIO(_fileHelper);
             xmlCablesIO ??= Factory.InitNewXmlCableIO(_fileHelper);
 
-            Log.Info($"Saving settings version {settings.SettingsVersion} to {folder}");
-            OnSettingsSaving(this, folder, settings);
-
-            if (!_fileHelper.FolderExists(folder))
-            {
-                try
-                {
-                    _fileHelper.CreateFolder(folder);
-                    if (Log.IsDebugEnabled) Log.Debug($"Folder {folder} successfully created");
-                }
-                catch (Exception ex)
-                {
-                    OnSettingsSaved(this, folder, false, settings);
-                    Log.Error(string.Format(Resources.SettingsIO_Save_There_was_an_error_creating_folder__0_, folder), ex);
-                    throw new SettingsException(string.Format(Resources.SettingsIO_Save_There_was_an_error_creating_folder__0_, folder), ex);
-                }
-            }
-            else
-            {
-                if (Log.IsDebugEnabled) Log.Debug($"Folder {folder} exists");
-            }
-
-            var st = new Stopwatch();
-            st.Start();
-
             try
             {
-                if (settings.FindBouquetsWithDuplicateFilename().Any())
-                    throw new SettingsException(Resources.SettingsIO_Save_Bouquet_filenames_are_not_unique_);
+                ErrorBoundary.Run(Log, string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, folder), () =>
+                {
+                    Log.Info($"Saving settings version {settings.SettingsVersion} to {folder}");
+                    OnSettingsSaving(this, folder, settings);
 
-                if (bLocalEnableDatabaseFile)
-                    WriteSettingsFile(folder, settings, strLocalFilenameOverride);
+                    if (!_fileHelper.FolderExists(folder))
+                    {
+                        try
+                        {
+                            _fileHelper.CreateFolder(folder);
+                            if (Log.IsDebugEnabled) Log.Debug($"Folder {folder} successfully created");
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new SettingsException(string.Format(Resources.SettingsIO_Save_There_was_an_error_creating_folder__0_, folder), ex);
+                        }
+                    }
+                    else if (Log.IsDebugEnabled)
+                    {
+                        Log.Debug($"Folder {folder} exists");
+                    }
 
-                if (bLocalEnableBouquetFiles)
-                    WriteBouquets(folder, settings);
+                    var st = Stopwatch.StartNew();
 
-                if (bLocalEnableSatellitesFile)
-                    xmlSatellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
+                    if (settings.FindBouquetsWithDuplicateFilename().Any())
+                        throw new SettingsException(Resources.SettingsIO_Save_Bouquet_filenames_are_not_unique_);
 
-                if (bLocalEnableCablesFile)
-                    xmlCablesIO.SaveCablesToFile(Path.Combine(folder, CablesXmlFileName), settings);
+                    if (bLocalEnableDatabaseFile)
+                        WriteSettingsFile(folder, settings, strLocalFilenameOverride);
 
-                st.Stop();
-                Log.Info($"Settings saved successfully in {st.ElapsedMilliseconds} ms.");
-                OnSettingsSaved(this, folder, true, settings);
+                    if (bLocalEnableBouquetFiles)
+                        WriteBouquets(folder, settings);
+
+                    if (bLocalEnableSatellitesFile)
+                        xmlSatellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
+
+                    if (bLocalEnableCablesFile)
+                        xmlCablesIO.SaveCablesToFile(Path.Combine(folder, CablesXmlFileName), settings);
+
+                    st.Stop();
+                    Log.Info($"Settings saved successfully in {st.ElapsedMilliseconds} ms.");
+                    OnSettingsSaved(this, folder, true, settings);
+                });
             }
-            catch (SettingsException ex)
+            catch
             {
                 OnSettingsSaved(this, folder, false, settings);
-                Log.Error(ex.Message, ex);
                 throw;
-            }
-            catch (Exception ex)
-            {
-                OnSettingsSaved(this, folder, false, settings);
-                Log.Error(string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, folder), ex);
-                throw new SettingsException(string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, folder), ex);
             }
         }
 
@@ -713,9 +696,8 @@ namespace Krkadoni.EnigmaSettings
             {
                 fileLines = _fileHelper.ReadAllLines(fileName);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 OnFileLoaded(this, fileName, false);
                 throw new SettingsException(string.Format(Resources.Settings_Read_Failed_to_read_file__0__1__2_, fileName, "", ""), ex);
             }
@@ -762,9 +744,8 @@ namespace Krkadoni.EnigmaSettings
             {
                 fileText = _fileHelper.ReadAllText(fileName);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 OnFileLoaded(this, fileName, false);
                 throw new SettingsException(string.Format(Resources.Settings_Read_Failed_to_read_file__0__1__2_, fileName, "", ""), ex);
             }
@@ -798,9 +779,8 @@ namespace Krkadoni.EnigmaSettings
                     _fileHelper.Delete(fileName);
                     if (Log.IsDebugEnabled) Log.Debug($"Existing file {fileName} successfully deleted");
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not SettingsException)
                 {
-                    Log.Error(ex.Message, ex);
                     throw new SettingsException(
                         string.Format(Resources.SettingsIO_DeleteFileIfExists_File__0__already_exists_and_could_not_be_deleted_, fileName), ex);
                 }
@@ -825,9 +805,8 @@ namespace Krkadoni.EnigmaSettings
                 if (Log.IsDebugEnabled) Log.Debug($"File {fileName} successfully written.");
                 OnFileSaved(this, fileName, true);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not SettingsException)
             {
-                Log.Error(ex.Message, ex);
                 OnFileSaved(this, fileName, false);
                 throw new SettingsException($"There was an error while writing file {fileName} to disk", ex);
             }
