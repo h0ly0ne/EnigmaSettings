@@ -24,6 +24,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (FileBouquet)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -39,45 +40,27 @@ namespace Krkadoni.EnigmaSettings
         private bool _hidden;
 
         #region "IEditable"
-        private bool _isEditing;
-        private string _mName;
-        private string _mFileName;
-        private bool _mHidden;
-        private IList<IBouquetItem> _mBouquetItems;
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
 
         public void BeginEdit()
         {
-            if (_isEditing)
-                return;
-
-            _mName = _name;
-            _mFileName = _fileName;
-            _mHidden = _hidden;
-            _mBouquetItems = new List<IBouquetItem>(_bouquetItems);
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public void CancelEdit()
         {
-            if (!_isEditing)
+            if (_editSnapshot == null)
                 return;
 
-            Name = _mName;
-            FileName = _mFileName;
-            Hidden = _mHidden;
-            BouquetItems.Clear();
-
-            foreach (var bouquetItem in _mBouquetItems)
-            {
-                BouquetItems.Add(bouquetItem);
-            }
-
-            _isEditing = false;
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 
@@ -160,6 +143,26 @@ namespace Krkadoni.EnigmaSettings
         private bool _isSubBouquet;
 
         /// <summary>
+        ///     Parental control of the whole bouquet: BlackListed when listed in the Enigma2 blacklist,
+        ///     WhiteListed when listed in the whitelist
+        /// </summary>
+        [DataMember]
+        public Enums.ServiceSecurity ServiceSecurity
+        {
+            get => _serviceSecurity;
+            set
+            {
+                if (value == _serviceSecurity)
+                    return;
+
+                _serviceSecurity = value;
+                OnPropertyChanged(nameof(ServiceSecurity));
+            }
+        }
+
+        private Enums.ServiceSecurity _serviceSecurity = Enums.ServiceSecurity.None;
+
+        /// <summary>
         ///     Type of the bouquet. Determined from FileName.
         /// </summary>
         /// <value></value>
@@ -216,7 +219,7 @@ namespace Krkadoni.EnigmaSettings
         /// <param name="fName">Filename without path</param>
         /// <returns>BouquetType enum for known filenames</returns>
         /// <remarks></remarks>
-        protected Enums.BouquetType GetTypeFromFileName(string fName)
+        protected static Enums.BouquetType GetTypeFromFileName(string fName)
         {
             if (string.IsNullOrEmpty(fName))
                 return Enums.BouquetType.Unknown;

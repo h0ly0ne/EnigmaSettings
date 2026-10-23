@@ -14,40 +14,6 @@ namespace Krkadoni.EnigmaSettings
         private IBouquetsBouquet _bouquet;
         private int _bouquetOrderNumberInt;
 
-        #region "IEditable"
-        private bool _isEditing;
-        private IBouquetsBouquet _mBouquet;
-        private int _mBouquetOrderNumberInt;
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            if (_isEditing) 
-                return;
-
-            _mBouquet = _bouquet;
-            _mBouquetOrderNumberInt = _bouquetOrderNumberInt;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            if (!_isEditing) 
-                return;
-
-            Bouquet = _mBouquet;
-            BouquetOrderNumberInt = _mBouquetOrderNumberInt;
-            _isEditing = false;
-        }
-        #endregion
-
         #region "ICloneable"
         /// <summary>
         /// Performs deep Clone on the object

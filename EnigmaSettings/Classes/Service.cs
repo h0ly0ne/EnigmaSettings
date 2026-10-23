@@ -27,6 +27,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (Service<TFlag>)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -37,70 +38,27 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "IEditable"
-        private bool _isEditing;
-        private string _mFlags;
-        private string _mTSID;
-        private string _mONID;
-        private string _mNameSpace;
-        private bool _mLocked;
-        private string _mName;
-        private string _mProgNumber;
-        private string _mSourceId;
-        private Enums.ServiceSecurity _mServiceSecurity;
-        private string _mSid;
-        private ITransponder _mTransponder;
-        private string _mType;
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
 
         public void BeginEdit()
         {
-            if (_isEditing)
-                return;
-
-            _mFlags = _flags;
-            _mTSID = _TSID;
-            _mONID = _ONID;
-            _mNameSpace = _nameSpace;
-            _mLocked = _locked;
-            _mName = _name;
-            _mProgNumber = _progNumber;
-            _mSourceId = _sourceId;
-            _mServiceSecurity = _serviceSecurity;
-            _mSid = _sid;
-            _mTransponder = _transponder;
-            _mType = _type;
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public void CancelEdit()
         {
-            if (!_isEditing)
+            if (_editSnapshot == null)
                 return;
 
-            Locked = _mLocked;
-            Name = _mName;
-            TSID = _mTSID;
-            ONID = _mONID;
-            NameSpace = _mNameSpace;
-            ProgNumber = _mProgNumber;
-            SourceID = _mSourceId;
-            ServiceSecurity = _mServiceSecurity;
-            SID = _mSid;
-            Transponder = _mTransponder;
-            Type = _mType;
-            
-            if (_flags != _mFlags)
-            {
-                _flags = _mFlags;
-                OnPropertyChanged(nameof(Flags));
-                OnPropertyChanged(nameof(FlagList));
-            }
-
-            _isEditing = false;
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 

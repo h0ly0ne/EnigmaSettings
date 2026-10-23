@@ -13,40 +13,6 @@ namespace Krkadoni.EnigmaSettings
     {
         private IService _service;
 
-        #region "IEditable"
-        private bool _isEditing;
-        private IService _mService;
-        private string _mDescription;
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            if (_isEditing) 
-                return;
-
-            _mService = _service;
-            _mDescription = _description;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            if (!_isEditing) 
-                return;
-
-            Service = _mService;
-            Description = _mDescription;
-            _isEditing = false;
-        }
-        #endregion
-
         #region "ICloneable"
         /// <summary>
         /// Performs deep Clone on the object

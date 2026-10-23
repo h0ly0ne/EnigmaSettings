@@ -15,40 +15,6 @@ namespace Krkadoni.EnigmaSettings
 
         private string _markerNumber = "0";
 
-        #region "IEditable"
-        private bool _isEditing;
-        private string _mDescription;
-        private string _mMarkerNumber = "0";
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            if (_isEditing) 
-                return;
-
-            _mDescription = _description;
-            _mMarkerNumber = _markerNumber;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            if (!_isEditing) 
-                return;
-
-            Description = _mDescription;
-            MarkerNumber = _mMarkerNumber;
-            _isEditing = false;
-        }
-        #endregion
-
         #region "ICloneable"
         /// <summary>
         /// Performs Memberwise Clone on the object
@@ -69,8 +35,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if description is null</exception>
         public BouquetItemMarker(string description, string markerNumber)
         {
-            if (description == null)
-                throw new ArgumentNullException(nameof(description));
+            ArgumentNullException.ThrowIfNull(description);
 
             markerNumber ??= "0";
 

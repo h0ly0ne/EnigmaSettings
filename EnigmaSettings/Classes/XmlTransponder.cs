@@ -22,6 +22,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (XmlTransponder)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -33,69 +34,27 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "IEditable"
-        private bool _isEditing;
-        private string _mFec;
-        private string _mFrequency;
-        private string _mInversion;
-        private string _mModulation;
-        private string _mPilot;
-        private string _mPolarization;
-        private string _mRollOff;
-        private string _mSymbolRate;
-        private string _mSystem;
-        private string _mIs_id;
-        private string _mPls_code;
-        private string _mPls_mode;
-        private string _mT2mi_plp_id;
-        private string _mT2mi_pid;
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
 
         public void BeginEdit()
         {
-            if (_isEditing) 
-                return;
-
-            _mFec = _fec;
-            _mFrequency = _frequency;
-            _mInversion = _inversion;
-            _mModulation = _modulation;
-            _mPilot = _pilot;
-            _mPolarization = _polarization;
-            _mRollOff = _rollOff;
-            _mSymbolRate = _symbolRate;
-            _mSystem = _system;
-            _mIs_id = _is_id;
-            _mPls_code = _pls_code;
-            _mPls_mode = _pls_mode;
-            _mT2mi_plp_id = _t2mi_plp_id;
-            _mT2mi_pid = _t2mi_pid;
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public void CancelEdit()
         {
-            if (!_isEditing) 
+            if (_editSnapshot == null)
                 return;
 
-            FEC = _mFec;
-            Frequency = _mFrequency;
-            Inversion = _mInversion;
-            Modulation = _mModulation;
-            Pilot = _mPilot;
-            Polarization = _mPolarization;
-            RollOff = _mRollOff;
-            SymbolRate = _mSymbolRate;
-            System = _mSystem;
-            IsId = _mIs_id;
-            PlsCode = _mPls_code;
-            PlsMode = _mPls_mode;
-            T2miPlpId = _mT2mi_plp_id;
-            T2miPid = _mT2mi_pid;
-            _isEditing = false;
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 

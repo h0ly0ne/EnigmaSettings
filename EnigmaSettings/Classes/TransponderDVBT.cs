@@ -12,69 +12,6 @@ namespace Krkadoni.EnigmaSettings
     [DataContract]
     public class TransponderDVBT : Transponder, ITransponderDVBT
     {
-        #region "IEditable"
-        private bool _isEditing;
-        private string _mBandwidth;
-        private string _mFecHigh;
-        private string _mFecLow;
-        private string _mFlags;
-        private string _mGuardInterval;
-        private string _mHierarchy;
-        private string _mInversion;
-        private string _mModulation;
-        private string _mTransmission;
-        private string _mSystem;
-        private string _mPlpId;
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            
-            if (_isEditing)
-                return;
-
-            _mBandwidth = _bandwidth;
-            _mFecHigh = _fecHigh;
-            _mFecLow = _fecLow;
-            _mFlags = _flags;
-            _mGuardInterval = _guardInterval;
-            _mHierarchy = _hierarchy;
-            _mInversion = _inversion;
-            _mModulation = _modulation;
-            _mTransmission = _transmission;
-            _mSystem = _system;
-            _mPlpId = _plp_id;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            
-            if (!_isEditing)
-                return;
-
-            Bandwidth = _mBandwidth;
-            FECHigh = _mFecHigh;
-            FECLow = _mFecLow;
-            Flags = _mFlags;
-            GuardInterval = _mGuardInterval;
-            Hierarchy = _mHierarchy;
-            Inversion = _mInversion;
-            Modulation = _mModulation;
-            Transmission = _mTransmission;
-            System = _mSystem;
-            PlpId = _mPlpId;
-
-            _isEditing = false;
-        }
-        #endregion
        
         private string _bandwidth = "0";
         private string _fecHigh = "0";

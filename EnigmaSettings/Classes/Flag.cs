@@ -24,6 +24,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (Flag)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -34,38 +35,27 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "IEditable"
-        private bool _isEditing;
-        private string _mFlagString;
-        
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
+
         public void BeginEdit()
         {
-            if (_isEditing) 
-                return;
-
-            _mFlagString = _flagString;
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public void CancelEdit()
         {
-            if (!_isEditing) 
+            if (_editSnapshot == null)
                 return;
 
-            if (_flagString != _mFlagString)
-            {
-                _flagString = _mFlagString;
-                OnPropertyChanged("FlagInt");
-                OnPropertyChanged("FlagValue");
-                OnPropertyChanged("FlagString");
-                OnPropertyChanged("C_FlagType");
-                OnPropertyChanged("F_FlagType");
-            }
-            _isEditing = false;
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 

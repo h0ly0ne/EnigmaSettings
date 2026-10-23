@@ -389,7 +389,7 @@ namespace Krkadoni.EnigmaSettings
                 if (Log.IsDebugEnabled) Log.Debug($"Reading bouquet {bqt.FileName}");
                 string[] bouquetLines = Read(fileName, true);
 
-                if (bouquetLines == null || !bouquetLines.Any())
+                if (bouquetLines == null || bouquetLines.Length == 0)
                 {
                     Log.Warn(string.Format(Resources.Settings_ReadBouquet_Bouquet__0__is_empty, bqt.FileName));
                 }
@@ -874,10 +874,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 return;
             }
-            if (fileName == null)
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
+            ArgumentNullException.ThrowIfNull(fileName);
 
             if (!_fileHelper.Exists(fileName))
             {
@@ -885,12 +882,31 @@ namespace Krkadoni.EnigmaSettings
             }
 
             var fName = Path.GetFileName(fileName);
+            bool blackListed = string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase);
 
-            string[] bouquetFileLines = Read(fileName);
-            sLocked.AddRange(bouquetFileLines.Where(x => !string.IsNullOrWhiteSpace(x)).Select(ReadServiceReference).Where(bqis => bqis != null));
+            string[] bouquetFileLines = Read(fileName).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 
-            if (!sLocked.Any()) return;
-            bool blackListed = (string.Equals(fName, BlackListFile, StringComparison.OrdinalIgnoreCase));
+            // whole bouquets: 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.x.tv" ORDER BY bouquet
+            foreach (string line in bouquetFileLines.Where(x => x.Contains("FROM BOUQUET", StringComparison.OrdinalIgnoreCase)))
+            {
+                int start = line.IndexOf('"');
+                int end = start > -1 ? line.IndexOf('"', start + 1) : -1;
+                string bouquetFile = end > start ? Path.GetFileName(line.Substring(start + 1, end - start - 1).Trim()) : string.Empty;
+                IFileBouquet bouquet = settings.Bouquets.OfType<IFileBouquet>()
+                    .FirstOrDefault(x => string.Equals(Path.GetFileName(x.FileName), bouquetFile, StringComparison.OrdinalIgnoreCase));
+
+                if (bouquet == null)
+                {
+                    Log.Warn($"Bouquet {bouquetFile} listed in {fName} was not found");
+                    continue;
+                }
+
+                bouquet.ServiceSecurity = blackListed ? Enums.ServiceSecurity.BlackListed : Enums.ServiceSecurity.WhiteListed;
+            }
+
+            sLocked.AddRange(bouquetFileLines.Where(x => !x.Contains("FROM BOUQUET", StringComparison.OrdinalIgnoreCase)).Select(ReadServiceReference).Where(bqis => bqis != null));
+
+            if (sLocked.Count == 0) return;
 
             //matching  services
             try
@@ -1005,7 +1021,7 @@ namespace Krkadoni.EnigmaSettings
             }
 
             Log.Debug("All items from services.locked loaded.");
-            if (!sLocked.Any())
+            if (sLocked.Count == 0)
                 return;
 
             IFileBouquet bouquets = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => x.BouquetType == Enums.BouquetType.E1Bouquets);

@@ -13,37 +13,6 @@ namespace Krkadoni.EnigmaSettings
     {
         private IFileBouquet _bouquet;
 
-        #region "IEditable"
-        private bool _isEditing;
-        private IFileBouquet _mBouquet;
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            if (_isEditing) 
-                return;
-
-            _mBouquet = _bouquet;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            if (!_isEditing) 
-                return;
-
-            Bouquet = _mBouquet;
-            _isEditing = false;
-        }
-        #endregion
-
         #region "ICloneable"
         /// <summary>
         /// Performs deep Clone on the object

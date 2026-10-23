@@ -25,6 +25,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (XmlSatellite)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -38,39 +39,27 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "IEditable"
-        private bool _isEditing;
-        private string _mFlags;
-        private string _mName;
-        private string _mPosition;
-        private IList<IXmlTransponder> _mTransponders;
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
 
         public void BeginEdit()
         {
-            if (_isEditing) return;
-            _mFlags = _flags;
-            _mName = _name;
-            _mPosition = _position;
-            _mTransponders = new List<IXmlTransponder>(_transponders);
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public void CancelEdit()
         {
-            if (!_isEditing) return;
-            Flags = _mFlags;
-            Name = _mName;
-            Position = _mPosition;
-            Transponders.Clear();
-            foreach (IXmlTransponder transponder in _mTransponders)
-            {
-                Transponders.Add(transponder);
-            }
-            _isEditing = false;
+            if (_editSnapshot == null)
+                return;
+
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 

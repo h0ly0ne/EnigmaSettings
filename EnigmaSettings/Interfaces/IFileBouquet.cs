@@ -26,5 +26,11 @@ namespace Krkadoni.EnigmaSettings.Interfaces
         ///     as a file but not listed in bouquets.tv / bouquets.radio. False for bouquets listed there.
         /// </summary>
         bool IsSubBouquet { get; set; }
+
+        /// <summary>
+        ///     Parental control of the whole bouquet: BlackListed when listed in the Enigma2 blacklist,
+        ///     WhiteListed when listed in the whitelist
+        /// </summary>
+        Enums.ServiceSecurity ServiceSecurity { get; set; }
     }
 }

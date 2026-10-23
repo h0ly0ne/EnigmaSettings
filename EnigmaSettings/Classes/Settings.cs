@@ -27,6 +27,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (Settings)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -37,77 +38,27 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "IEditable"
-        private bool _isEditing;
-        private IList<IBouquet> _mBouquets;
-        private IList<IXmlSatellite> _mSatellites;
-        private IList<IXmlCable> _mCables;
-        private IList<IService> _mServices;
-        private IList<ITransponder> _mTransponders;
-        private string _mSettingsFileName;
-        private Enums.SettingsVersion _mSettingsVersion;
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
 
         public void BeginEdit()
         {
-            if (_isEditing) 
-                return;
-
-            _mBouquets = new List<IBouquet>(_bouquets);
-            _mServices = new List<IService>(_services);
-            _mTransponders = new List<ITransponder>(_transponders);
-            _mSatellites = new List<IXmlSatellite>(_satellites);
-            _mCables = new List<IXmlCable>(_cables);
-            _mSettingsFileName = _settingsFileName;
-            _mSettingsVersion = _settingsVersion;
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public void CancelEdit()
         {
-            if (!_isEditing) return;
+            if (_editSnapshot == null)
+                return;
 
-            Bouquets.Clear();
-
-            foreach (var bouquet in _mBouquets)
-            {
-                Bouquets.Add(bouquet);
-            }
-
-            Services.Clear();
-
-            foreach (var service in _mServices)
-            {
-                Services.Add(service);
-            }
-
-            Transponders.Clear();
-
-            foreach (var transponder in _mTransponders)
-            {
-                Transponders.Add(transponder);
-            }
-
-            Satellites.Clear();
-
-            foreach (var satellite in _mSatellites)
-            {
-                Satellites.Add(satellite);
-            }
-
-            Cables.Clear();
-
-            foreach (var cable in _mCables)
-            {
-                Cables.Add(cable);
-            }
-
-            SettingsFileName = _mSettingsFileName;
-            SettingsVersion = _mSettingsVersion;
-            _isEditing = false;
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 
@@ -1155,8 +1106,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (service == null)
-                    throw new ArgumentNullException(nameof(service));
+                ArgumentNullException.ThrowIfNull(service);
 
                 if (Log.IsDebugEnabled) Log.Debug($"Removing service {service.Name} from settings");
                 RemoveServicesCore([service]);
@@ -1218,8 +1168,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (transponder == null)
-                    throw new ArgumentNullException(nameof(transponder));
+                ArgumentNullException.ThrowIfNull(transponder);
 
                 if (Log.IsDebugEnabled) Log.Debug($"Removing transponder {transponder.TransponderId} from settings");
                 RemoveTranspondersCore([transponder]);
@@ -1355,16 +1304,14 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (satellite == null)
-                    throw new ArgumentNullException(nameof(satellite));
+                ArgumentNullException.ThrowIfNull(satellite);
 
                 if (Log.IsDebugEnabled) Log.Debug($"Removing satellite {satellite.Name}");
                 IList<ITransponder> trans = Transponders.OfType<ITransponderDVBS>().Where(x => Equals(x.Satellite, satellite)).Select(x => (ITransponder)x).ToList();
                 RemoveTransponders(trans);
 
-                if (Satellites.Contains(satellite))
+                if (Satellites.Remove(satellite))
                 {
-                    Satellites.Remove(satellite);
                     if (Log.IsDebugEnabled) Log.Debug($"Satellite {satellite.Name} removed from satellites");
                 }
 
@@ -1435,8 +1382,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (cable == null)
-                    throw new ArgumentNullException(nameof(cable));
+                ArgumentNullException.ThrowIfNull(cable);
 
                 if (Log.IsDebugEnabled) Log.Debug($"Removing cable {cable.Name}");
 
@@ -1540,8 +1486,7 @@ namespace Krkadoni.EnigmaSettings
         {
             try
             {
-                if (satellite == null)
-                    throw new ArgumentNullException(nameof(satellite));
+                ArgumentNullException.ThrowIfNull(satellite);
 
                 if (satellite.Position == newPosition.ToString(CultureInfo.InvariantCulture))
                     return;

@@ -677,6 +677,7 @@ namespace Krkadoni.EnigmaSettings
                 Log.Debug("There is no locked services to put inside blacklist file");
             }
 
+            AppendBouquetSecurity(fContent, settings, Enums.ServiceSecurity.BlackListed);
             WriteFile(Path.Combine(directory, BlackListFile), fContent.ToString(), Utf8NoBom);
         }
 
@@ -710,7 +711,22 @@ namespace Krkadoni.EnigmaSettings
             {
                 Log.Debug("There is no services to put inside whitelist file");
             }
+
+            AppendBouquetSecurity(fContent, settings, Enums.ServiceSecurity.WhiteListed);
             WriteFile(Path.Combine(directory, WhiteListFile), fContent.ToString(), Utf8NoBom);
+        }
+
+        /// <summary>
+        ///     Adds the bouquets with the given parental control state as FROM BOUQUET references
+        /// </summary>
+        private void AppendBouquetSecurity(StringBuilder content, ISettings settings, Enums.ServiceSecurity security)
+        {
+            foreach (IFileBouquet bouquet in settings.Bouquets.OfType<IFileBouquet>().Where(x => x.ServiceSecurity == security))
+            {
+                string type = bouquet.BouquetType == Enums.BouquetType.UserBouquetRadio ? "2" : "1";
+                content.Append("1:7:").Append(type).Append(":0:0:0:0:0:0:0:FROM BOUQUET \"").Append(Path.GetFileName(bouquet.FileName)).Append("\" ORDER BY bouquet\n");
+                if (Log.IsDebugEnabled) Log.Debug($"Bouquet {bouquet.FileName} added as {security}");
+            }
         }
 
         /// <summary>

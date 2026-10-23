@@ -22,6 +22,7 @@ namespace Krkadoni.EnigmaSettings
         {
             var clone = (BouquetItem)MemberwiseClone();
             clone.PropertyChanged = null;
+            clone._editSnapshot = null;
             return clone;
         }
 
@@ -32,33 +33,27 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "IEditable"
-        private bool _isEditing;
-        private string _mFavoritesTypeFlag;
-        private string _mLineSpecifierFlag;
+        // field values captured by BeginEdit (see EditSnapshot), null while not editing
+        private object[] _editSnapshot;
 
         public virtual void BeginEdit()
         {
-            if (_isEditing) 
-                return;
-
-            _mFavoritesTypeFlag = _favoritesTypeFlag;
-            _mLineSpecifierFlag = _lineSpecifierFlag;
-            _isEditing = true;
+            _editSnapshot ??= EditSnapshot.Capture(this);
         }
 
         public virtual void EndEdit()
         {
-            _isEditing = false;
+            _editSnapshot = null;
         }
 
         public virtual void CancelEdit()
         {
-            if (!_isEditing) 
+            if (_editSnapshot == null)
                 return;
 
-            FavoritesTypeFlag = _mFavoritesTypeFlag;
-            LineSpecifierFlag = _mLineSpecifierFlag;
-            _isEditing = false;
+            EditSnapshot.Restore(this, _editSnapshot);
+            _editSnapshot = null;
+            OnPropertyChanged(string.Empty);
         }
         #endregion
 

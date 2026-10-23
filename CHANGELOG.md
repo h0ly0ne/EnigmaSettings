@@ -112,6 +112,11 @@
 - `FindBouquetsWithDuplicateFilename` compares the file name without directory and ignoring case,
   so two bouquets that end up in the same file on Windows (`userbouquet.Fav.tv` /
   `userbouquet.fav.tv`) are reported and `Save` refuses them instead of silently overwriting one.
+- **Parental control of whole bouquets was lost.** `FROM BOUQUET` entries in the Enigma2
+  `blacklist` / `whitelist` are read into the new `IFileBouquet.ServiceSecurity` and written back
+  (they were dropped before).
+- `CancelEdit` of `IFileBouquet` did not restore `IsSubBouquet`, and of `IXmlTransponder` not
+  `Tsid` / `Onid`.
 
 ### Changed
 
@@ -160,6 +165,13 @@
 - `SerializerSatellites` / `SerializerCables` derive from the new `XmlFileRoot<T>` that holds the
   shared serializer, `Serialize`, `Deserialize`, `LoadFromFile` and `SaveToFile`.
 - Removed 7 unused resource strings, commented-out code and unused `using static` directives.
+- `IEditableObject` of all model classes, `Settings` and `SettingsIO` is implemented once
+  (`EditSnapshot`): `BeginEdit` captures every field and the content of list fields, `CancelEdit`
+  restores them and raises `PropertyChanged` with an empty property name (all properties changed).
+  New properties can no longer be forgotten; the per-class backup fields and the `BeginEdit` /
+  `CancelEdit` overrides of the derived bouquet item and transponder classes are gone.
+- `ArgumentNullException.ThrowIfNull`, `Count` / `Length` instead of `Any()`, `FileHelper` sealed,
+  `FileBouquet.GetTypeFromFileName` static.
 
 ### Breaking
 
@@ -167,8 +179,8 @@
 - Values of the DVB-T enums, `DVBSRollOffType.X20` and `DVBSPilotType` changed to the Enigma2
   coding (see Fixed). Code that persisted or compared the numeric enum values must be adjusted.
 - `IBouquetItemStream.URL` returns the decoded URL (see Fixed).
-- New interface members `IXmlTransponder.Tsid` / `Onid`, `IBouquetItemService.Description` and
-  `IFileBouquet.IsSubBouquet`;
+- New interface members `IXmlTransponder.Tsid` / `Onid`, `IBouquetItemService.Description`,
+  `IFileBouquet.IsSubBouquet` and `IFileBouquet.ServiceSecurity`;
   own implementations of these interfaces must add them.
 
 ### Removed (breaking)

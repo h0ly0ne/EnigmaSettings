@@ -12,47 +12,6 @@ namespace Krkadoni.EnigmaSettings
     [DataContract]
     public class TransponderDVBC : Transponder, ITransponderDVBC
     {
-        #region "IEditable"
-        private bool _isEditing;
-        private string _mFec;
-        private string _mFlags;
-        private string _mInversion;
-        private string _mModulation;
-        private string _mSymbolRate;
-        private string _mSystem;
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            if (_isEditing) return;
-            _mFec = _fec;
-            _mFlags = _flags;
-            _mInversion = _inversion;
-            _mModulation = _modulation;
-            _mSymbolRate = _symbolRate;
-            _mSystem = _system;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            if (!_isEditing) return;
-            FEC = _mFec;
-            Flags = _mFlags;
-            Inversion = _mInversion;
-            Modulation = _mModulation;
-            SymbolRate = _mSymbolRate;
-            System = _mSystem;
-            _isEditing = false;
-        }
-        #endregion
 
         #region "ICloneable"
         /// <summary>

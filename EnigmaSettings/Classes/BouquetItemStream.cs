@@ -20,54 +20,6 @@ namespace Krkadoni.EnigmaSettings
         private string _streamFlag = "1";
         private string _url = string.Empty;
 
-        #region "IEditable"
-        private bool _isEditing;
-        private string _mDescription;
-        private string _mExtraFlag1;
-        private string _mExtraFlag2;
-        private string _mServiceId;
-        private string _mStreamFlag;
-        private string _mUrl;
-
-        public override void BeginEdit()
-        {
-            base.BeginEdit();
-            if (_isEditing)
-                return;
-
-            _mDescription = _description;
-            _mExtraFlag1 = _extraFlag1;
-            _mExtraFlag2 = _extraFlag2;
-            _mServiceId = _serviceId;
-            _mStreamFlag = _streamFlag;
-            _mUrl = _url;
-            _isEditing = true;
-        }
-
-        public override void EndEdit()
-        {
-            base.EndEdit();
-            _isEditing = false;
-        }
-
-        public override void CancelEdit()
-        {
-            base.CancelEdit();
-            if (!_isEditing)
-                return;
-
-            Description = _mDescription;
-            ExtraFlag1 = _mExtraFlag1;
-            ExtraFlag2 = _mExtraFlag2;
-            ServiceID = _mServiceId;
-            StreamFlag = _mStreamFlag;
-            URL = _mUrl;
-
-
-            _isEditing = false;
-        }
-        #endregion
-
         #region "ICloneable"
         /// <summary>
         /// Performs Memberwise Clone on the object
