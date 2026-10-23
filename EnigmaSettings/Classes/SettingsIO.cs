@@ -75,7 +75,11 @@ namespace Krkadoni.EnigmaSettings
         private static readonly HashSet<string> _streamFavoritesTypes = ["4097", "5001", "5002", "8193", "8739"];
         // Enigma reads these files line by line, a BOM would corrupt the first entry
         private static readonly Encoding Utf8NoBom = new UTF8Encoding(false);
-        private static readonly HashSet<int> DirectoryLineSpecifiers = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 519];
+        // Enigma2 eServiceReference flags (second field of a #SERVICE line)
+        private const int DirectoryFlags = 7;   // isDirectory | mustDescent | canDescent
+        private const int MarkerFlag = 64;      // isMarker
+        private const int GroupFlag = 128;      // isGroup (alternatives)
+        private const int InvisibleFlag = 512;  // isInvisible
         private static readonly string FavoritesTypeFile = ((int)Enums.FavoritesType.File).ToString(CultureInfo.InvariantCulture);
         private static readonly string FavoritesTypeUnknown = ((int)Enums.FavoritesType.Unknown).ToString(CultureInfo.InvariantCulture);
 

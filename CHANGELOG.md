@@ -9,6 +9,13 @@
   additional file. Saving version 5 now does the same as Enigma2: `lamedb` in version 4 plus `lamedb5`
   next to it (with a file name override `x`: `x` and `x5`). Previously only `lamedb5` was written, so
   the receiver kept using its old `lamedb`.
+- **Bouquet entries with flag combinations the library did not list were silently dropped** —
+  e.g. numbered markers (`1:320`, common in current OpenPLi / OpenATV lists), invisible markers
+  (`1:576`) and invisible services (`1:512`). The second field of a `#SERVICE` line is now evaluated
+  as the Enigma2 flag mask (`isMarker` 64, `isGroup` 128, `isDirectory|mustDescent|canDescent` 7,
+  `isInvisible` 512) instead of a fixed list of values, the flag is written back as read, and lines
+  that still cannot be used are logged as warnings instead of disappearing.
+- Markers without description (e.g. spacers `1:832`) no longer get an empty `#DESCRIPTION` line.
 - `FileHelper` removes its temporary file when writing fails (e.g. read-only target); the original
   file stays untouched.
 - **Enigma1 `bouquets` file could never be read.** The parser cut the content with an end
@@ -267,7 +274,8 @@ service-type / DVB-T modulation enum set.
 
 - A SPACE (832) entry that has no `#DESCRIPTION` is read as a marker whose description
   defaults to a placeholder, so it is not byte-identical on round-trip (the line
-  specifier and value are preserved).
+  specifier and value are preserved). *(Resolved, see Unreleased: no empty `#DESCRIPTION` is
+  written anymore.)*
 - The legacy **PCL Profile111** project (`EnigmaSettingsPCL`) does not build — a
   pre-existing issue unrelated to this work: `XmlSatellitesIO` uses
   `System.IO.FileStream`, which is unavailable in Profile111. The netstandard2.0 and

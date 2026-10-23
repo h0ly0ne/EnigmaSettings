@@ -470,7 +470,9 @@ namespace Krkadoni.EnigmaSettings
 
                     case IBouquetItemMarker bim:
                         sContent.Append(serviceTag).Append(string.Join(":", bim.FavoritesTypeFlag, bim.LineSpecifierFlag, bim.MarkerNumber, "0", "0", "0", "0", "0", "0", "0", "")).Append('\n');
-                        sContent.Append(descriptionTag).Append(bim.Description).Append('\n');
+                        // spacers (832) usually have no description, an empty #DESCRIPTION line is not written
+                        if (!string.IsNullOrEmpty(bim.Description))
+                            sContent.Append(descriptionTag).Append(bim.Description).Append('\n');
                         if (debug) Log.Debug($"Marker {bim.Description} added to bouquet {bouquet.Name}");
                         break;
 

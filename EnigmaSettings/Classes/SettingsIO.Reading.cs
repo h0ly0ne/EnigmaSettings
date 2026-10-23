@@ -487,13 +487,29 @@ namespace Krkadoni.EnigmaSettings
                 }
 
                 string favoritesType = sData[0];
-                var lineType = (Enums.LineSpecifier)lineSpecifier;
-                bool isDirectory = DirectoryLineSpecifiers.Contains(lineSpecifier) || favoritesType == FavoritesTypeFile;
 
-                if (lineType == Enums.LineSpecifier.Unknown || favoritesType == FavoritesTypeUnknown)
+                // the line specifier is a bit mask (Enigma2 eServiceReference flags): isDirectory=1, mustDescent=2,
+                // canDescent=4, isMarker=64, isGroup=128, isNumberedMarker=256, isInvisible=512
+                bool isMarker = (lineSpecifier & MarkerFlag) != 0;
+                bool isGroup = !isMarker && (lineSpecifier & GroupFlag) != 0;
+                bool isDirectory = !isMarker && !isGroup && ((lineSpecifier & DirectoryFlags) != 0 || favoritesType == FavoritesTypeFile);
+
+                if (lineSpecifier < 0 || favoritesType == FavoritesTypeUnknown)
                     Log.Warn(string.Format(Resources.SettingsIO_ReadServicesLocked_Found_unknown_reference_type__0__in__1_, line, Path.Combine(folder, bouquet.Name ?? string.Empty)));
-                else if ((isDirectory || lineType == Enums.LineSpecifier.Alternative) && sData.Length < 11)
+                else if ((isDirectory || isGroup) && sData.Length < 11)
                     Log.Warn(string.Format(Resources.Settings_ReadBouquet_Unsupported_line___1___in_bouquet__0_, Path.GetFileName(bouquet.FileName), line));
+                else if (isMarker)
+                {
+                    // plain, numbered (320), invisible (576) markers and spacers (832); the flag is written back as read
+                    IBouquetItemMarker bqim = ReadMarkerReference(line, description);
+                    if (bqim != null)
+                    {
+                        bouquet.BouquetItems.Add(bqim);
+                        if (Log.IsDebugEnabled) Log.Debug($"Marker {bqim.Description} ({sData[1]}) added to bouquet {bouquet.Name}");
+                    }
+                    else
+                        Log.Warn($"Invalid marker {line} not added to bouquet {bouquet.Name}");
+                }
                 else if (isDirectory)
                 {
                     if (Log.IsDebugEnabled) Log.Debug($"Found (sub)directory item {sData[10]}");
@@ -518,7 +534,7 @@ namespace Krkadoni.EnigmaSettings
                         if (settings.SettingsVersion is Enums.SettingsVersion.Enigma1Ver1 or Enums.SettingsVersion.Enigma1Ver2)
                             subBqt.FileName = sData[10];
 
-                        if (lineType == Enums.LineSpecifier.Hidden)
+                        if ((lineSpecifier & InvisibleFlag) != 0)
                             subBqt.Hidden = true;
 
                         // listed in bouquets.tv / .radio (or E1 userbouquets.*.epl) wins over being referenced
@@ -546,90 +562,61 @@ namespace Krkadoni.EnigmaSettings
                             bouquet.Name));
                     }
                 }
-                else
-                    switch (lineType)
+                else if (isGroup)
+                {
+                    var altTmp = sData[10];
+
+                    if (altTmp.IndexOf('"') > -1)
                     {
-                        case Enums.LineSpecifier.Marker:
-                            {
-                                IBouquetItemMarker bqim = ReadMarkerReference(line, description);
-
-                                if (bqim != null)
-                                {
-                                    bouquet.BouquetItems.Add(bqim);
-                                    if (Log.IsDebugEnabled) Log.Debug($"Marker {bqim.Description} added to bouquet {bouquet.Name}");
-                                }
-                                else
-                                    Log.Warn($"Invalid marker {line} not added to bouquet {bouquet.Name}");
-                            }
-                            break;
-                        case Enums.LineSpecifier.Space:
-                            {
-                                IBouquetItemMarker bqim = ReadMarkerReference(line, description);
-
-                                if (bqim != null)
-                                {
-                                    bouquet.BouquetItems.Add(bqim);
-                                    if (Log.IsDebugEnabled) Log.Debug($"Spacer entry preserved in bouquet {bouquet.Name}");
-                                }
-                            }
-                            break;
-                        case Enums.LineSpecifier.Alternative:
-                            {
-                                var altTmp = sData[10];
-
-                                if (altTmp.IndexOf('"') > -1)
-                                {
-                                    altTmp = altTmp.Substring(altTmp.IndexOf('"') + 1);
-                                    altTmp = altTmp.Substring(0, altTmp.IndexOf('"')).Trim();
-                                }
-
-                                string altFile = Path.GetFileName(altTmp);
-
-                                IFileBouquet altBqt = ReadFileBouquet(Path.Combine(folder, altFile), ref settings);
-
-                                if (altBqt != null)
-                                {
-                                    IBouquetItemAlternative bia = Factory.InitNewBouquetItemAlternative(altBqt);
-                                    bia.FavoritesTypeFlag = sData[0];
-                                    bia.LineSpecifierFlag = sData[1];
-                                    bouquet.BouquetItems.Add(bia);
-                                    if (Log.IsDebugEnabled) Log.Debug($"Alternative {altFile} added to bouquet {bouquet.Name}");
-                                }
-                                else
-                                    Log.Warn($"Alternative {altFile} in bouquet {bouquet.Name} could not be read");
-                            }
-                            break;
-                        case Enums.LineSpecifier.NormalService:
-                            if (_streamFavoritesTypes.Contains(favoritesType) || (sData.Length > 10 && sData[10].Contains("//", StringComparison.Ordinal)) || sData.Length == 12)
-                            {
-                                //it is a stream
-                                IBouquetItemStream bqis = ReadStreamReference(line, description);
-                                if (bqis != null)
-                                {
-                                    bouquet.BouquetItems.Add(bqis);
-                                    if (description.Length == 0)
-                                       Log.Warn(string.Format(Resources.Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description, bouquet.Name, bqis.Description));
-                                    else
-                                        if (Log.IsDebugEnabled) Log.Debug($"Stream service {bqis.Description} added to bouquet {bouquet.Name}");
-                                }
-                                else
-                                    Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
-                            }
-                            else
-                            {
-                                //it is a regular DVB service
-                                IBouquetItemService bqis = ReadServiceReference(line);
-                                if (bqis != null)
-                                {
-                                    bqis.Description = StripDescriptionTag(description);
-                                    bouquet.BouquetItems.Add(bqis);
-                                    if (Log.IsDebugEnabled) Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
-                                }
-                                else
-                                    Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
-                            }
-                            break;
+                        altTmp = altTmp.Substring(altTmp.IndexOf('"') + 1);
+                        altTmp = altTmp.Substring(0, altTmp.IndexOf('"')).Trim();
                     }
+
+                    string altFile = Path.GetFileName(altTmp);
+
+                    IFileBouquet altBqt = ReadFileBouquet(Path.Combine(folder, altFile), ref settings);
+
+                    if (altBqt != null)
+                    {
+                        IBouquetItemAlternative bia = Factory.InitNewBouquetItemAlternative(altBqt);
+                        bia.FavoritesTypeFlag = sData[0];
+                        bia.LineSpecifierFlag = sData[1];
+                        bouquet.BouquetItems.Add(bia);
+                        if (Log.IsDebugEnabled) Log.Debug($"Alternative {altFile} added to bouquet {bouquet.Name}");
+                    }
+                    else
+                        Log.Warn($"Alternative {altFile} in bouquet {bouquet.Name} could not be read");
+                }
+                else if (_streamFavoritesTypes.Contains(favoritesType) || (sData.Length > 10 && sData[10].Contains("//", StringComparison.Ordinal)) || sData.Length == 12)
+                {
+                    //it is a stream (any remaining flags, e.g. invisible, are kept)
+                    IBouquetItemStream bqis = ReadStreamReference(line, description);
+                    if (bqis == null)
+                    {
+                        Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_stream_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
+                    }
+                    else
+                    {
+                        bouquet.BouquetItems.Add(bqis);
+                        if (description.Length == 0)
+                            Log.Warn(string.Format(Resources.Settings_ReadBouquet_Stream_service__1__added_to_bouquet__0__without_description, bouquet.Name, bqis.Description));
+                        else if (Log.IsDebugEnabled)
+                            Log.Debug($"Stream service {bqis.Description} added to bouquet {bouquet.Name}");
+                    }
+                }
+                else
+                {
+                    //it is a regular DVB service (any remaining flags, e.g. invisible, are kept)
+                    IBouquetItemService bqis = ReadServiceReference(line);
+                    if (bqis != null)
+                    {
+                        bqis.Description = StripDescriptionTag(description);
+                        bouquet.BouquetItems.Add(bqis);
+                        if (Log.IsDebugEnabled) Log.Debug($"DVB service {serviceData} added to bouquet {bouquet.Name}");
+                    }
+                    else
+                        Log.Warn(string.Format(Resources.SettingsIO_ReadFileBouquet_Invalid_service_reference__0__not_added_to_bouquet__1_, line, bouquet.Name));
+                }
             }
             else if (line.StartsWith("#TYPE", StringComparison.Ordinal))
             {
