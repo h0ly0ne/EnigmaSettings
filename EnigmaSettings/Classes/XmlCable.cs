@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+﻿// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System.Collections.Generic;
@@ -76,12 +76,6 @@ namespace Krkadoni.EnigmaSettings
             return cab;
         }
 
-        private IList<IXmlTransponder> _transponders = new List<IXmlTransponder>();
-        private string _flags;
-        private string _name = string.Empty;
-        private string _satfeed = string.Empty;
-        private string _countrycode = string.Empty;
-
         /// <summary>
         ///     Cable flags from cables.xml file
         /// </summary>
@@ -91,13 +85,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Flags
         {
-            get => _flags;
+            get;
             set
             {
-                if (value == _flags)
+                if (value == field)
                     return;
 
-                _flags = value;
+                field = value;
                 OnPropertyChanged(nameof(Flags));
             }
         }
@@ -111,18 +105,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get => _name;
+            get;
             set
             {
                 value ??= string.Empty;
 
-                if (value == _name)
+                if (value == field)
                     return;
 
-                _name = value;
+                field = value;
                 OnPropertyChanged(nameof(Name));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Cable satfeed from cables.xml file
@@ -133,18 +127,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SatFeed
         {
-            get => _satfeed;
+            get;
             set
             {
                 value ??= string.Empty;
 
-                if (value == _satfeed)
+                if (value == field)
                     return;
 
-                _satfeed = value;
+                field = value;
                 OnPropertyChanged(nameof(SatFeed));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Cable countrycode from cables.xml file
@@ -155,18 +149,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string CountryCode
         {
-            get => _countrycode;
+            get;
             set
             {
                 value ??= string.Empty;
 
-                if (value == _countrycode)
+                if (value == field)
                     return;
 
-                _countrycode = value;
+                field = value;
                 OnPropertyChanged(nameof(CountryCode));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     List of transponders from xml file
@@ -177,14 +171,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IXmlTransponder> Transponders
         {
-            get => _transponders;
+            get;
             set
             {
                 value ??= new List<IXmlTransponder>();
-                _transponders = value;
+                field = value;
                 OnPropertyChanged(nameof(Transponders));
             }
-        }
+        } = new List<IXmlTransponder>();
 
         /// <summary>
         /// Performs MemberwiseClone on current object

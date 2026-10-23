@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -79,14 +79,7 @@ namespace Krkadoni.EnigmaSettings
         private string _TSID;
         private string _ONID;
         private string _nameSpace;
-        private bool _locked;
-        private string _name = string.Empty;
-        private string _progNumber = "0";
         private string _sourceId = string.Empty;
-        private Enums.ServiceSecurity _serviceSecurity = Enums.ServiceSecurity.None;
-        private string _sid = "0";
-        private ITransponder _transponder;
-        private string _type = "0";
 
         /// <summary>
         ///     Initializes service properties from 1st line of service in lamedb
@@ -107,7 +100,7 @@ namespace Krkadoni.EnigmaSettings
         public Service(string serviceData, string name, string flags)
         {
             if (string.IsNullOrEmpty(serviceData))
-                throw new ArgumentNullException(nameof(serviceData), Resources.Service_ServiceData_Service_data_cannot_be_empty_);
+                throw new ArgumentNullException(nameof(serviceData), Resources.Resources.Service_ServiceData_Service_data_cannot_be_empty_);
 
             if (string.IsNullOrEmpty(name))
                 name = string.Empty;
@@ -131,7 +124,7 @@ namespace Krkadoni.EnigmaSettings
                 _flags = flags;
             }
             else
-                throw new ArgumentException(Resources.Service_ServiceData_Invalid_service_data_);
+                throw new ArgumentException(Resources.Resources.Service_ServiceData_Invalid_service_data_);
         }
 
         /// <summary>
@@ -143,20 +136,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SID
         {
-            get => _sid;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _sid) 
+                if (value == field)
                     return;
 
-                _sid = value;
+                field = value;
 
                 OnPropertyChanged(nameof(SID));
                 OnPropertyChanged(nameof(ServiceId));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Defines type of service (TV,Radio,Data, etc.)
@@ -168,20 +161,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Type
         {
-            get => _type;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value.Trim() == _type)
+                if (value.Trim() == field)
                     return;
 
-                _type = value.Trim();
+                field = value.Trim();
                 OnPropertyChanged(nameof(Type));
                 OnPropertyChanged(nameof(ServiceType));
                 OnPropertyChanged(nameof(ServiceId));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Program number
@@ -192,18 +185,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string ProgNumber
         {
-            get => _progNumber;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _progNumber)
+                if (value == field)
                     return;
 
-                _progNumber = value;
+                field = value;
                 OnPropertyChanged(nameof(ProgNumber));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Source id - optional 7th field of the service reference line in newer enigma2 lamedb files
@@ -251,17 +244,17 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get => _name;
+            get;
             set
             {
-                if (value == _name)
+                if (value == field)
                     return;
 
                 value ??= string.Empty;
-                _name = value;
+                field = value;
                 OnPropertyChanged(nameof(Name));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Transport Stream ID
@@ -388,13 +381,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public ITransponder Transponder
         {
-            get => _transponder;
+            get;
             set
             {
-                if (value == _transponder)
+                if (value == field)
                     return;
 
-                _transponder = value;
+                field = value;
                 OnPropertyChanged(nameof(Transponder));
                 OnPropertyChanged(nameof(TransponderId));
                 OnPropertyChanged(nameof(ServiceId));
@@ -410,16 +403,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public Enums.ServiceSecurity ServiceSecurity
         {
-            get => _serviceSecurity;
+            get;
             set
             {
-                if (value == _serviceSecurity)
+                if (value == field)
                     return;
 
-                _serviceSecurity = value;
+                field = value;
                 OnPropertyChanged(nameof(ServiceSecurity));
             }
-        }
+        } = Enums.ServiceSecurity.None;
 
         /// <summary>
         ///     List of flag objects
@@ -469,13 +462,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public bool Locked
         {
-            get => _locked;
+            get;
             set
             {
                 if (value == Locked)
                     return;
 
-                _locked = value;
+                field = value;
                 OnPropertyChanged(nameof(Locked));
             }
         }

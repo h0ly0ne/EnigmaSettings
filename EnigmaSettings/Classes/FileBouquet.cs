@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -34,10 +34,7 @@ namespace Krkadoni.EnigmaSettings
         }
         #endregion
 
-        private IList<IBouquetItem> _bouquetItems = new List<IBouquetItem>();
         private string _fileName = string.Empty;
-        private string _name = string.Empty;
-        private bool _hidden;
 
         #region "IEditable"
         // field values captured by BeginEdit (see EditSnapshot), null while not editing
@@ -111,13 +108,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public bool Hidden
         {
-            get => _hidden;
+            get;
             set
             {
-                if (value == _hidden)
+                if (value == field)
                     return;
 
-                _hidden = value;
+                field = value;
                 OnPropertyChanged(nameof(Hidden));
             }
         }
@@ -129,18 +126,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public bool IsSubBouquet
         {
-            get => _isSubBouquet;
+            get;
             set
             {
-                if (value == _isSubBouquet)
+                if (value == field)
                     return;
 
-                _isSubBouquet = value;
+                field = value;
                 OnPropertyChanged(nameof(IsSubBouquet));
             }
         }
-
-        private bool _isSubBouquet;
 
         /// <summary>
         ///     Parental control of the whole bouquet: BlackListed when listed in the Enigma2 blacklist,
@@ -149,18 +144,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public Enums.ServiceSecurity ServiceSecurity
         {
-            get => _serviceSecurity;
+            get;
             set
             {
-                if (value == _serviceSecurity)
+                if (value == field)
                     return;
 
-                _serviceSecurity = value;
+                field = value;
                 OnPropertyChanged(nameof(ServiceSecurity));
             }
-        }
-
-        private Enums.ServiceSecurity _serviceSecurity = Enums.ServiceSecurity.None;
+        } = Enums.ServiceSecurity.None;
 
         /// <summary>
         ///     Type of the bouquet. Determined from FileName.
@@ -183,14 +176,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IBouquetItem> BouquetItems
         {
-            get => _bouquetItems;
+            get;
             set
             {
                 value ??= new List<IBouquetItem>();
-                _bouquetItems = value;
+                field = value;
                 OnPropertyChanged(nameof(BouquetItems));
             }
-        }
+        } = new List<IBouquetItem>();
 
         /// <summary>
         ///     Name of the bouquet as displayed in the list.
@@ -201,17 +194,17 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get => _name;
+            get;
             set
             {
-                if (value == _name)
+                if (value == field)
                     return;
 
                 value ??= string.Empty;
-                _name = value;
+                field = value;
                 OnPropertyChanged(nameof(Name));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Determines type of bouquet by its filename

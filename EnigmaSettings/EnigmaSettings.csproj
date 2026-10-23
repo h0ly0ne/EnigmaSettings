@@ -3,11 +3,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>Krkadoni.EnigmaSettings</RootNamespace>
-    <AssemblyTitle>EnigmaSettings</AssemblyTitle>
+    <AssemblyTitle>Krkadoni.EnigmaSettings</AssemblyTitle>
     <Description>Enigma1 &amp; Enigma2 settings management utility</Description>
     <Company>Krkadoni.com</Company>
-    <Product>EnigmaSettings</Product>
-    <Copyright>Copyright © Krkadoni.com 2013</Copyright>
+    <Product>Krkadoni.EnigmaSettings</Product>
+    <Copyright>Copyright © 2013-2026</Copyright>
     <AssemblyVersion>1.1.0.1</AssemblyVersion>
     <FileVersion>1.1.0.1</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>

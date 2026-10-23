@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -77,10 +77,6 @@ namespace Krkadoni.EnigmaSettings
         }
         #endregion
 
-        private IList<IBouquetItem> _bouquetItems = new List<IBouquetItem>();
-        private bool _locked;
-        private string _name = string.Empty;
-
         /// <summary>
         ///     List of bouquet items
         /// </summary>
@@ -90,13 +86,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IBouquetItem> BouquetItems
         {
-            get => _bouquetItems;
-            set {                 
+            get;
+            set
+            {
                 value ??= new List<IBouquetItem>();
-                _bouquetItems = value;
+                field = value;
                 OnPropertyChanged(nameof(BouquetItems));
             }
-        }
+        } = new List<IBouquetItem>();
 
         /// <summary>
         ///     Type of settings file
@@ -117,19 +114,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get => _name;
+            get;
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentException("Bouquet name cannot be empty", nameof(value));
+                    throw new ArgumentException(Resources.Resources.BouquetsBouquet_Name_Bouquet_name_cannot_be_empty, nameof(value));
 
-                if (value == _name)
+                if (value == field)
                     return;
 
-                _name = value;
+                field = value;
                 OnPropertyChanged(nameof(Name));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Determines if bouquet is locked.
@@ -140,13 +137,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public bool Locked
         {
-            get => _locked;
+            get;
             set
             {
-                if (value == _locked)
+                if (value == field)
                     return;
 
-                _locked = value;
+                field = value;
                 OnPropertyChanged(nameof(Locked));
             }
         }

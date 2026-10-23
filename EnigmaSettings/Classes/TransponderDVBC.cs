@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -104,19 +104,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SymbolRate
         {
-            get => _symbolRate;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _symbolRate)
+                if (value == field)
                     return;
 
-                _symbolRate = value;
+                field = value;
                 OnPropertyChanged(nameof(SymbolRate));
             }
         }
-        private string _symbolRate;
 
         /// <summary>
         ///     Spectral inversion
@@ -124,18 +123,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Inversion
         {
-            get => _inversion;
+            get;
             set
             {
                 value ??= "0";
-                if (value == _inversion)
+                if (value == field)
                     return;
 
-                _inversion = value;
+                field = value;
                 OnPropertyChanged(nameof(Inversion));
                 OnPropertyChanged(nameof(InversionType));
             }
         }
+
         [DataMember]
         public Enums.DVBSCInversionType InversionType
         {
@@ -149,7 +149,6 @@ namespace Krkadoni.EnigmaSettings
                 };
             }
         }
-        private string _inversion;
 
         /// <summary>
         ///     Modulation
@@ -157,18 +156,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Modulation
         {
-            get => _modulation;
+            get;
             set
             {
                 value ??= "0";
-                if (value == _modulation)
+                if (value == field)
                     return;
 
-                _modulation = value;
+                field = value;
                 OnPropertyChanged(nameof(Modulation));
                 OnPropertyChanged(nameof(ModulationType));
             }
         }
+
         [DataMember]
         public Enums.DVBCModulationType ModulationType
         {
@@ -186,7 +186,6 @@ namespace Krkadoni.EnigmaSettings
                 };
             }
         }
-        private string _modulation;
 
         /// <summary>
         ///     FEC
@@ -194,18 +193,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string FEC
         {
-            get => _fec;
+            get;
             set
             {
                 value ??= "0";
-                if (value == _fec)
+                if (value == field)
                     return;
 
-                _fec = value;
+                field = value;
                 OnPropertyChanged(nameof(FEC));
                 OnPropertyChanged(nameof(FECType));
             }
         }
+
         [DataMember]
         public Enums.DVBSCFECType FECType
         {
@@ -228,7 +228,6 @@ namespace Krkadoni.EnigmaSettings
                 };
             }
         }
-        private string _fec;
 
         /// <summary>
         ///     Flag value
@@ -236,18 +235,17 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Flags
         {
-            get => _flags;
+            get;
             set
             {
                 value ??= "0";
-                if (value == _flags)
+                if (value == field)
                     return;
 
-                _flags = value;
+                field = value;
                 OnPropertyChanged(nameof(Flags));
             }
         }
-        private string _flags;
 
         /// <summary>
         ///     DVB system
@@ -255,17 +253,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string System
         {
-            get => _system;
+            get;
             set
             {
-                if (value == _system)
+                if (value == field)
                     return;
 
-                _system = value;
+                field = value;
                 OnPropertyChanged(nameof(System));
             }
         }
-        private string _system;
 
         public override string ToString()
         {

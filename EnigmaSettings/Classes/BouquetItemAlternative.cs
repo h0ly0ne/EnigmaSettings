@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -12,8 +12,6 @@ namespace Krkadoni.EnigmaSettings
     [DataContract]
     public class BouquetItemAlternative : BouquetItem, IBouquetItemAlternative
     {
-        private IFileBouquet _bouquet;
-
         #region "ICloneable"
         public override object Clone()
         {
@@ -50,13 +48,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IFileBouquet Bouquet
         {
-            get => _bouquet;
+            get;
             set
             {
-                if (value == _bouquet) 
+                if (value == field)
                     return;
 
-                _bouquet = value;
+                field = value;
                 OnPropertyChanged(nameof(Bouquet));
             }
         }

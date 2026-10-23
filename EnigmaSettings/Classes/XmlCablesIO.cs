@@ -1,12 +1,9 @@
-﻿// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+﻿// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
@@ -31,8 +28,8 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="ArgumentNullException">Throws argument null exception if factory is null</exception>
         public XmlCablesIO(IInstanceFactory factory, IFileHelper fileProvider)
         {
-            Factory = factory ?? throw new ArgumentNullException(nameof(factory), Resources.SettingsIO_New_Invalid_instance_factory_);
-            _fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider), Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
+            Factory = factory ?? throw new ArgumentNullException(nameof(factory), Resources.Resources.SettingsIO_New_Invalid_instance_factory_);
+            _fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider), Resources.Resources.XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider);
         }
 
         /// <summary>

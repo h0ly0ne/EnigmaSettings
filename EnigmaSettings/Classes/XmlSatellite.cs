@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+﻿// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -81,11 +81,6 @@ namespace Krkadoni.EnigmaSettings
             return sat;
         }
 
-        private IList<IXmlTransponder> _transponders = new List<IXmlTransponder>();
-        private string _flags;
-        private string _name = string.Empty;
-        private string _position = string.Empty;
-
         /// <summary>
         ///     Satellite flags from satellites.xml file
         /// </summary>
@@ -95,13 +90,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Flags
         {
-            get => _flags;
+            get;
             set
             {
-                if (value == _flags) 
+                if (value == field)
                     return;
 
-                _flags = value;
+                field = value;
                 OnPropertyChanged(nameof(Flags));
             }
         }
@@ -115,18 +110,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Name
         {
-            get => _name;
+            get;
             set
             {
                 value ??= string.Empty;
 
-                if (value == _name) 
+                if (value == field)
                     return;
 
-                _name = value;
+                field = value;
                 OnPropertyChanged(nameof(Name));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Satellite position
@@ -137,19 +132,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Position
         {
-            get => _position;
+            get;
             set
             {
                 value ??= string.Empty;
 
-                if (value == _position) 
+                if (value == field)
                     return;
 
-                _position = value;
+                field = value;
                 OnPropertyChanged(nameof(Position));
                 OnPropertyChanged(nameof(PositionString));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Parses position to position string
@@ -180,14 +175,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IXmlTransponder> Transponders
         {
-            get => _transponders;
+            get;
             set
             {
                 value ??= new List<IXmlTransponder>();
-                _transponders = value;
+                field = value;
                 OnPropertyChanged(nameof(Transponders));
             }
-        }
+        } = new List<IXmlTransponder>();
 
         /// <summary>
         /// Performs MemberwiseClone on current object

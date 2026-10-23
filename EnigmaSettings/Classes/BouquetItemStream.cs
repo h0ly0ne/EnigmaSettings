@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -18,7 +18,7 @@ namespace Krkadoni.EnigmaSettings
         private string _extraFlag2 = "0";
         private string _serviceId = "0";
         private string _streamFlag = "1";
-        private string _url = string.Empty;
+        private string _url;
 
         #region "ICloneable"
         /// <summary>

@@ -369,4 +369,7 @@
   <data name="XmlSatellitesIO_XmlSatellitesIO_Invalid_file_provider" xml:space="preserve">
     <value>Invalid file provider</value>
   </data>
+  <data name="BouquetsBouquet_Name_Bouquet_name_cannot_be_empty" xml:space="preserve">
+	  <value>Bouquet name cannot be empty</value>
+  </data>
 </root>

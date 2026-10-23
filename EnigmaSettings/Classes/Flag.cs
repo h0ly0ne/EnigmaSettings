@@ -1,12 +1,12 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
-using Krkadoni.EnigmaSettings.Interfaces;
 
+using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
 {
@@ -81,7 +81,7 @@ namespace Krkadoni.EnigmaSettings
         public Flag(string flagString)
         {
             if (string.IsNullOrEmpty(flagString))
-                throw new ArgumentNullException(nameof(flagString), Resources.Flag_New_Flag_string_cannot_be_empty_);
+                throw new ArgumentNullException(nameof(flagString), Resources.Resources.Flag_New_Flag_string_cannot_be_empty_);
 
             _flagString = flagString;
         }
@@ -264,7 +264,7 @@ namespace Krkadoni.EnigmaSettings
             set
             {
                 if (FlagString.Length == 0)
-                    throw new ArgumentException(Resources.Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_);
+                    throw new ArgumentException(Resources.Resources.Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_);
 
                 value ??= string.Empty;
 
@@ -300,7 +300,7 @@ namespace Krkadoni.EnigmaSettings
             set
             {
                 if (FlagString.Length == 0)
-                    throw new ArgumentException(Resources.Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_);
+                    throw new ArgumentException(Resources.Resources.Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_);
 
                 // c: and f: values are hex like the getter reads them (c: as 2 digit type + 4 digit value)
                 string flagValue = FlagType switch
@@ -329,10 +329,10 @@ namespace Krkadoni.EnigmaSettings
             set
             {
                 if (string.IsNullOrEmpty(value))
-                    throw new ArgumentNullException(nameof(value), Resources.Flag_New_Flag_string_cannot_be_empty_);
+                    throw new ArgumentNullException(nameof(value), Resources.Resources.Flag_New_Flag_string_cannot_be_empty_);
 
                 if (!value.Contains(':'))
-                    throw new ArgumentException(Resources.Flag_New_Invalid_flag);
+                    throw new ArgumentException(Resources.Resources.Flag_New_Invalid_flag);
 
                 if (value == _flagString)
                     return;

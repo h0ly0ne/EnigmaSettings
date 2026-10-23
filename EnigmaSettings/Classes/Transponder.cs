@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System.ComponentModel;
@@ -69,10 +69,6 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         protected Enums.TransponderType _TransponderType = Enums.TransponderType.Unknown;
-        private string _frequency = "0";
-        private string _nameSpc = "0";
-        private string _nid = "0";
-        private string _tsid = "0";
 
         /// <summary>
         ///     Namespace of the transponder
@@ -83,20 +79,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string NameSpc
         {
-            get => _nameSpc;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _nameSpc) 
+                if (value == field)
                     return;
 
-                _nameSpc = value;
+                field = value;
                 _transponderId = null;
                 OnPropertyChanged(nameof(NameSpc));
                 OnPropertyChanged(nameof(TransponderId));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Transponder ID
@@ -107,20 +103,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string TSID
         {
-            get => _tsid;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _tsid) 
+                if (value == field)
                     return;
 
-                _tsid = value;
+                field = value;
                 _transponderId = null;
                 OnPropertyChanged(nameof(TSID));
                 OnPropertyChanged(nameof(TransponderId));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Original network ID
@@ -131,20 +127,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string NID
         {
-            get => _nid;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _nid) 
+                if (value == field)
                     return;
 
-                _nid = value;
+                field = value;
                 _transponderId = null;
                 OnPropertyChanged(nameof(NID));
                 OnPropertyChanged(nameof(TransponderId));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Frequency in Hertz
@@ -155,18 +151,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Frequency
         {
-            get => _frequency;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _frequency)
+                if (value == field)
                     return;
 
-                _frequency = value;
+                field = value;
                 OnPropertyChanged(nameof(Frequency));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Transponder type (Satellite, Cable, Terrestrial)

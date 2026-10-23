@@ -203,6 +203,12 @@
   (`lib/dvb/frontendparms.h`) instead of the forum post the old (partly wrong) value tables came from,
   which is no longer reachable.
 - Removed 2 more resource strings that are no longer used.
+- Properties of the model classes use the C# `field` keyword instead of separate backing fields
+  (same behaviour, initial values kept).
+- `BouquetsBouquet.Name` takes its "cannot be empty" message from the resources
+  (new resource `BouquetsBouquet_Name_Bouquet_name_cannot_be_empty`) instead of a fixed string.
+- Copyright header `Copyright © 2013-2026 Krkadoni.com` in all source files; assembly title and
+  product are `Krkadoni.EnigmaSettings`.
 - Prefix / suffix checks use `StartsWith` / `EndsWith` with `OrdinalIgnoreCase` instead of
   upper-/lower-casing a copy of every line (reading 48 000 bouquet entries: 129 ms / 68 MB →
   112 ms / 59 MB).
@@ -225,6 +231,9 @@
 
 ### Breaking
 
+- The public resource class moved from `Krkadoni.EnigmaSettings.Resources` to
+  `Krkadoni.EnigmaSettings.Resources.Resources` (namespace `Krkadoni.EnigmaSettings.Resources`).
+  Code that reads the message texts directly must use the new name.
 - Invalid arguments of public methods (e.g. `Load(null)`, `RemoveService(null)`,
   `RemoveServices(null)`) throw the `ArgumentNullException` directly instead of a `SettingsException`
   and are not logged. Errors in the settings data and file access still arrive as `SettingsException`.

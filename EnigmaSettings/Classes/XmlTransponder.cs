@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System.ComponentModel;
@@ -69,21 +69,6 @@ namespace Krkadoni.EnigmaSettings
         }
         #endregion
 
-        private string _fec;
-        private string _frequency;
-        private string _inversion;
-        private string _modulation;
-        private string _pilot;
-        private string _polarization;
-        private string _rollOff;
-        private string _symbolRate;
-        private string _system;
-        private string _is_id;
-        private string _pls_code;
-        private string _pls_mode;
-        private string _t2mi_plp_id;
-        private string _t2mi_pid;
-
         /// <summary>
         ///     0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8, 6=8/9, 7=3/5, 8=4/5, 9=9/10, 10=6/7, 15=None
         /// </summary>
@@ -94,13 +79,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string FEC
         {
-            get => _fec;
+            get;
             set
             {
-                if (value == _fec) 
+                if (value == field)
                     return;
 
-                _fec = value;
+                field = value;
                 OnPropertyChanged(nameof(FEC));
             }
         }
@@ -114,13 +99,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Frequency
         {
-            get => _frequency;
+            get;
             set
             {
-                if (value == _frequency) 
+                if (value == field)
                     return;
 
-                _frequency = value;
+                field = value;
                 OnPropertyChanged(nameof(Frequency));
             }
         }
@@ -135,13 +120,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Inversion
         {
-            get => _inversion;
+            get;
             set
             {
-                if (value == _inversion) 
+                if (value == field)
                     return;
 
-                _inversion = value;
+                field = value;
                 OnPropertyChanged(nameof(Inversion));
             }
         }
@@ -156,13 +141,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Modulation
         {
-            get => _modulation;
+            get;
             set
             {
-                if (value == _modulation)
+                if (value == field)
                     return;
 
-                _modulation = value;
+                field = value;
                 OnPropertyChanged(nameof(Modulation));
             }
         }
@@ -177,13 +162,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Pilot
         {
-            get => _pilot;
+            get;
             set
             {
-                if (value == _pilot) 
+                if (value == field)
                     return;
 
-                _pilot = value;
+                field = value;
                 OnPropertyChanged(nameof(Pilot));
             }
         }
@@ -198,13 +183,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Polarization
         {
-            get => _polarization;
+            get;
             set
             {
-                if (value == _polarization) 
+                if (value == field)
                     return;
 
-                _polarization = value;
+                field = value;
                 OnPropertyChanged(nameof(Polarization));
             }
         }
@@ -219,13 +204,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string RollOff
         {
-            get => _rollOff;
+            get;
             set
             {
-                if (value == _rollOff) 
+                if (value == field)
                     return;
 
-                _rollOff = value;
+                field = value;
                 OnPropertyChanged(nameof(RollOff));
             }
         }
@@ -239,13 +224,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SymbolRate
         {
-            get => _symbolRate;
+            get;
             set
             {
-                if (value == _symbolRate) 
+                if (value == field)
                     return;
 
-                _symbolRate = value;
+                field = value;
                 OnPropertyChanged(nameof(SymbolRate));
             }
         }
@@ -260,13 +245,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string System
         {
-            get => _system;
+            get;
             set
             {
-                if (value == _system) 
+                if (value == field)
                     return;
 
-                _system = value;
+                field = value;
                 OnPropertyChanged(nameof(System));
             }
         }
@@ -277,13 +262,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string IsId
         {
-            get => _is_id;
+            get;
             set
             {
-                if (value == _is_id) 
+                if (value == field)
                     return;
 
-                _is_id = value;
+                field = value;
                 OnPropertyChanged(nameof(IsId));
             }
         }
@@ -294,13 +279,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string PlsCode
         {
-            get => _pls_code;
+            get;
             set
             {
-                if (value == _pls_code)
+                if (value == field)
                     return;
 
-                _pls_code = value;
+                field = value;
                 OnPropertyChanged(nameof(PlsCode));
             }
         }
@@ -311,13 +296,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string PlsMode
         {
-            get => _pls_mode;
+            get;
             set
             {
-                if (value == _pls_mode) 
+                if (value == field)
                     return;
 
-                _pls_mode = value;
+                field = value;
                 OnPropertyChanged(nameof(PlsMode));
             }
         }
@@ -328,13 +313,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string T2miPlpId
         {
-            get => _t2mi_plp_id;
+            get;
             set
             {
-                if (value == _t2mi_plp_id)
+                if (value == field)
                     return;
 
-                _t2mi_plp_id = value;
+                field = value;
                 OnPropertyChanged(nameof(T2miPlpId));
             }
         }
@@ -345,13 +330,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string T2miPid
         {
-            get => _t2mi_pid;
+            get;
             set
             {
-                if (value == _t2mi_pid)
+                if (value == field)
                     return;
 
-                _t2mi_pid = value;
+                field = value;
                 OnPropertyChanged(nameof(T2miPid));
             }
         }
@@ -362,13 +347,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Tsid
         {
-            get => _tsid;
+            get;
             set
             {
-                if (value == _tsid)
+                if (value == field)
                     return;
 
-                _tsid = value;
+                field = value;
                 OnPropertyChanged(nameof(Tsid));
             }
         }
@@ -379,19 +364,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Onid
         {
-            get => _onid;
+            get;
             set
             {
-                if (value == _onid)
+                if (value == field)
                     return;
 
-                _onid = value;
+                field = value;
                 OnPropertyChanged(nameof(Onid));
             }
         }
-
-        private string _tsid;
-        private string _onid;
 
         /// <summary>
         /// Performs MemberwiseClone on current object

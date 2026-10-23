@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
+// Full license text can be found at http://opensource.org/licenses/MIT
+
+using System;
 
 using Krkadoni.EnigmaSettings.Interfaces;
 

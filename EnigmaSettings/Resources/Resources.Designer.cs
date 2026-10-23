@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Krkadoni.EnigmaSettings {
+namespace Krkadoni.EnigmaSettings.Resources {
     using System;
     
     
@@ -61,6 +61,15 @@ namespace Krkadoni.EnigmaSettings {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bouquet name cannot be empty ähnelt.
+        /// </summary>
+        public static string BouquetsBouquet_Name_Bouquet_name_cannot_be_empty {
+            get {
+                return ResourceManager.GetString("BouquetsBouquet_Name_Bouquet_name_cannot_be_empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Cannot change flag value before specifing flag. ähnelt.
         /// </summary>
         public static string Flag_FlagValue_Cannot_change_flag_value_before_specifing_flag_ {
@@ -87,7 +96,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid service data. ähnelt.
         /// </summary>
@@ -105,9 +113,6 @@ namespace Krkadoni.EnigmaSettings {
                 return ResourceManager.GetString("Service_ServiceData_Service_data_cannot_be_empty_", resourceCulture);
             }
         }
-        
-        
-        
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Added new transponder {0} for previously missing satellite {1} ähnelt.
@@ -193,7 +198,6 @@ namespace Krkadoni.EnigmaSettings {
                 return ResourceManager.GetString("Settings_LoadSettings_File__0__does_not_exist_", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bouquet service {0} not found in settings ähnelt.
@@ -547,8 +551,6 @@ namespace Krkadoni.EnigmaSettings {
             }
         }
         
-        
-        
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Service {0} in bouquet {1} is not supported in Enigma1. Not writing it. ähnelt.
         /// </summary>
@@ -558,7 +560,6 @@ namespace Krkadoni.EnigmaSettings {
                         "a1__Not_writing_it_", resourceCulture);
             }
         }
-        
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Invalid instance factory! ähnelt.

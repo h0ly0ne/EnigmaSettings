@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -130,7 +130,7 @@ namespace Krkadoni.EnigmaSettings
             catch (Exception ex) when (ex is not SettingsException)
             {
                 OnFileSaved(this, fi, false);
-                throw new SettingsException(string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, fi), ex);
+                throw new SettingsException(string.Format(Resources.Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, fi), ex);
             }
         }
 
@@ -192,7 +192,7 @@ namespace Krkadoni.EnigmaSettings
                             case 't': AddTransponderDVBT(settings, first, second); break;
                             case 'c': AddTransponderDVBC(settings, first, second); break;
                             default:
-                                Log.Warn(string.Format(Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, first, second));
+                                Log.Warn(string.Format(Resources.Resources.SettingsIO_ReadSettingsFile_Unknown_transponder_type_for_transponder__0___1___adding_it_as_satellite_transponder, first, second));
                                 AddTransponderDVBS(settings, first, second);
                                 break;
                         }

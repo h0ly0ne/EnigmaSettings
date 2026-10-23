@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -12,19 +12,6 @@ namespace Krkadoni.EnigmaSettings
     [DataContract]
     public class TransponderDVBT : Transponder, ITransponderDVBT
     {
-       
-        private string _bandwidth = "0";
-        private string _fecHigh = "0";
-        private string _fecLow = "0";
-        private string _flags = "0";
-        private string _guardInterval = "0";
-        private string _hierarchy = "0";
-        private string _inversion = "0";
-        private string _modulation = "0";
-        private string _transmission = "0";
-        private string _system;
-        private string _plp_id;
-
         /// <summary>
         ///     Initializes new terrestrial transponder from data found in services file
         /// </summary>
@@ -115,19 +102,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Bandwidth
         {
-            get => _bandwidth;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _bandwidth) 
+                if (value == field)
                     return;
 
-                _bandwidth = value;
+                field = value;
                 OnPropertyChanged(nameof(Bandwidth));
                 OnPropertyChanged(nameof(BandwidthType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Code rate High Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
@@ -139,19 +126,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string FECHigh
         {
-            get => _fecHigh;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _fecHigh) 
+                if (value == field)
                     return;
 
-                _fecHigh = value;
+                field = value;
                 OnPropertyChanged(nameof(FECHigh));
                 OnPropertyChanged(nameof(FECHighType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Code rate Low Pass FEC: 0=1/2, 1=2/3, 2=3/4, 3=5/6, 4=7/8, 5=Auto, 6=6/7, 7=8/9, 8=3/5, 9=4/5
@@ -163,19 +150,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string FECLow
         {
-            get => _fecLow;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _fecLow) 
+                if (value == field)
                     return;
 
-                _fecLow = value;
+                field = value;
                 OnPropertyChanged(nameof(FECLow));
                 OnPropertyChanged(nameof(FECLowType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     0=QPSK, 1=QAM16, 2=QAM64, 3=Auto, 4=QAM256
@@ -187,19 +174,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Modulation
         {
-            get => _modulation;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _modulation)
+                if (value == field)
                     return;
 
-                _modulation = value;
+                field = value;
                 OnPropertyChanged(nameof(Modulation));
                 OnPropertyChanged(nameof(ModulationType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     0=2k, 1=8k, 2=Auto, 3=4k, 4=1k, 5=16k, 6=32k
@@ -211,19 +198,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Transmission
         {
-            get => _transmission;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _transmission) 
+                if (value == field)
                     return;
 
-                _transmission = value;
+                field = value;
                 OnPropertyChanged(nameof(Transmission));
                 OnPropertyChanged(nameof(TransmissionType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     0=1/32, 1=1/16, 2=1/8, 3=1/4, 4=Auto, 5=1/128, 6=19/128, 7=19/256
@@ -235,19 +222,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string GuardInterval
         {
-            get => _guardInterval;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _guardInterval) 
+                if (value == field)
                     return;
 
-                _guardInterval = value;
+                field = value;
                 OnPropertyChanged(nameof(GuardInterval));
                 OnPropertyChanged(nameof(GuardIntervalType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     0=None, 1=1, 2=2, 3=4, 4=Auto
@@ -259,19 +246,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Hierarchy
         {
-            get => _hierarchy;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _hierarchy) 
+                if (value == field)
                     return;
 
-                _hierarchy = value;
+                field = value;
                 OnPropertyChanged(nameof(Hierarchy));
                 OnPropertyChanged(nameof(HierarchyType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     0=Off, 1=On, 2=Auto
@@ -283,19 +270,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Inversion
         {
-            get => _inversion;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == _inversion) 
+                if (value == field)
                     return;
 
-                _inversion = value;
+                field = value;
                 OnPropertyChanged(nameof(Inversion));
                 OnPropertyChanged(nameof(InversionType));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Transponder flags
@@ -306,18 +293,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Flags
         {
-            get => _flags;
+            get;
             set
             {
                 value ??= "0";
 
-                if (value == Flags) 
+                if (value == Flags)
                     return;
 
-                _flags = value;
+                field = value;
                 OnPropertyChanged(nameof(Flags));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///  https://github.com/OpenViX/enigma2/blob/master/lib/dvb/db.cpp#L793
@@ -325,13 +312,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string System
         {
-            get => _system;
+            get;
             set
             {
-                if (value == _system) 
+                if (value == field)
                     return;
 
-                _system = value;
+                field = value;
                 OnPropertyChanged(nameof(System));
             }
         }
@@ -342,13 +329,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string PlpId
         {
-            get => _plp_id;
+            get;
             set
             {
-                if (value == _plp_id)
+                if (value == field)
                     return;
 
-                _plp_id = value;
+                field = value;
                 OnPropertyChanged(nameof(PlpId));
             }
         }

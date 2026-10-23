@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System.ComponentModel;
@@ -68,10 +68,8 @@ namespace Krkadoni.EnigmaSettings
         }
         #endregion
 
-        // ReSharper disable InconsistentNaming
         protected string _favoritesTypeFlag = "1";
         protected string _lineSpecifierFlag = "0";
-        // ReSharper restore InconsistentNaming
 
         /// <summary>
         ///     Type of bouquet item. Each subclass defines its own type

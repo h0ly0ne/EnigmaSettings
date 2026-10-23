@@ -1,9 +1,10 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
 using System.Globalization;
 using System.Runtime.Serialization;
+
 using Krkadoni.EnigmaSettings.Interfaces;
 
 namespace Krkadoni.EnigmaSettings
@@ -11,8 +12,6 @@ namespace Krkadoni.EnigmaSettings
     [DataContract]
     public class BouquetItemService : BouquetItem, IBouquetItemService
     {
-        private IService _service;
-
         #region "ICloneable"
         /// <summary>
         /// Performs deep Clone on the object
@@ -122,13 +121,13 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IService Service
         {
-            get => _service;
+            get;
             set
             {
-                if (value == _service)
+                if (value == field)
                     return;
 
-                _service = value;
+                field = value;
                 OnPropertyChanged(nameof(Service));
             }
         }
@@ -139,20 +138,18 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Description
         {
-            get => _description;
+            get;
             set
             {
                 value ??= string.Empty;
 
-                if (value == _description)
+                if (value == field)
                     return;
 
-                _description = value;
+                field = value;
                 OnPropertyChanged(nameof(Description));
             }
-        }
-
-        private string _description = string.Empty;
+        } = string.Empty;
 
         /// <summary>
         ///     Return line in format ready to be written to bouquet

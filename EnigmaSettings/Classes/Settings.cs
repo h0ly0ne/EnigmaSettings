@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -158,17 +158,8 @@ namespace Krkadoni.EnigmaSettings
         #endregion
 
         #region "Properties"
-        private IList<IBouquet> _bouquets = new List<IBouquet>();
-        private IList<IXmlSatellite> _satellites = new List<IXmlSatellite>();
-        private IList<IXmlCable> _cables = new List<IXmlCable>();
-        private IList<IService> _services = new List<IService>();
-        private IList<ITransponder> _transponders = new List<ITransponder>();
 
         private static readonly ILog NullLogger = new NullLogger();
-
-        private string _settingsFileName = string.Empty;
-        private string _settingsDirectory = string.Empty;
-        private Enums.SettingsVersion _settingsVersion = Enums.SettingsVersion.Unknown;
 
         /// <summary>
         ///     Instance used for logging
@@ -201,16 +192,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string SettingsFileName
         {
-            get => _settingsFileName;
+            get;
             set
             {
-                if (value == _settingsFileName) 
+                if (value == field)
                     return;
 
-                _settingsFileName = value;
+                field = value;
                 OnPropertyChanged(nameof(SettingsFileName));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Directory with all the files for the settings
@@ -223,7 +214,7 @@ namespace Krkadoni.EnigmaSettings
         {
             get
             {
-                if (string.IsNullOrEmpty(_settingsDirectory))
+                if (string.IsNullOrEmpty(field))
                 {
                     if (string.IsNullOrEmpty(SettingsFileName))
                         return string.Empty;
@@ -239,17 +230,17 @@ namespace Krkadoni.EnigmaSettings
                     }
                 }
                 else
-                    return _settingsDirectory;
+                    return field;
             }
             set
             {
-                if (value == _settingsDirectory)
+                if (value == field)
                     return;
 
-                _settingsDirectory = value;
+                field = value;
                 OnPropertyChanged(nameof(SettingsDirectory));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Version of the settings file
@@ -260,16 +251,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public Enums.SettingsVersion SettingsVersion
         {
-            get => _settingsVersion;
+            get;
             set
             {
-                if (value == _settingsVersion) 
+                if (value == field)
                     return;
 
-                _settingsVersion = value;
+                field = value;
                 OnPropertyChanged(nameof(SettingsVersion));
             }
-        }
+        } = Enums.SettingsVersion.Unknown;
 
         /// <summary>
         ///     List of satellites from satellites.xml file
@@ -280,14 +271,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IXmlSatellite> Satellites
         {
-            get => _satellites;
+            get;
             set
             {
                 value ??= new List<IXmlSatellite>();
-                _satellites = value;
+                field = value;
                 OnPropertyChanged(nameof(Satellites));
             }
-        }
+        } = new List<IXmlSatellite>();
 
         /// <summary>
         ///     List of cables from cables.xml file
@@ -298,14 +289,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IXmlCable> Cables
         {
-            get => _cables;
+            get;
             set
             {
                 value ??= new List<IXmlCable>();
-                _cables = value;
+                field = value;
                 OnPropertyChanged(nameof(Cables));
             }
-        }
+        } = new List<IXmlCable>();
 
         /// <summary>
         ///     All transponders (ATSC, DVBC, DVBS, DVBT, IPTV) from settings/lamedb file
@@ -316,14 +307,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<ITransponder> Transponders
         {
-            get => _transponders;
+            get;
             set
             {
                 value ??= new List<ITransponder>();
-                _transponders = value;
+                field = value;
                 OnPropertyChanged(nameof(Transponders));
             }
-        }
+        } = new List<ITransponder>();
 
         /// <summary>
         ///     All services from settings file
@@ -334,14 +325,14 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IService> Services
         {
-            get => _services;
+            get;
             set
             {
                 value ??= new List<IService>();
-                _services = value;
+                field = value;
                 OnPropertyChanged(nameof(Services));
             }
-        }
+        } = new List<IService>();
 
         /// <summary>
         ///     All bouquets except the ones stored in 'bouquets' file from Enigma 1
@@ -352,19 +343,20 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public IList<IBouquet> Bouquets
         {
-            get => _bouquets;
+            get;
             set
             {
                 value ??= new List<IBouquet>();
-                _bouquets = value;
+                field = value;
                 OnPropertyChanged(nameof(Bouquets));
             }
-        }
+        } = new List<IBouquet>();
+
         #endregion
 
         #region "Public methods"
         /// <summary>
-        ///     Numeric value of a frequency / symbol rate string for sorting (non numeric values sort last)
+        ///     Numeric value of a frequency / symbol rate string for sorting (non-numeric values sort last)
         /// </summary>
         private static long NumericValue(string value)
         {
@@ -498,7 +490,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void AddMissingXmlSatellites(IInstanceFactory factory, int frequencyToleration = 30000)
         {
-            ErrorBoundary.Run(Log, Resources.Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_AddMissingXMLSatellites_Failed_to_update_missing_XML_satellites, () =>
             {
                 var trans = FindTranspondersWithoutSatellite().ToList();
 
@@ -519,7 +511,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     if (position == 0)
                     {
-                        Log.Warn(Resources.Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_);
+                        Log.Warn(Resources.Resources.Settings_AddMissingXMLSatellites_WARNING__Some_transponders_are_market_as_satellite_but_have_invalid_position_0_degrees_);
                         continue;
                     }
 
@@ -534,7 +526,7 @@ namespace Krkadoni.EnigmaSettings
                         xmlSat.Name = "Sat " + xmlSat.PositionString;
                         Satellites.Add(xmlSat);
                         newSatellites.Add(xmlSat);
-                        Log.Warn(string.Format(Resources.Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites, position));
+                        Log.Warn(string.Format(Resources.Resources.Settings_AddMissingXMLSatellites_New_satellite_for_position__0__added_to_satellites, position));
                     }
 
                     foreach (var transponder in trans.Where(x => x.OrbitalPositionInt == position))
@@ -557,7 +549,7 @@ namespace Krkadoni.EnigmaSettings
 
                         var xmlTran = factory.InitNewXmlTransponder(tran);
                         tran.Satellite.Transponders.Add(xmlTran);
-                        Log.Warn(string.Format(Resources.Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing_satellite__1_, tran.TransponderId, newsat.PositionString));
+                        Log.Warn(string.Format(Resources.Resources.Settings_AddMissingXMLSatellites_Added_new_transponder__0__for_previously_missing_satellite__1_, tran.TransponderId, newsat.PositionString));
                     }
                 }
             });
@@ -588,7 +580,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void AddMissingXmlTranspondersSatellites(IInstanceFactory factory, int frequencyToleration = 30000)
         {
-            ErrorBoundary.Run(Log, Resources.Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_AddMissingXMLTransponders_Failed_to_update_missing_XML_transponders, () =>
             {
                 AddMissingXmlSatellites(factory, frequencyToleration);
                 Log.Debug("Adding missing xmlTransponders for transponders in settings file");
@@ -622,7 +614,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void MatchServicesWithTransponders()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_services_with_transponders, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_MatchServicesWithTransponders_There_was_an_error_while_trying_to_match_services_with_transponders, () =>
             {
                 Log.Debug("Matching services with transponders");
                 var query = Services.Join(Transponders, sr => sr.TransponderId, tr => tr.TransponderId, (sr, tr) => new { Transponder = tr, Service = sr });
@@ -641,7 +633,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     foreach (var srv in servc)
                     {
-                        Log.Warn(string.Format(Resources.Settings_MatchServicesWithTransponders_No_transponder_has_been_found_for_service__0_____1_, srv.ServiceId, srv.Name));
+                        Log.Warn(string.Format(Resources.Resources.Settings_MatchServicesWithTransponders_No_transponder_has_been_found_for_service__0_____1_, srv.ServiceId, srv.Name));
                     }
                 }
             });
@@ -654,7 +646,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void MatchSatellitesWithTransponders()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transponders_with_satellites_, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_MatchSatellitesWithTransponders_There_was_an_error_while_matching_transponders_with_satellites_, () =>
             {
                 if (Satellites.Count == 0)
                 {
@@ -678,7 +670,7 @@ namespace Krkadoni.EnigmaSettings
 
                 foreach (var tr in transDVBS.Where(x => x.Satellite == null).ToList())
                 {
-                    Log.Warn(string.Format(Resources.Settings_MatchSatellitesWithTransponders_No_satellite_has_been_found_for_transponder__0_, tr.TransponderId));
+                    Log.Warn(string.Format(Resources.Resources.Settings_MatchSatellitesWithTransponders_No_satellite_has_been_found_for_transponder__0_, tr.TransponderId));
                 }
             });
         }
@@ -690,7 +682,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void MatchFileBouquetsServices()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, () =>
             {
                 if (Bouquets.Count == 0)
                 {
@@ -699,7 +691,7 @@ namespace Krkadoni.EnigmaSettings
                 }
                 Log.Debug("Matching file bouquets services to services from settings");
 
-                IList<IBouquetItemService> bis = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemService>().Concat(Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemAlternative>().Where(a => a.Bouquet != null).SelectMany(a => a.Bouquet.BouquetItems).OfType<IBouquetItemService>()).ToList();
+                IList<IBouquetItemService> bis = [.. Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemService>(), .. Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemAlternative>().Where(a => a.Bouquet != null).SelectMany(a => a.Bouquet.BouquetItems).OfType<IBouquetItemService>()];
                 var query = bis.Join(Services, bs => bs.ServiceId, srv => srv.ServiceId, (bs, srv) => new
                 {
                     BouquetItem = bs,
@@ -727,7 +719,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     foreach (var nm in notMatched)
                     {
-                        Log.Warn(string.Format(Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
+                        Log.Warn(string.Format(Resources.Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
                     }
                 }
             });
@@ -740,7 +732,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void MatchBouquetsBouquetsServices()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_MatchBouquetServices_There_was_an_error_while_matching_bouquet_items_to_services, () =>
             {
                 Log.Debug("Matching services from Enigma1 bouquets file to services from settings");
 
@@ -789,7 +781,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     foreach (var nm in notMatched)
                     {
-                        Log.Warn(string.Format(Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
+                        Log.Warn(string.Format(Resources.Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
                     }
                 }
             });
@@ -802,7 +794,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void RenumberMarkers()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RenumberMarkers_There_was_an_error_while_renumbering_markers_, () =>
             {
                 Log.Debug("Renumbering marker numbers");
                 IList<IBouquetItemMarker> bim = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemMarker>().ToList();
@@ -820,12 +812,11 @@ namespace Krkadoni.EnigmaSettings
         /// <summary>
         ///     Renumbers file names for all file bouquets that have filename starting with 'userbouquet.dbe'
         /// </summary>
-        /// <remarks>Preserv
-        /// es path in filename if any is set</remarks>
+        /// <remarks>Preserves path in filename if any is set</remarks>
         /// <exception cref="SettingsException"></exception>
         public void RenumberBouquetFileNames()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_, () =>
             {
                 Log.Debug("Renumbering bouquets filenames");
                 IList<IFileBouquet> bqsTv = Bouquets.OfType<IFileBouquet>().Where(x =>
@@ -916,7 +907,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void RemoveEmptyMarkers(Func<IBouquetItemMarker, bool> preserveCondition)
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveDoubleMarkers_There_was_an_error_while_removing_double_markers, () =>
             {
                 Log.Debug("Removing empty markers");
 
@@ -971,7 +962,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void RemoveEmptyBouquets()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveEmptyBouquets_There_was_an_error_while_removing_empty_bouquets, () =>
             {
                 Log.Debug("Removing empty bouquets");
 
@@ -983,8 +974,9 @@ namespace Krkadoni.EnigmaSettings
 
                     foreach (var bouquet in AllServiceContainers())
                     {
+                        var empty1 = empty;
                         RemoveWhere(bouquet.BouquetItems,
-                            x => x is IBouquetItemFileBouquet { Bouquet: not null } fileBouquet && empty.Contains(fileBouquet.Bouquet),
+                            x => x is IBouquetItemFileBouquet { Bouquet: not null } fileBouquet && empty1.Contains(fileBouquet.Bouquet),
                             x => $"Removed reference to empty bouquet {((IBouquetItemFileBouquet)x).FileName} from bouquet {bouquet.Name}");
                     }
                 }
@@ -1018,7 +1010,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void RemoveStreams()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveStreams_There_was_an_error_while_removing_streams, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveStreams_There_was_an_error_while_removing_streams, () =>
             {
                 Log.Debug("Removing streams from bouquets");
 
@@ -1041,7 +1033,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(service);
 
-            ErrorBoundary.Run(Log, string.Format(Resources.Settings_RemoveService_There_was_an_error_while_removing_service__0_, service.Name), () =>
+            ErrorBoundary.Run(Log, string.Format(Resources.Resources.Settings_RemoveService_There_was_an_error_while_removing_service__0_, service.Name), () =>
             {
                 if (Log.IsDebugEnabled) Log.Debug($"Removing service {service.Name} from settings");
                 RemoveServicesCore([service]);
@@ -1059,7 +1051,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(srv);
 
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveServices_There_was_an_error_while_deleting_services, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveServices_There_was_an_error_while_deleting_services, () =>
             {
                 if (srv.Count == 0)
                     return;
@@ -1089,7 +1081,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(transponder);
 
-            ErrorBoundary.Run(Log, string.Format(Resources.Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_, transponder.TransponderId), () =>
+            ErrorBoundary.Run(Log, string.Format(Resources.Resources.Settings_RemoveTransponder_There_was_an_error_while_removing_transponder__0_, transponder.TransponderId), () =>
             {
                 if (Log.IsDebugEnabled) Log.Debug($"Removing transponder {transponder.TransponderId} from settings");
                 RemoveTranspondersCore([transponder]);
@@ -1108,7 +1100,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(trans);
 
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveTransponders_There_was_an_error_while_removing_transponders, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveTransponders_There_was_an_error_while_removing_transponders, () =>
             {
                 if (trans.Count == 0)
                     return;
@@ -1212,7 +1204,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(satellite);
 
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveSatellite_There_was_an_error_while_removing_satellite, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveSatellite_There_was_an_error_while_removing_satellite, () =>
             {
                 if (Log.IsDebugEnabled) Log.Debug($"Removing satellite {satellite.Name}");
                 IList<ITransponder> trans = Transponders.OfType<ITransponderDVBS>().Where(x => Equals(x.Satellite, satellite)).Select(x => (ITransponder)x).ToList();
@@ -1237,7 +1229,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void RemoveSatellite(int orbitalPosition)
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveSatellite_There_was_an_error_while_removing_satellite, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveSatellite_There_was_an_error_while_removing_satellite, () =>
             {
                 if (Log.IsDebugEnabled) Log.Debug($"Removing satellite position {orbitalPosition}");
                 IList<ITransponder> trans = Transponders.OfType<ITransponderDVBS>().Where(x => x.OrbitalPositionInt == orbitalPosition).Select(x => (ITransponder)x).ToList();
@@ -1280,7 +1272,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(cable);
 
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveCable_There_was_an_error_while_removing_cable, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveCable_There_was_an_error_while_removing_cable, () =>
             {
                 if (Log.IsDebugEnabled) Log.Debug($"Removing cable {cable.Name}");
 
@@ -1314,7 +1306,7 @@ namespace Krkadoni.EnigmaSettings
         /// <remarks>IBouquetItemMarker and IBouquetItemStream items are preserved</remarks>
         public void RemoveInvalidBouquetItems()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouquet_items, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_RemoveInvalidBouquetItems_There_was_an_error_while_removing_invalid_bouquet_items, () =>
             {
                 Log.Debug("Removing bouquet items without valid reference to service or another bouquet");
 
@@ -1343,7 +1335,7 @@ namespace Krkadoni.EnigmaSettings
         /// <exception cref="SettingsException"></exception>
         public void UpdateSatelliteTranspondersNameSpaces()
         {
-            ErrorBoundary.Run(Log, Resources.Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_namespaces_for_satellite_transponders_, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_UpdateSatelliteTranspondersNameSpaces_There_was_an_error_while_updating_namespaces_for_satellite_transponders_, () =>
             {
                 Log.Debug("Updating namespaces for satellite transponders");
                 IList<ITransponderDVBS> trans = Transponders.OfType<ITransponderDVBS>().Where(x => x.NameSpc != x.CalculatedNameSpace).ToList();
@@ -1368,7 +1360,7 @@ namespace Krkadoni.EnigmaSettings
         {
             ArgumentNullException.ThrowIfNull(satellite);
 
-            ErrorBoundary.Run(Log, Resources.Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position, () =>
+            ErrorBoundary.Run(Log, Resources.Resources.Settings_MoveSatellite_There_was_an_error_while_moving_satellite_to_a_new_position, () =>
             {
                 if (satellite.Position == newPosition.ToString(CultureInfo.InvariantCulture))
                     return;
@@ -1380,7 +1372,7 @@ namespace Krkadoni.EnigmaSettings
                     throw new SettingsException(
                         string.Format(
                             Resources
-                                .Settings_ChangeSatellitePosition_Cannot_change_position_for_satellite__1__to__2___0_There_is_already_satellite_on_this_position,
+                                .Resources.Settings_ChangeSatellitePosition_Cannot_change_position_for_satellite__1__to__2___0_There_is_already_satellite_on_this_position,
                             Environment.NewLine, satellite.Name, newPosition));
                 }
 

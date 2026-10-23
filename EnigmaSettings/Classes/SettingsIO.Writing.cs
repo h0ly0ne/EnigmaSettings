@@ -1,16 +1,12 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Krkadoni.EnigmaSettings.Interfaces;
 
@@ -53,7 +49,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 OnFileSaved(this, fi, false);
                 throw new SettingsException(
-                    string.Format(Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, Path.Combine(directory, fileName)), ex);
+                    string.Format(Resources.Resources.SettingsIO_Save_Failed_to_save_settings_to__0_, Path.Combine(directory, fileName)), ex);
             }
 
             if (lameDb5)
@@ -293,7 +289,7 @@ namespace Krkadoni.EnigmaSettings
             var sContent = new StringBuilder();
             if (service.Transponder == null && bLocalTransponderIsNull != true)
             {
-                Log.Warn(string.Format(Resources.SettingsIO_ServicesToString_Service__0__has_no_transponder_set__not_writing_it_to_settings_,
+                Log.Warn(string.Format(Resources.Resources.SettingsIO_ServicesToString_Service__0__has_no_transponder_set__not_writing_it_to_settings_,
                     service.ToString().Replace("\t", "  ")));
             }
             else
@@ -402,7 +398,7 @@ namespace Krkadoni.EnigmaSettings
             {
                 OnFileSaved(this, fileName, false);
                 throw new SettingsException(
-                    string.Format(Resources.SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_, bouquetName, fileName), ex);
+                    string.Format(Resources.Resources.SettingsIO_WriteTvBouquetsE2_Failed_to_write_bouquet__0__to__1_, bouquetName, fileName), ex);
             }
         }
 
@@ -490,7 +486,7 @@ namespace Krkadoni.EnigmaSettings
                         break;
 
                     default:
-                        Log.Warn(string.Format(Resources.SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_, bouquet.Name));
+                        Log.Warn(string.Format(Resources.Resources.SettingsIO_WriteBouquets_Skipping_unknown_bouquet_item_type_in_bouquet__0_, bouquet.Name));
                         break;
                 }
             }
@@ -514,7 +510,7 @@ namespace Krkadoni.EnigmaSettings
             }
             else if (enigma1 && bis.Service.Transponder is ITransponderDVBS { SystemType: not Enums.DVBSSystemType.DVBS })
             {
-                Log.Warn(string.Format(Resources.SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigma1__Not_writing_it_, bis.Service.Name, bouquet.Name));
+                Log.Warn(string.Format(Resources.Resources.SettingsIO_E1BouquetToString_Service__0__in_bouquet__1__is_not_supported_in_Enigma1__Not_writing_it_, bis.Service.Name, bouquet.Name));
                 return;
             }
 
@@ -671,7 +667,7 @@ namespace Krkadoni.EnigmaSettings
                     if (srv.Transponder == null)
                     {
                         Log.Warn(string.Format(
-                            Resources.SettingsIO_WriteBlackList_Service__0__has_no_matching_transponder__not_adding_it_to_blacklist_file, srv));
+                            Resources.Resources.SettingsIO_WriteBlackList_Service__0__has_no_matching_transponder__not_adding_it_to_blacklist_file, srv));
                     }
                     else
                     {
@@ -706,7 +702,7 @@ namespace Krkadoni.EnigmaSettings
                     if (srv.Transponder == null)
                     {
                         Log.Warn(string.Format(
-                            Resources.SettingsIO_WriteWhiteList_Service__0__has_no_matching_transponder__not_adding_it_to_whitelist_file, srv));
+                            Resources.Resources.SettingsIO_WriteWhiteList_Service__0__has_no_matching_transponder__not_adding_it_to_whitelist_file, srv));
                     }
                     else
                     {
@@ -779,7 +775,7 @@ namespace Krkadoni.EnigmaSettings
                                     Log.Warn(
                                         string.Format(
                                             Resources
-                                                .SettingsIO_WriteServicesLocked_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_services_locked,
+                                                .Resources.SettingsIO_WriteServicesLocked_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_services_locked,
                                             lbq.BouquetOrderNumber));
                                 }
                             }
@@ -808,7 +804,7 @@ namespace Krkadoni.EnigmaSettings
                         if (srv.Transponder == null)
                         {
                             Log.Warn(
-                                string.Format(Resources.SettingsIO_WriteServicesLocked_Service__0__has_no_transponder__not_adding_it_to_services_locked,
+                                string.Format(Resources.Resources.SettingsIO_WriteServicesLocked_Service__0__has_no_transponder__not_adding_it_to_services_locked,
                                     srv));
                         }
                         else
@@ -828,7 +824,7 @@ namespace Krkadoni.EnigmaSettings
             catch (Exception ex) when (ex is not SettingsException)
             {
                 throw new SettingsException(
-                    string.Format(Resources.SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_, directory), ex);
+                    string.Format(Resources.Resources.SettingsIO_WriteServicesLocked_Failed_to_write_services_locked_file_to__0_, directory), ex);
             }
         }
 
@@ -881,7 +877,7 @@ namespace Krkadoni.EnigmaSettings
                                             Log.Warn(
                                                 string.Format(
                                                     Resources
-                                                        .SettingsIO_WriteEnigma1Bouquets_Service__0__in_Enigma1_bouqet__0__has_no_matching_transponder__not_adding_it_to_bouquets_file_,
+                                                        .Resources.SettingsIO_WriteEnigma1Bouquets_Service__0__in_Enigma1_bouqet__0__has_no_matching_transponder__not_adding_it_to_bouquets_file_,
                                                     srv.Service, bbq.Bouquet.Name));
                                         }
                                     }
@@ -890,7 +886,7 @@ namespace Krkadoni.EnigmaSettings
                                         Log.Warn(
                                             string.Format(
                                                 Resources
-                                                    .SettingsIO_WriteEnigma1Bouquets_Service_reference__0__has_no_matching_service__not_adding_it_to_bouquet__1_,
+                                                    .Resources.SettingsIO_WriteEnigma1Bouquets_Service_reference__0__has_no_matching_service__not_adding_it_to_bouquet__1_,
                                                 srv.ServiceId, bbq.Bouquet.Name));
                                     }
                                 }
@@ -903,7 +899,7 @@ namespace Krkadoni.EnigmaSettings
                                 Log.Warn(
                                     string.Format(
                                         Resources
-                                            .SettingsIO_WriteEnigma1Bouquets_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_bouquets_file,
+                                            .Resources.SettingsIO_WriteEnigma1Bouquets_Reference_to_Enigma1_bouquet__0__has_no_matching_bouquet_set__not_adding_it_to_bouquets_file,
                                         bbq.BouquetOrderNumber));
                             }
                         }

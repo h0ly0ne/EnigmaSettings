@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Krkadoni.com - Released under The MIT License.
+// Copyright © 2013-2026 Krkadoni.com - Released under The MIT License.
 // Full license text can be found at http://opensource.org/licenses/MIT
 
 using System;
@@ -11,10 +11,6 @@ namespace Krkadoni.EnigmaSettings
     [DataContract]
     public class BouquetItemMarker : BouquetItem, IBouquetItemMarker
     {
-        private string _description = string.Empty;
-
-        private string _markerNumber = "0";
-
         #region "ICloneable"
         /// <summary>
         /// Performs Memberwise Clone on the object
@@ -61,19 +57,19 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string Description
         {
-            get => _description;
+            get;
             set
             {
-                if (value == _description) 
+                if (value == field)
                     return;
 
                 if (string.IsNullOrEmpty(value))
                     value = "-------------------------";
-                
-                _description = value.Trim();
+
+                field = value.Trim();
                 OnPropertyChanged(nameof(Description));
             }
-        }
+        } = string.Empty;
 
         /// <summary>
         ///     Sequential number of marker in total markers count through all bouquets
@@ -84,16 +80,16 @@ namespace Krkadoni.EnigmaSettings
         [DataMember]
         public string MarkerNumber
         {
-            get => _markerNumber;
+            get;
             set
             {
-                if (value == _markerNumber)
+                if (value == field)
                     return;
 
-                _markerNumber = value ?? "0";
+                field = value ?? "0";
                 OnPropertyChanged(nameof(MarkerNumber));
             }
-        }
+        } = "0";
 
         /// <summary>
         ///     Return line in format ready to be written to bouquet
