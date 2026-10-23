@@ -16,6 +16,12 @@
   `isInvisible` 512) instead of a fixed list of values, the flag is written back as read, and lines
   that still cannot be used are logged as warnings instead of disappearing.
 - Markers without description (e.g. spacers `1:832`) no longer get an empty `#DESCRIPTION` line.
+- `satellites.xml` and `cables.xml` raise the same file events as all other settings files
+  (`FileLoading` / `FileLoaded`, `FileSaving` / `FileSaved`); a `satellites.xml` / `cables.xml` that
+  cannot be read is reported as `FileLoaded(false)` in addition to the warning.
+- Enigma2 bouquet files (`bouquets.tv` / `.radio`, userbouquets, sub bouquets, alternatives) are
+  written with CRLF line endings like Enigma2 (`eBouquet::flushChanges`); lamedb, lists and Enigma1
+  files keep LF. Both are read either way.
 - **An empty `satellites.xml` / `cables.xml` was written when the list had no satellites / cables**
   (e.g. loaded without these files). Uploaded to the receiver it wipes its satellite list, so DVB-S
   tuning no longer works; it also made a second load + save differ from the first. The files are

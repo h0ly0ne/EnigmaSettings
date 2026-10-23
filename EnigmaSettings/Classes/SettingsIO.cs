@@ -372,16 +372,7 @@ namespace Krkadoni.EnigmaSettings
 
                     if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)))
                     {
-                        IList<IXmlSatellite> sats;
-                        try
-                        {
-                            sats = satellitesIO.LoadSatellitesFromFile(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName)).ToList();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Warn($"There was an error while reading {SatelliteXmlFileName} file.", ex);
-                            sats = new List<IXmlSatellite>();
-                        }
+                        IList<IXmlSatellite> sats = LoadXmlFile(Path.Combine(settings.SettingsDirectory, SatelliteXmlFileName), satellitesIO.LoadSatellitesFromFile);
 
                         foreach (var sat in sats)
                         {
@@ -394,16 +385,7 @@ namespace Krkadoni.EnigmaSettings
 
                     if (_fileHelper.Exists(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)))
                     {
-                        IList<IXmlCable> cabs;
-                        try
-                        {
-                            cabs = cablesIO.LoadCablesFromFile(Path.Combine(settings.SettingsDirectory, CablesXmlFileName)).ToList();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Warn($"There was an error while reading {CablesXmlFileName} file.", ex);
-                            cabs = new List<IXmlCable>();
-                        }
+                        IList<IXmlCable> cabs = LoadXmlFile(Path.Combine(settings.SettingsDirectory, CablesXmlFileName), cablesIO.LoadCablesFromFile);
 
                         foreach (var cab in cabs)
                         {
@@ -447,6 +429,45 @@ namespace Krkadoni.EnigmaSettings
             finally
             {
                 _bouquetReadContext = null;
+            }
+        }
+
+        /// <summary>
+        ///     Loads satellites.xml / cables.xml with the same file events as the other settings files; a broken file
+        ///     is reported as FileLoaded(false) and a warning, the settings are loaded without it
+        /// </summary>
+        private IList<T> LoadXmlFile<T>(string fileName, Func<string, IList<T>> load)
+        {
+            OnFileLoading(this, fileName);
+            try
+            {
+                IList<T> items = load(fileName).ToList();
+                OnFileLoaded(this, fileName, true);
+                return items;
+            }
+            catch (Exception ex)
+            {
+                OnFileLoaded(this, fileName, false);
+                Log.Warn($"There was an error while reading {Path.GetFileName(fileName)} file.", ex);
+                return new List<T>();
+            }
+        }
+
+        /// <summary>
+        ///     Saves satellites.xml / cables.xml with the same file events as the other settings files
+        /// </summary>
+        private void SaveXmlFile(string fileName, Action<string> save)
+        {
+            OnFileSaving(this, fileName);
+            try
+            {
+                save(fileName);
+                OnFileSaved(this, fileName, true);
+            }
+            catch
+            {
+                OnFileSaved(this, fileName, false);
+                throw;
             }
         }
 
@@ -577,12 +598,12 @@ namespace Krkadoni.EnigmaSettings
 
                     // an empty satellites.xml / cables.xml would wipe the satellite / cable list of the receiver
                     if (bLocalEnableSatellitesFile && settings.Satellites.Count > 0)
-                        xmlSatellitesIO.SaveSatellitesToFile(Path.Combine(folder, SatelliteXmlFileName), settings);
+                        SaveXmlFile(Path.Combine(folder, SatelliteXmlFileName), file => xmlSatellitesIO.SaveSatellitesToFile(file, settings));
                     else if (bLocalEnableSatellitesFile)
                         Log.Info($"No satellites, {SatelliteXmlFileName} not written");
 
                     if (bLocalEnableCablesFile && settings.Cables.Count > 0)
-                        xmlCablesIO.SaveCablesToFile(Path.Combine(folder, CablesXmlFileName), settings);
+                        SaveXmlFile(Path.Combine(folder, CablesXmlFileName), file => xmlCablesIO.SaveCablesToFile(file, settings));
                     else if (bLocalEnableCablesFile)
                         Log.Info($"No cables, {CablesXmlFileName} not written");
 

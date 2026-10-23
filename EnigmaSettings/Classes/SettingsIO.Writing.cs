@@ -374,6 +374,14 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
+        ///     Enigma2 writes bouquet files with CRLF line endings (eBouquet::flushChanges); it reads both
+        /// </summary>
+        protected static string WithEnigma2LineEndings(string content)
+        {
+            return content.Replace("\r\n", "\n").Replace("\n", "\r\n");
+        }
+
+        /// <summary>
         ///     Writes text to specified fileName
         /// </summary>
         /// <param name="fileName">Full path to file location od disk</param>
@@ -612,10 +620,10 @@ namespace Krkadoni.EnigmaSettings
                 }
 
                 if (!string.IsNullOrEmpty(fName))
-                    WriteBouquet(Path.Combine(directory, fName), E2BouquetToString(bouquet), bouquet.Name);
+                    WriteBouquet(Path.Combine(directory, fName), WithEnigma2LineEndings(E2BouquetToString(bouquet)), bouquet.Name);
             }
 
-            WriteBouquet(Path.Combine(directory, listFile), list.ToString(), listFile);
+            WriteBouquet(Path.Combine(directory, listFile), WithEnigma2LineEndings(list.ToString()), listFile);
         }
 
         /// <summary>
@@ -640,7 +648,7 @@ namespace Krkadoni.EnigmaSettings
                         continue;
 
                     string content = E2BouquetToString(alt.Bouquet);
-                    WriteBouquet(Path.Combine(directory, fName), content, alt.Bouquet.Name);
+                    WriteBouquet(Path.Combine(directory, fName), WithEnigma2LineEndings(content), alt.Bouquet.Name);
                     if (Log.IsDebugEnabled) Log.Debug($"Alternatives file {fName} written");
                 }
             }
