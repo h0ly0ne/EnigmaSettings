@@ -770,7 +770,7 @@ namespace Krkadoni.EnigmaSettings
                 bqt.FileName = BouquetsFile;
                 bqt.Name = BouquetsFile;
 
-                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
+                IFileBouquet existing = FindE1BouquetsBouquet(settings);
                 if (existing != null)
                 {
                     bqt = existing;
@@ -928,6 +928,7 @@ namespace Krkadoni.EnigmaSettings
             if (sLocked.Count == 0) return;
 
             //matching  services
+            var matched = new HashSet<IBouquetItemService>();
             try
             {
                 Log.Debug(!blackListed ? "Matching whitelisted services." : "Matching blacklisted services.");
@@ -950,7 +951,7 @@ namespace Krkadoni.EnigmaSettings
                         match.Service.ServiceSecurity = Enums.ServiceSecurity.WhiteListed;
                         if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as WHITELISTED");
                     }
-                    sLocked.Remove(match.LockedBouquetItem);
+                    matched.Add(match.LockedBouquetItem);
                 }
             }
             catch (Exception ex) when (ex is not SettingsException)
@@ -959,7 +960,7 @@ namespace Krkadoni.EnigmaSettings
             }
 
             //logging items that are not matched
-            foreach (IBouquetItemService bi in sLocked)
+            foreach (IBouquetItemService bi in sLocked.Where(x => !matched.Contains(x)))
             {
                 Log.Warn(string.Format(Resources.Resources.SettingsIO_ReadServicesLocked_Locked_bouquet_item__0__has_no_matching_service, bi.ServiceId));
             }
@@ -1042,7 +1043,8 @@ namespace Krkadoni.EnigmaSettings
             if (sLocked.Count == 0)
                 return;
 
-            IFileBouquet bouquets = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => x.BouquetType == Enums.BouquetType.E1Bouquets);
+            IFileBouquet bouquets = FindE1BouquetsBouquet(settings);
+            var matched = new HashSet<IBouquetItem>();
 
             //matching locked bouquets by order number
             try
@@ -1070,7 +1072,7 @@ namespace Krkadoni.EnigmaSettings
                             Log.Warn(string.Format(Resources.Resources.SettingsIO_ReadServicesLocked_Bouquet_item__0__has_no_matching_Enigma1_bouquet_,
                                 match.LockedBouquetItem.BouquetOrderNumber));
                         }
-                        sLocked.Remove(match.LockedBouquetItem);
+                        matched.Add(match.LockedBouquetItem);
                     }
                 }
                 else
@@ -1098,7 +1100,7 @@ namespace Krkadoni.EnigmaSettings
                 {
                     match.Service.ServiceSecurity = Enums.ServiceSecurity.BlackListed;
                     if (Log.IsDebugEnabled) Log.Debug($"Service {match.Service} has been marked as LOCKED");
-                    sLocked.Remove(match.LockedBouquetItem);
+                    matched.Add(match.LockedBouquetItem);
                 }
             }
             catch (Exception ex) when (ex is not SettingsException)
@@ -1107,7 +1109,7 @@ namespace Krkadoni.EnigmaSettings
             }
 
             //logging items that are not matched
-            foreach (IBouquetItem bi in sLocked)
+            foreach (IBouquetItem bi in sLocked.Where(x => !matched.Contains(x)))
             {
                 if (bi is IBouquetItemService service)
                 {

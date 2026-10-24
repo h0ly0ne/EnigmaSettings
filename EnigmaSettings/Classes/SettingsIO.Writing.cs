@@ -308,7 +308,7 @@ namespace Krkadoni.EnigmaSettings
 
                     //make sure provider name is not empty for Enigma1 settings
                     IList<IFlag> flagList = service.FlagList;
-                    IFlag pFlag = flagList.SingleOrDefault(x => x.FlagType == Enums.FlagType.P);
+                    IFlag pFlag = flagList.FirstOrDefault(x => x.FlagType == Enums.FlagType.P);
                     if (pFlag != null && pFlag.FlagValue.Length == 0)
                     {
                         pFlag.FlagValue = "unknown";
@@ -754,7 +754,7 @@ namespace Krkadoni.EnigmaSettings
                 var fContent = new StringBuilder();
                 fContent.Append("Parentallocked Services" + "\n");
 
-                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
+                IFileBouquet existing = FindE1BouquetsBouquet(settings);
                 if (existing != null)
                 {
                     if (existing.BouquetItems.Any())
@@ -849,7 +849,7 @@ namespace Krkadoni.EnigmaSettings
                 var fContent = new StringBuilder();
                 fContent.Append("eDVB bouquets /2/" + "\n" + "bouquets" + "\n");
 
-                IFileBouquet existing = settings.Bouquets.OfType<IFileBouquet>().SingleOrDefault(x => string.Equals(x.FileName, BouquetsFile, StringComparison.OrdinalIgnoreCase));
+                IFileBouquet existing = FindE1BouquetsBouquet(settings);
                 if (existing != null)
                 {
                     if (existing.BouquetItems.Any())

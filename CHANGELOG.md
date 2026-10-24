@@ -158,6 +158,13 @@
   (they were dropped before).
 - `CancelEdit` of `IFileBouquet` did not restore `IsSubBouquet`, and of `IXmlTransponder` not
   `Tsid` / `Onid`.
+- `MatchBouquetsBouquetsServices` failed with a `NullReferenceException` for an Enigma1 bouquet
+  reference without bouquet; such references are skipped (and reported when saving) like in the writer.
+- Two Enigma1 `bouquets` bouquets made loading `services.locked` and `MatchBouquetsBouquetsServices`
+  fail (`SingleOrDefault`); the first one is used with a warning.
+- Saving Enigma1 settings failed when a service had more than one provider (`p:`) flag.
+- `Service.TransponderId` threw a `NullReferenceException` when the service had neither a transponder
+  nor transponder data (e.g. after deserialization).
 
 ### Changed
 
@@ -209,6 +216,14 @@
   (new resource `BouquetsBouquet_Name_Bouquet_name_cannot_be_empty`) instead of a fixed string.
 - Copyright header `Copyright © 2013-2026 Krkadoni.com` in all source files; assembly title and
   product are `Krkadoni.EnigmaSettings`.
+- Matching `whitelist` / `blacklist` / `services.locked` entries to services tracks the matched
+  entries in a set instead of removing each one from a list (quadratic when the file order differs
+  from lamedb).
+- `RemoveEmptyMarkers` looks up the preserved markers in a set instead of a list.
+- `Service.TransponderId` is lower-cased once when the service is created instead of on every access.
+- `MatchFileBouquetsServices` / `MatchBouquetsBouquetsServices` share one matching method and only walk
+  the bouquets for debug output when debug logging is enabled.
+- `RenumberBouquetFileNames` uses one method for TV and radio bouquets.
 - Prefix / suffix checks use `StartsWith` / `EndsWith` with `OrdinalIgnoreCase` instead of
   upper-/lower-casing a copy of every line (reading 48 000 bouquet entries: 129 ms / 68 MB →
   112 ms / 59 MB).

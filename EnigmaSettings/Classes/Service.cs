@@ -116,7 +116,7 @@ namespace Krkadoni.EnigmaSettings
                 if (sData.Length >= 7)
                     SourceID = sData[6].Trim();
 
-                TransponderId = string.Join(":", sData[1], sData[2], sData[3]);
+                TransponderId = string.Join(":", sData[1], sData[2], sData[3]).ToLowerInvariant();
                 _TSID = sData[2];
                 _ONID = sData[3];
                 _nameSpace = sData[1];
@@ -376,7 +376,7 @@ namespace Krkadoni.EnigmaSettings
         /// </returns>
         /// <remarks></remarks>
         [DataMember]
-        public string TransponderId => Transponder == null ? field.ToLowerInvariant() : Transponder.TransponderId;
+        public string TransponderId => Transponder == null ? field : Transponder.TransponderId;
 
         [DataMember]
         public ITransponder Transponder

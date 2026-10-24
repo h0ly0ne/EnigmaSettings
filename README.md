@@ -13,7 +13,8 @@ It’s written in C# and targets .NET 10.
 Contributions and bugfixes are welcomed.
 
 - Additional info and support on http://www.krkadoni.com/.
-- Help file (.chm): http://www.krkadoni.com/EnigmaSettingsHelp.zip
+- Help file (.chm): http://www.krkadoni.com/EnigmaSettingsHelp.zip – describes an older version of the library;
+  for the current API see the XML documentation of the interfaces and [CHANGELOG.md](CHANGELOG.md).
 
 Main Features
 ==============
@@ -26,13 +27,13 @@ Main Features
 - It supports Enigma1, Enigma2 ver3, ver4 and ver5 (lamedb5) settings and automatic conversion between them.
 - Task based `LoadAsync` / `SaveAsync` methods for loading and saving on a background thread
 - Full interface based objective model
-- Every part of library can be replaced by custom code via custom instance factory (Inversion of Concerns)
-- Fully prepared for GUI data binding (IEditable and IPropertyChanged interfaces implemented)
+- Every part of library can be replaced by custom code via custom instance factory (Inversion of Control)
+- Fully prepared for GUI data binding (IEditableObject and INotifyPropertyChanged interfaces implemented)
 
 Examples
 ==============
 
-Too see library used in a real application check out SESE aplication available on https://github.com/shaxxx/SESE
+To see the library used in a real application check out the SESE application available on https://github.com/shaxxx/SESE
 
 ```C#
 // C#

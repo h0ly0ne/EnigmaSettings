@@ -740,6 +740,19 @@ namespace Krkadoni.EnigmaSettings
         }
 
         /// <summary>
+        ///     Returns the bouquet of the Enigma1 'bouquets' file, the first one with a warning when there are several
+        /// </summary>
+        private IFileBouquet FindE1BouquetsBouquet(ISettings settings)
+        {
+            var e1Bouquets = settings.Bouquets.OfType<IFileBouquet>().Where(x => x.BouquetType == Enums.BouquetType.E1Bouquets).Take(2).ToList();
+
+            if (e1Bouquets.Count > 1)
+                Log.Warn("More than one Enigma1 'bouquets' bouquet found, only the first one is used");
+
+            return e1Bouquets.FirstOrDefault();
+        }
+
+        /// <summary>
         ///     Writes text to specified file with specified encoding
         /// </summary>
         /// <param name="fileName">Full path to file on disk</param>

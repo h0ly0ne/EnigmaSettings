@@ -692,37 +692,39 @@ namespace Krkadoni.EnigmaSettings
                 Log.Debug("Matching file bouquets services to services from settings");
 
                 IList<IBouquetItemService> bis = [.. Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemService>(), .. Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemAlternative>().Where(a => a.Bouquet != null).SelectMany(a => a.Bouquet.BouquetItems).OfType<IBouquetItemService>()];
-                var query = bis.Join(Services, bs => bs.ServiceId, srv => srv.ServiceId, (bs, srv) => new
-                {
-                    BouquetItem = bs,
-                    Service = srv
-                }, StringComparer.OrdinalIgnoreCase);
-
-                foreach (var match in query.ToList())
-                {
-                    match.BouquetItem.Service = match.Service;
-                }
-
-                foreach (var bq in Bouquets)
-                {
-                    foreach (var bqis in bq.BouquetItems.OfType<IBouquetItemService>().ToList().Where(bqis => bqis.Service != null))
-                    {
-                        if (Log.IsDebugEnabled) Log.Debug($"Bouquet item {bqis.ServiceId} in file bouquet {bq.Name} matched to service {bqis.Service}");
-                    }
-                }
-
-                IList<IBouquetItemService> notMatched = bis.Where(x => x.Service == null).ToList();
-
-                if (notMatched.Count == 0)
-                    Log.Debug("All file bouquets services have corresponding service from settings");
-                else
-                {
-                    foreach (var nm in notMatched)
-                    {
-                        Log.Warn(string.Format(Resources.Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
-                    }
-                }
+                MatchBouquetItemsWithServices(bis, "All file bouquets services have corresponding service from settings");
             });
+        }
+
+        /// <summary>
+        ///     Links the bouquet items to the services with the same service id and warns the items without service
+        /// </summary>
+        private void MatchBouquetItemsWithServices(IList<IBouquetItemService> bis, string allMatchedMessage)
+        {
+            var query = bis.Join(Services, bs => bs.ServiceId, srv => srv.ServiceId, (bs, srv) => new
+            {
+                BouquetItem = bs,
+                Service = srv
+            }, StringComparer.OrdinalIgnoreCase);
+
+            bool debug = Log.IsDebugEnabled;
+
+            foreach (var match in query.ToList())
+            {
+                match.BouquetItem.Service = match.Service;
+                if (debug) Log.Debug($"Bouquet item {match.BouquetItem.ServiceId} matched to service {match.Service}");
+            }
+
+            bool allMatched = true;
+
+            foreach (var nm in bis.Where(x => x.Service == null))
+            {
+                allMatched = false;
+                Log.Warn(string.Format(Resources.Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
+            }
+
+            if (allMatched)
+                Log.Debug(allMatchedMessage);
         }
 
         /// <summary>
@@ -736,17 +738,23 @@ namespace Krkadoni.EnigmaSettings
             {
                 Log.Debug("Matching services from Enigma1 bouquets file to services from settings");
 
-                var bouquetsBouquet = Bouquets.SingleOrDefault(x => x.BouquetType == Enums.BouquetType.E1Bouquets);
+                var e1Bouquets = Bouquets.Where(x => x.BouquetType == Enums.BouquetType.E1Bouquets).Take(2).ToList();
 
-                if (bouquetsBouquet == null)
+                if (e1Bouquets.Count == 0)
                 {
                     Log.Debug("'bouquets' bouquet not found in the list of bouquets, skipping matching...");
                     return;
                 }
 
-                var a = bouquetsBouquet.BouquetItems.OfType<IBouquetItemBouquetsBouquet>();
-                var b = a.SelectMany(x => x.Bouquet.BouquetItems);
-                IList<IBouquetItemService> bis = b.OfType<IBouquetItemService>().ToList();
+                if (e1Bouquets.Count > 1)
+                    Log.Warn("More than one Enigma1 'bouquets' bouquet found, only the first one is used");
+
+                // references without bouquet are reported when saving
+                IList<IBouquetItemService> bis = e1Bouquets[0].BouquetItems.OfType<IBouquetItemBouquetsBouquet>()
+                    .Where(x => x.Bouquet != null)
+                    .SelectMany(x => x.Bouquet.BouquetItems)
+                    .OfType<IBouquetItemService>()
+                    .ToList();
 
                 if (bis.Count == 0)
                 {
@@ -754,36 +762,7 @@ namespace Krkadoni.EnigmaSettings
                     return;
                 }
 
-                var query = bis.Join(Services, bs => bs.ServiceId, srv => srv.ServiceId, (bs, srv) => new
-                {
-                    BouquetItem = bs,
-                    Service = srv
-                }, StringComparer.OrdinalIgnoreCase);
-
-                foreach (var match in query.ToList())
-                {
-                    match.BouquetItem.Service = match.Service;
-                }
-
-                foreach (var bq in bouquetsBouquet.BouquetItems.OfType<IBouquetItemBouquetsBouquet>().ToList())
-                {
-                    foreach (var bqis in bq.Bouquet.BouquetItems.OfType<IBouquetItemService>().ToList().Where(bqis => bqis.Service != null))
-                    {
-                        if (Log.IsDebugEnabled) Log.Debug($"Bouquet item {bqis.ServiceId} in Enigma1 bouquet {bq.Bouquet.Name} matched to service {bqis.Service}");
-                    }
-                }
-
-                IList<IBouquetItemService> notMatched = bis.Where(x => x.Service == null).ToList();
-
-                if (notMatched.Count == 0)
-                    Log.Debug("All services from Enigma1 bouquets file have corresponding service from settings");
-                else
-                {
-                    foreach (var nm in notMatched)
-                    {
-                        Log.Warn(string.Format(Resources.Resources.Settings_MatchBouquetServices_Bouquet_service__0__not_found_in_settings, nm.ServiceId));
-                    }
-                }
+                MatchBouquetItemsWithServices(bis, "All services from Enigma1 bouquets file have corresponding service from settings");
             });
         }
 
@@ -819,63 +798,37 @@ namespace Krkadoni.EnigmaSettings
             ErrorBoundary.Run(Log, Resources.Resources.Settings_RenumberBouquetFileNames_There_was_an_error_while_trying_to_renumber_bouquet_file_names_, () =>
             {
                 Log.Debug("Renumbering bouquets filenames");
-                IList<IFileBouquet> bqsTv = Bouquets.OfType<IFileBouquet>().Where(x =>
-                {
-                    var s = Path.GetFileName(x.FileName);
-                    return s != null && (x.BouquetType == Enums.BouquetType.UserBouquetTv && s.StartsWith("userbouquet.dbe", StringComparison.Ordinal));
-                }).ToList();
-                var index = 0;
-
-                foreach (var bouquet in bqsTv)
-                {
-                    var name = Path.GetFileName(bouquet.FileName);
-
-                    if (name != null && !name.StartsWith("userbouquet.dbe", StringComparison.Ordinal))
-                        continue;
-
-                    var fileName = string.Empty;
-
-                    if (bouquet.FileName.IndexOf('/') > -1)
-                        fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf('/') + 1);
-
-                    fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0') + ".tv";
-
-                    if (fileName != bouquet.FileName)
-                    {
-                        if (Log.IsDebugEnabled) Log.Debug($"Changed filename for bouquet {bouquet.Name} from {Path.GetFileName(bouquet.FileName)} to {Path.GetFileName(fileName)}");
-                        bouquet.FileName = fileName;
-                    }
-
-                    index += 1;
-                }
-
-                index = 0;
-                IList<IFileBouquet> bqsRadio = Bouquets.OfType<IFileBouquet>().Where(x =>
-                {
-                    var name = Path.GetFileName(x.FileName);
-                    return name != null && (x.BouquetType == Enums.BouquetType.UserBouquetRadio && name.StartsWith("userbouquet.dbe", StringComparison.Ordinal));
-                }).ToList();
-
-                foreach (var bouquet in bqsRadio)
-                {
-                    var fileName = string.Empty;
-
-                    if (bouquet.FileName.IndexOf('/') > -1)
-                        fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf('/') + 1);
-                    
-                    fileName = fileName + "userbouquet.dbe" + index.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0') + ".radio";
-
-                    if (fileName != bouquet.FileName)
-                    {
-                        if (Log.IsDebugEnabled) Log.Debug($"Changed filename for bouquet {bouquet.Name} from {Path.GetFileName(bouquet.FileName)} to {Path.GetFileName(fileName)}");
-                        bouquet.FileName = fileName;
-                    }
-
-                    index += 1;
-                }
-
+                RenumberBouquetFileNames(Enums.BouquetType.UserBouquetTv, ".tv");
+                RenumberBouquetFileNames(Enums.BouquetType.UserBouquetRadio, ".radio");
                 Log.Debug("Finished renumbering file names");
             });
+        }
+
+        /// <summary>
+        ///     Renames the 'userbouquet.dbe' bouquets of one type to userbouquet.dbe00, dbe01, ... in list order
+        /// </summary>
+        private void RenumberBouquetFileNames(Enums.BouquetType type, string extension)
+        {
+            IList<IFileBouquet> bouquets = Bouquets.OfType<IFileBouquet>().Where(x =>
+            {
+                var name = Path.GetFileName(x.FileName);
+                return name != null && x.BouquetType == type && name.StartsWith("userbouquet.dbe", StringComparison.Ordinal);
+            }).ToList();
+
+            for (var index = 0; index < bouquets.Count; index++)
+            {
+                var bouquet = bouquets[index];
+
+                // a path in the filename is preserved
+                var fileName = bouquet.FileName.Substring(0, bouquet.FileName.LastIndexOf('/') + 1)
+                               + "userbouquet.dbe" + index.ToString("00", CultureInfo.InvariantCulture) + extension;
+
+                if (fileName == bouquet.FileName)
+                    continue;
+
+                if (Log.IsDebugEnabled) Log.Debug($"Changed filename for bouquet {bouquet.Name} from {Path.GetFileName(bouquet.FileName)} to {Path.GetFileName(fileName)}");
+                bouquet.FileName = fileName;
+            }
         }
 
         /// <summary>
@@ -911,10 +864,10 @@ namespace Krkadoni.EnigmaSettings
             {
                 Log.Debug("Removing empty markers");
 
-                List<IBouquetItemMarker> preserveList = null;
+                HashSet<IBouquetItemMarker> preserveList = null;
 
                 if (preserveCondition != null)
-                    preserveList = Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemMarker>().Where(preserveCondition).ToList();
+                    preserveList = new HashSet<IBouquetItemMarker>(Bouquets.SelectMany(x => x.BouquetItems).OfType<IBouquetItemMarker>().Where(preserveCondition));
 
                 foreach (var bouquet in Bouquets.Where(bouquet => bouquet.BouquetItems.Count > 0))
                 {
